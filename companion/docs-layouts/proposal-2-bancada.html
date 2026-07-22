@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcana DataTable · Bancada — Proposta 02</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #101418;
+    --surface: #171d23;
+    --surface-2: #1b232b;
+    --border: #232b33;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #ffb224;
+    --on: #3fb950;
+    --tk-k: #ff7b72;
+    --tk-s: #a5d6ff;
+    --tk-p: #79c0ff;
+    --tk-c: #8b949e;
+    --font-ui: "Inter Tight", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  button { font-family: inherit; color: inherit; }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 54px;
+    padding: 0 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .brand-mark {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .brand .dim { color: var(--muted); font-weight: 500; }
+
+  .topbar-note {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+
+  .topbar-spacer { flex: 1; }
+
+  .fw-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .fw-toggle button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    cursor: pointer;
+  }
+
+  .fw-toggle button[aria-pressed="true"] {
+    background: var(--surface-2);
+    color: var(--accent);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  .btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #101418;
+  }
+
+  .btn-accent:hover { color: #101418; filter: brightness(1.06); }
+
+  /* ---------- Workbench grid ---------- */
+  .workbench {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr) 300px;
+  }
+
+  /* ---------- Left: features ---------- */
+  .features {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    overflow-y: auto;
+    padding: 12px 0 24px;
+  }
+
+  .panel-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    padding: 8px 16px;
+  }
+
+  .feature-btn {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-left: 2px solid transparent;
+    padding: 8px 14px;
+    color: var(--muted);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .12s ease, color .12s ease;
+  }
+
+  .feature-btn .idx {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    opacity: .6;
+  }
+
+  .feature-btn:hover { background: var(--surface-2); color: var(--text); }
+
+  .feature-btn[aria-current="true"] {
+    border-left-color: var(--accent);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .feature-btn[aria-current="true"] .idx { color: var(--accent); opacity: 1; }
+
+  .feature-select-wrap { display: none; padding: 12px 16px 4px; }
+
+  .feature-select-wrap select {
+    width: 100%;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  /* ---------- Center: preview ---------- */
+  .stage {
+    min-width: 0;
+    overflow-y: auto;
+    padding: 20px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .stage-head h1 {
+    margin: 0 0 4px;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .stage-head p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13.5px;
+    max-width: 64ch;
+  }
+
+  .stage-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 3px;
+    padding: 3px 8px;
+  }
+
+  .badge.badge-on { color: var(--on); border-color: rgba(63,185,80,.4); }
+  .badge.badge-accent { color: var(--accent); border-color: rgba(255,178,36,.4); }
+
+  /* ---------- Fake datatable ---------- */
+  .dt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .dt-scroll { overflow: auto; }
+
+  .sticky-on .dt-scroll { max-height: 264px; }
+
+  table.dt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 560px;
+  }
+
+  .dt thead th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .sticky-on .dt thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 1px 0 var(--border), 0 4px 8px rgba(0,0,0,.25);
+  }
+
+  .dt thead th.sortable { cursor: pointer; }
+  .dt thead th.sortable:hover { color: var(--text); }
+
+  .sort-ind {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 10px;
+    opacity: .45;
+  }
+
+  th.sorted .sort-ind { opacity: 1; color: var(--accent); }
+  th.sorted { color: var(--text); }
+
+  .dt tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .dt tbody tr { transition: background-color .1s ease; }
+  .dt tbody tr:hover { background: rgba(255,178,36,.045); }
+  .dt tbody tr.row-selected { background: rgba(255,178,36,.08); }
+  .dt tbody tr:last-child td { border-bottom: 0; }
+
+  .dt .col-check { width: 40px; padding-right: 4px; }
+
+  .dt input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .cell-name { font-weight: 600; }
+
+  .cell-email {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .cell-amount {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+
+  th.th-amount { text-align: right; }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .pill-ativo   { color: var(--on); border-color: rgba(63,185,80,.45); background: rgba(63,185,80,.09); }
+  .pill-analise { color: var(--accent); border-color: rgba(255,178,36,.45); background: rgba(255,178,36,.09); }
+  .pill-inativo { color: var(--muted); border-color: var(--border); background: rgba(139,152,165,.08); }
+
+  /* filter row */
+  .dt tr.filter-row th {
+    background: var(--surface);
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .sticky-on .dt tr.filter-row th { top: 37px; box-shadow: 0 1px 0 var(--border); }
+
+  .dt .filter-input, .dt .filter-select {
+    width: 100%;
+    min-width: 90px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .dt .filter-input::placeholder { color: var(--muted); opacity: .7; }
+
+  /* summarizer + footer */
+  .dt tfoot td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    font-weight: 600;
+  }
+
+  .dt tfoot .total-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+  }
+
+  .dt tfoot .total-value {
+    text-align: right;
+    font-family: var(--font-mono);
+    color: var(--accent);
+  }
+
+  .empty-cell {
+    text-align: center;
+    color: var(--muted);
+    padding: 44px 16px !important;
+    font-size: 13.5px;
+  }
+
+  .empty-cell .empty-icon {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 18px;
+    margin-bottom: 8px;
+    opacity: .5;
+  }
+
+  .dt-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .dt-footer .foot-spacer { flex: 1; }
+
+  .dt-footer .sel-chip { color: var(--accent); }
+
+  .dt-footer label { display: inline-flex; align-items: center; gap: 8px; }
+
+  .dt-footer select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    padding: 4px 6px;
+  }
+
+  .pager { display: inline-flex; align-items: center; gap: 8px; }
+
+  .pager button {
+    appearance: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    width: 26px;
+    height: 26px;
+    cursor: not-allowed;
+    opacity: .55;
+  }
+
+  /* ---------- Right: knobs ---------- */
+  .knobs {
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    overflow-y: auto;
+    padding: 12px 0 24px;
+  }
+
+  .knobs-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-right: 16px;
+  }
+
+  .knobs-reset {
+    appearance: none;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .knobs-reset:hover { color: var(--accent); }
+
+  .knob {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-left: 2px solid transparent;
+    transition: background-color .12s ease;
+  }
+
+  .knob + .knob { border-top: 1px solid rgba(35,43,51,.6); }
+
+  .knob.hl {
+    border-left-color: var(--accent);
+    background: rgba(255,178,36,.05);
+  }
+
+  .knob-meta { min-width: 0; }
+
+  .knob-name {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+  }
+
+  .knob.hl .knob-name { color: var(--accent); }
+
+  .knob-desc {
+    font-size: 11px;
+    color: var(--muted);
+    display: block;
+    margin-top: 1px;
+  }
+
+  .knob-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0 4px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  /* hardware-style switch */
+  .hw-switch {
+    appearance: none;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    margin: 0;
+    transition: border-color .12s ease, background-color .12s ease;
+  }
+
+  .hw-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 15px;
+    height: 14px;
+    background: var(--muted);
+    border-radius: 2px;
+    transition: transform .12s ease, background-color .12s ease;
+  }
+
+  .hw-switch:checked { border-color: rgba(63,185,80,.6); background: rgba(63,185,80,.12); }
+  .hw-switch:checked::after { transform: translateX(19px); background: var(--on); }
+
+  .knob-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    padding: 5px 8px;
+    max-width: 150px;
+  }
+
+  .knob-group-sep {
+    padding: 14px 16px 6px;
+  }
+
+  /* ---------- Code panel ---------- */
+  .codepanel {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .codebar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+  }
+
+  .codebar-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+  }
+
+  .codebar .code-fw {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--accent);
+    border: 1px solid rgba(255,178,36,.4);
+    border-radius: 3px;
+    padding: 2px 7px;
+  }
+
+  .codebar .live-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--on);
+  }
+
+  .live-dot::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--on);
+  }
+
+  .codebar-spacer { flex: 1; }
+
+  .code-toggle {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+
+  .code-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+  .codebody {
+    max-height: 240px;
+    overflow: auto;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .codepanel.collapsed .codebody { display: none; }
+
+  .codebody pre {
+    margin: 0;
+    padding: 16px 20px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .tk-k { color: var(--tk-k); }
+  .tk-s { color: var(--tk-s); }
+  .tk-p { color: var(--tk-p); }
+  .tk-c { color: var(--tk-c); font-style: italic; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 16px);
+    background: var(--surface-2);
+    border: 1px solid var(--on);
+    color: var(--on);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 9px 16px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s ease, transform .16s ease;
+    z-index: 60;
+  }
+
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- Proto switch ---------- */
+  .proto-switch {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 50;
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  }
+
+  .proto-switch a {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+  }
+
+  .proto-switch a:hover { color: var(--text); background: var(--surface-2); }
+
+  .proto-switch a[aria-current="page"] {
+    color: #101418;
+    background: var(--accent);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 980px) {
+    .app { height: auto; min-height: 100vh; }
+
+    .workbench {
+      grid-template-columns: 1fr;
+    }
+
+    .features {
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+      overflow: visible;
+      padding-bottom: 12px;
+    }
+
+    .feature-list, .features .panel-label { display: none; }
+    .feature-select-wrap { display: block; }
+
+    .stage { order: 1; overflow: visible; padding: 16px; }
+    .knobs { order: 2; border-left: 0; border-top: 1px solid var(--border); overflow: visible; }
+
+    .codebody { max-height: 320px; }
+  }
+
+  @media (max-width: 640px) {
+    .topbar { flex-wrap: wrap; height: auto; padding: 10px 12px; gap: 10px; }
+    .topbar-note { display: none; }
+    .stage-head h1 { font-size: 17px; }
+    .dt-footer { gap: 10px; }
+    .proto-switch { right: 8px; bottom: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ Topbar ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">A</span>
+      Arcana DataTable <span class="dim">· Bancada</span>
+    </div>
+    <span class="topbar-note">Protótipo de layout · Proposta 02 · Bancada</span>
+    <div class="topbar-spacer"></div>
+    <div class="fw-toggle" role="group" aria-label="Framework do código gerado">
+      <button type="button" id="fwReact" aria-pressed="true">React</button>
+      <button type="button" id="fwVue" aria-pressed="false">Vue</button>
+    </div>
+    <button type="button" class="btn btn-accent" id="copyBtn">Copiar config</button>
+  </header>
+
+  <!-- ============ Workbench ============ -->
+  <div class="workbench">
+
+    <!-- Left: features -->
+    <aside class="features" aria-label="Recursos">
+      <div class="panel-label">Recursos · 12</div>
+      <div class="feature-select-wrap">
+        <label class="panel-label" for="featureSelect" style="padding:0 0 6px; display:block;">Recurso</label>
+        <select id="featureSelect"></select>
+      </div>
+      <nav class="feature-list" id="featureList" aria-label="Lista de recursos"></nav>
+    </aside>
+
+    <!-- Center: preview -->
+    <main class="stage" id="stage">
+      <div class="stage-head">
+        <h1 id="stageTitle"></h1>
+        <p id="stageDesc"></p>
+        <div class="stage-badges" id="stageBadges"></div>
+      </div>
+
+      <div class="dt-card" id="dtCard">
+        <div class="dt-scroll">
+          <table class="dt" aria-label="Prévia da datatable">
+            <thead id="dtHead"></thead>
+            <tbody id="dtBody"></tbody>
+            <tfoot id="dtFoot"></tfoot>
+          </table>
+        </div>
+        <div class="dt-footer" id="dtFooter"></div>
+      </div>
+    </main>
+
+    <!-- Right: knobs -->
+    <aside class="knobs" aria-label="Configuração">
+      <div class="knobs-head">
+        <div class="panel-label">Config</div>
+        <button type="button" class="knobs-reset" id="resetKnobs">restaurar defaults</button>
+      </div>
+      <div id="knobPanel"></div>
+    </aside>
+  </div>
+
+  <!-- ============ Code panel ============ -->
+  <section class="codepanel" id="codePanel" aria-label="Código gerado">
+    <div class="codebar">
+      <span class="codebar-title">Código gerado</span>
+      <span class="code-fw" id="codeFwLabel">React · TSX</span>
+      <span class="live-dot">sincronizado com os knobs</span>
+      <span class="codebar-spacer"></span>
+      <button type="button" class="code-toggle" id="codeToggle" aria-expanded="true" aria-controls="codeBody">recolher ▾</button>
+    </div>
+    <div class="codebody" id="codeBody">
+      <pre><code id="codeOut"></code></pre>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status">Config copiada para a área de transferência</div>
+
+<nav class="proto-switch" aria-label="Trocar proposta">
+  <a href="index.html">Início</a>
+  <a href="proposal-1-manual.html">01</a>
+  <a href="proposal-2-bancada.html" aria-current="page">02</a>
+  <a href="proposal-3-trilha.html">03</a>
+  <a href="proposal-4-cookbook.html">04</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= Dados ================= */
+
+  var ROWS = [
+    { name: 'Ada Lovelace',      email: 'ada@arcana.dev',       department: 'Engenharia', status: 'Ativo',      amount: 4280 },
+    { name: 'Grace Hopper',      email: 'grace@arcana.dev',     department: 'Engenharia', status: 'Ativo',      amount: 1950 },
+    { name: 'Alan Turing',       email: 'alan@arcana.dev',      department: 'Pesquisa',   status: 'Em análise', amount: 8760 },
+    { name: 'Margaret Hamilton', email: 'margaret@arcana.dev',  department: 'Produto',    status: 'Ativo',      amount: 2340 },
+    { name: 'Edsger Dijkstra',   email: 'edsger@arcana.dev',    department: 'Pesquisa',   status: 'Inativo',    amount: 5150 },
+    { name: 'Katherine Johnson', email: 'katherine@arcana.dev', department: 'Produto',    status: 'Ativo',      amount: 3680 }
+  ];
+
+  var PILL_CLASS = { 'Ativo': 'pill-ativo', 'Em análise': 'pill-analise', 'Inativo': 'pill-inativo' };
+
+  function brl(n) {
+    return 'R$ ' + n.toLocaleString('pt-BR');
+  }
+
+  /* ================= Knobs ================= */
+
+  var DEFAULT_KNOBS = {
+    searchEnabled: true,
+    checkboxEnabled: false,
+    footerSummarizerEnabled: false,
+    stickyHeaderEnabled: false,
+    rowsPerPage: 6,
+    emptyState: false,
+    responsiveMode: 'HORIZONTAL_OVERFLOW'
+  };
+
+  // Defaults DA LIB (usados pra decidir o que entra no código gerado)
+  var LIB_DEFAULTS = {
+    searchEnabled: true,
+    checkboxEnabled: false,
+    footerSummarizerEnabled: false,
+    stickyHeaderEnabled: false,
+    rowsPerPage: 10
+  };
+
+  /* ================= Recursos (12) ================= */
+
+  var FEATURES = [
+    {
+      id: 'modos', label: 'Modos (remote/dataset)',
+      title: 'Modos: remote e dataset',
+      desc: 'A mesma config alimenta a tabela com um array em memória (dataset) ou com um endpoint paginado (remote). Nesta bancada o preview roda em modo dataset — os knobs à direita mexem no componente de verdade.',
+      knobs: {}, hl: []
+    },
+    {
+      id: 'colunas', label: 'Colunas e conteúdo',
+      title: 'Colunas e conteúdo',
+      desc: 'Cada coluna declara name, label e, opcionalmente, type (como CURRENCY) e textAlignment. Repare na coluna Valor: alinhada à direita e formatada — tudo saiu da config, sem CSS manual.',
+      knobs: {}, hl: []
+    },
+    {
+      id: 'paginacao', label: 'Paginação e estados',
+      title: 'Paginação e estados',
+      desc: 'Preset funcional: rowsPerPage caiu para 3 — o rodapé agora mostra "1–3 de 6". Ligue "Estado vazio" para ver a tabela sem registros, exatamente como a lib renderiza.',
+      knobs: { rowsPerPage: 3 }, hl: ['rowsPerPage', 'emptyState']
+    },
+    {
+      id: 'filtros', label: 'Filtros e valores iniciais',
+      title: 'Filtros e valores iniciais',
+      desc: 'Com searchEnabled, cada coluna ganha um campo de filtro sob o header. Digite no filtro de Nome do preview: a contagem do rodapé acompanha. Valores iniciais entram via initialFilters na config.',
+      knobs: {}, hl: ['searchEnabled']
+    },
+    {
+      id: 'busca', label: 'Tipos de busca',
+      title: 'Tipos de busca',
+      desc: 'Cada coluna escolhe seu searchType: texto livre, seleção (como o filtro de Status no preview), intervalo numérico ou data. Desligue searchEnabled para ver a linha de filtros sumir.',
+      knobs: {}, hl: ['searchEnabled']
+    },
+    {
+      id: 'ordenacao', label: 'Ordenação',
+      title: 'Ordenação',
+      desc: 'Headers clicáveis com indicador de direção. Experimente no preview: clique em Nome ou Valor. Em modo remote a lib envia sortBy/sortDirection na request; em dataset ela ordena localmente.',
+      knobs: {}, hl: []
+    },
+    {
+      id: 'selecao-multipla', label: 'Seleção múltipla',
+      title: 'Seleção múltipla',
+      desc: 'Preset funcional: checkboxEnabled ligado — a coluna de checkboxes apareceu no preview e no código gerado abaixo. Marque linhas para ver o contador de selecionadas no rodapé.',
+      knobs: { checkboxEnabled: true }, hl: ['checkboxEnabled']
+    },
+    {
+      id: 'selecao-unica', label: 'Seleção única',
+      title: 'Seleção única',
+      desc: 'Modo radio: uma linha por vez, via singleSelectionEnabled. Útil para pickers ("escolha o cliente"). A API de eventos é a mesma da seleção múltipla — o payload traz uma linha só.',
+      knobs: {}, hl: ['checkboxEnabled']
+    },
+    {
+      id: 'totais', label: 'Totais e sumarização',
+      title: 'Totais e sumarização',
+      desc: 'Preset funcional: footerSummarizerEnabled ligado — a linha de total (R$ 26.360) apareceu no pé da tabela. A coluna declara o summarizer (SUM, AVG ou função própria) e a lib cuida do resto.',
+      knobs: { footerSummarizerEnabled: true }, hl: ['footerSummarizerEnabled']
+    },
+    {
+      id: 'altura', label: 'Altura e responsividade',
+      title: 'Altura e responsividade',
+      desc: 'Preset funcional: stickyHeaderEnabled ligado — o corpo rola dentro de uma altura fixa e o header fica preso. responsiveMode decide o comportamento em telas estreitas: overflow horizontal ou cartões por registro.',
+      knobs: { stickyHeaderEnabled: true }, hl: ['stickyHeaderEnabled', 'responsiveMode']
+    },
+    {
+      id: 'acoes', label: 'Ações foco e eventos',
+      title: 'Ações, foco e eventos',
+      desc: 'A tabela emite row-click, selection-change, sort-change e filter-change. Ações por linha entram como coluna de tipo ACTIONS; o foco por teclado percorre células e ações na ordem visual.',
+      knobs: {}, hl: []
+    },
+    {
+      id: 'hooks', label: 'Hooks de renderização',
+      title: 'Hooks de renderização',
+      desc: 'Qualquer célula pode ser substituída por um slot (Vue) ou render prop (React) — as pills de Status do preview seriam um hook cellRenderer. O resto da tabela continua vindo da config.',
+      knobs: {}, hl: []
+    }
+  ];
+
+  /* ================= Estado ================= */
+
+  var LS_KEY = 'arcana-docs-framework';
+
+  var state = {
+    framework: (function () {
+      try {
+        var v = localStorage.getItem(LS_KEY);
+        return v === 'vue' ? 'vue' : 'react';
+      } catch (e) { return 'react'; }
+    })(),
+    featureId: 'modos',
+    knobs: Object.assign({}, DEFAULT_KNOBS),
+    sort: { col: 'name', dir: 'asc' },
+    nameFilter: '',
+    statusFilter: '',
+    selected: {}
+  };
+
+  /* ================= Utilidades DOM ================= */
+
+  function $(id) { return document.getElementById(id); }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function currentFeature() {
+    for (var i = 0; i < FEATURES.length; i++) {
+      if (FEATURES[i].id === state.featureId) return FEATURES[i];
+    }
+    return FEATURES[0];
+  }
+
+  /* ================= Lista de recursos ================= */
+
+  function renderFeatureList() {
+    var nav = $('featureList');
+    nav.innerHTML = '';
+    FEATURES.forEach(function (f, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'feature-btn';
+      b.setAttribute('aria-current', String(f.id === state.featureId));
+      b.innerHTML = '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span><span>' + esc(f.label) + '</span>';
+      b.addEventListener('click', function () { selectFeature(f.id); });
+      nav.appendChild(b);
+    });
+
+    var sel = $('featureSelect');
+    sel.innerHTML = '';
+    FEATURES.forEach(function (f, i) {
+      var o = document.createElement('option');
+      o.value = f.id;
+      o.textContent = String(i + 1).padStart(2, '0') + ' · ' + f.label;
+      sel.appendChild(o);
+    });
+    sel.value = state.featureId;
+  }
+
+  function selectFeature(id) {
+    state.featureId = id;
+    var f = currentFeature();
+    state.knobs = Object.assign({}, DEFAULT_KNOBS, f.knobs);
+    state.selected = {};
+    state.nameFilter = '';
+    state.statusFilter = '';
+    renderAll();
+  }
+
+  /* ================= Knobs ================= */
+
+  var KNOB_DEFS = [
+    { key: 'checkboxEnabled',        type: 'switch', label: 'checkboxEnabled',        desc: 'Coluna de seleção múltipla' },
+    { key: 'searchEnabled',          type: 'switch', label: 'searchEnabled',          desc: 'Linha de filtros sob o header' },
+    { key: 'footerSummarizerEnabled',type: 'switch', label: 'footerSummarizerEnabled',desc: 'Linha de total no pé da tabela' },
+    { key: 'stickyHeaderEnabled',    type: 'switch', label: 'stickyHeaderEnabled',    desc: 'Header preso com corpo rolável' },
+    { key: 'rowsPerPage',            type: 'select', label: 'rowsPerPage',            desc: 'Linhas por página', options: [3, 6] },
+    { key: 'responsiveMode',         type: 'select', label: 'responsiveMode',         desc: 'Comportamento em telas estreitas', options: ['HORIZONTAL_OVERFLOW', 'VERTICAL_RECORD'] },
+    { key: 'emptyState',             type: 'switch', label: 'Estado vazio',           desc: 'Simula dataset sem registros', preview: true }
+  ];
+
+  function renderKnobs() {
+    var panel = $('knobPanel');
+    var f = currentFeature();
+    panel.innerHTML = '';
+
+    KNOB_DEFS.forEach(function (def) {
+      var row = document.createElement('div');
+      row.className = 'knob' + (f.hl.indexOf(def.key) !== -1 ? ' hl' : '');
+
+      var meta = document.createElement('div');
+      meta.className = 'knob-meta';
+      meta.innerHTML =
+        '<span class="knob-name">' + esc(def.label) +
+        (def.preview ? '<span class="knob-tag">preview</span>' : '') +
+        '</span><span class="knob-desc">' + esc(def.desc) + '</span>';
+      row.appendChild(meta);
+
+      var ctrlId = 'knob-' + def.key;
+
+      if (def.type === 'switch') {
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.className = 'hw-switch';
+        input.id = ctrlId;
+        input.checked = !!state.knobs[def.key];
+        input.setAttribute('aria-label', def.label);
+        input.addEventListener('change', function () {
+          state.knobs[def.key] = input.checked;
+          renderPreview();
+          renderCode();
+        });
+        row.appendChild(input);
+      } else {
+        var select = document.createElement('select');
+        select.className = 'knob-select';
+        select.id = ctrlId;
+        select.setAttribute('aria-label', def.label);
+        def.options.forEach(function (opt) {
+          var o = document.createElement('option');
+          o.value = String(opt);
+          o.textContent = String(opt);
+          select.appendChild(o);
+        });
+        select.value = String(state.knobs[def.key]);
+        select.addEventListener('change', function () {
+          var v = select.value;
+          state.knobs[def.key] = (def.key === 'rowsPerPage') ? parseInt(v, 10) : v;
+          renderPreview();
+          renderCode();
+        });
+        row.appendChild(select);
+      }
+
+      panel.appendChild(row);
+    });
+  }
+
+  /* ================= Preview ================= */
+
+  function filteredRows() {
+    if (state.knobs.emptyState) return [];
+    var q = state.nameFilter.trim().toLowerCase();
+    return ROWS.filter(function (r) {
+      var okName = !q || r.name.toLowerCase().indexOf(q) !== -1 || r.email.toLowerCase().indexOf(q) !== -1;
+      var okStatus = !state.statusFilter || r.status === state.statusFilter;
+      return okName && okStatus;
+    });
+  }
+
+  function sortedRows(rows) {
+    var col = state.sort.col, dir = state.sort.dir === 'asc' ? 1 : -1;
+    return rows.slice().sort(function (a, b) {
+      var va = a[col], vb = b[col];
+      if (typeof va === 'string') return va.localeCompare(vb, 'pt-BR') * dir;
+      return (va - vb) * dir;
+    });
+  }
+
+  function renderPreview() {
+    var k = state.knobs;
+    var f = currentFeature();
+
+    // header do stage
+    $('stageTitle').textContent = f.title;
+    $('stageDesc').textContent = f.desc;
+
+    var badges = [];
+    badges.push('<span class="badge">mode: dataset</span>');
+    badges.push('<span class="badge' + (k.responsiveMode === 'VERTICAL_RECORD' ? ' badge-accent' : '') + '">responsiveMode: ' + k.responsiveMode + '</span>');
+    if (k.stickyHeaderEnabled) badges.push('<span class="badge badge-on">stickyHeader: on</span>');
+    if (k.checkboxEnabled) badges.push('<span class="badge badge-on">checkbox: on</span>');
+    if (k.footerSummarizerEnabled) badges.push('<span class="badge badge-on">summarizer: on</span>');
+    $('stageBadges').innerHTML = badges.join('');
+
+    $('dtCard').classList.toggle('sticky-on', k.stickyHeaderEnabled);
+
+    var rows = sortedRows(filteredRows());
+    var total = rows.length;
+    var visible = rows.slice(0, k.rowsPerPage);
+    var colCount = 4 + (k.checkboxEnabled ? 1 : 0);
+
+    /* ---- thead ---- */
+    var head = $('dtHead');
+    var h = '<tr>';
+    if (k.checkboxEnabled) {
+      var allChecked = visible.length > 0 && visible.every(function (r) { return state.selected[r.email]; });
+      h += '<th class="col-check"><input type="checkbox" id="checkAll" aria-label="Selecionar todas"' + (allChecked ? ' checked' : '') + '></th>';
+    }
+    h += sortableTh('name', 'Nome');
+    h += sortableTh('department', 'Área');
+    h += '<th>Status</th>';
+    h += sortableTh('amount', 'Valor', 'th-amount');
+    h += '</tr>';
+
+    if (k.searchEnabled) {
+      h += '<tr class="filter-row">';
+      if (k.checkboxEnabled) h += '<th class="col-check"></th>';
+      h += '<th><input class="filter-input" id="fltName" type="text" placeholder="Buscar…" value="' + esc(state.nameFilter) + '" aria-label="Filtrar por nome"></th>';
+      h += '<th></th>';
+      h += '<th><select class="filter-select" id="fltStatus" aria-label="Filtrar por status">' +
+        ['', 'Ativo', 'Em análise', 'Inativo'].map(function (s) {
+          return '<option value="' + esc(s) + '"' + (state.statusFilter === s ? ' selected' : '') + '>' + (s || 'Todos') + '</option>';
+        }).join('') + '</select></th>';
+      h += '<th></th>';
+      h += '</tr>';
+    }
+    head.innerHTML = h;
+
+    function sortableTh(col, label, extra) {
+      var sorted = state.sort.col === col;
+      var ind = sorted ? (state.sort.dir === 'asc' ? '▲' : '▼') : '⇅';
+      return '<th class="sortable ' + (extra || '') + (sorted ? ' sorted' : '') + '" data-sort="' + col + '" tabindex="0" role="button" aria-label="Ordenar por ' + label + '">' +
+        label + '<span class="sort-ind" aria-hidden="true">' + ind + '</span></th>';
+    }
+
+    /* ---- tbody ---- */
+    var body = $('dtBody');
+    if (visible.length === 0) {
+      body.innerHTML = '<tr><td class="empty-cell" colspan="' + colCount + '">' +
+        '<span class="empty-icon" aria-hidden="true">[ ]</span>Nenhum registro encontrado.</td></tr>';
+    } else {
+      body.innerHTML = visible.map(function (r) {
+        var sel = !!state.selected[r.email];
+        var tr = '<tr' + (sel ? ' class="row-selected"' : '') + '>';
+        if (k.checkboxEnabled) {
+          tr += '<td class="col-check"><input type="checkbox" class="row-check" data-row="' + esc(r.email) + '" aria-label="Selecionar ' + esc(r.name) + '"' + (sel ? ' checked' : '') + '></td>';
+        }
+        tr += '<td><span class="cell-name">' + esc(r.name) + '</span><span class="cell-email">' + esc(r.email) + '</span></td>';
+        tr += '<td>' + esc(r.department) + '</td>';
+        tr += '<td><span class="pill ' + PILL_CLASS[r.status] + '">' + esc(r.status) + '</span></td>';
+        tr += '<td class="cell-amount">' + brl(r.amount) + '</td>';
+        tr += '</tr>';
+        return tr;
+      }).join('');
+    }
+
+    /* ---- tfoot (summarizer) ---- */
+    var foot = $('dtFoot');
+    if (k.footerSummarizerEnabled && visible.length > 0) {
+      foot.innerHTML = '<tr>' +
+        (k.checkboxEnabled ? '<td class="col-check"></td>' : '') +
+        '<td class="total-label" colspan="3">Total (SUM · amount)</td>' +
+        '<td class="total-value">R$ 26.360</td></tr>';
+    } else {
+      foot.innerHTML = '';
+    }
+
+    /* ---- rodapé ---- */
+    var selCount = Object.keys(state.selected).filter(function (kk) { return state.selected[kk]; }).length;
+    var rangeText = total === 0 ? '0 de 0' : '1–' + Math.min(k.rowsPerPage, total) + ' de ' + total;
+
+    $('dtFooter').innerHTML =
+      '<span>' + total + ' registro' + (total === 1 ? '' : 's') + '</span>' +
+      (k.checkboxEnabled && selCount > 0 ? '<span class="sel-chip">' + selCount + ' selecionada' + (selCount === 1 ? '' : 's') + '</span>' : '') +
+      '<span class="foot-spacer"></span>' +
+      '<label>Linhas por página <select id="footRpp">' +
+        [3, 6].map(function (n) { return '<option value="' + n + '"' + (k.rowsPerPage === n ? ' selected' : '') + '>' + n + '</option>'; }).join('') +
+      '</select></label>' +
+      '<span class="pager"><button type="button" disabled aria-label="Página anterior">‹</button>' +
+      '<span>' + rangeText + '</span>' +
+      '<button type="button" disabled aria-label="Próxima página">›</button></span>';
+
+    bindPreviewEvents();
+  }
+
+  function bindPreviewEvents() {
+    // sort
+    Array.prototype.forEach.call(document.querySelectorAll('th.sortable'), function (th) {
+      function toggle() {
+        var col = th.getAttribute('data-sort');
+        if (state.sort.col === col) {
+          state.sort.dir = state.sort.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.sort = { col: col, dir: 'asc' };
+        }
+        renderPreview();
+      }
+      th.addEventListener('click', toggle);
+      th.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+
+    // filtros
+    var fltName = $('fltName');
+    if (fltName) {
+      fltName.addEventListener('input', function () {
+        state.nameFilter = fltName.value;
+        var pos = fltName.selectionStart;
+        renderPreview();
+        var again = $('fltName');
+        if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (e) {} }
+      });
+    }
+    var fltStatus = $('fltStatus');
+    if (fltStatus) {
+      fltStatus.addEventListener('change', function () {
+        state.statusFilter = fltStatus.value;
+        renderPreview();
+      });
+    }
+
+    // seleção
+    var checkAll = $('checkAll');
+    if (checkAll) {
+      checkAll.addEventListener('change', function () {
+        var rows = sortedRows(filteredRows()).slice(0, state.knobs.rowsPerPage);
+        rows.forEach(function (r) { state.selected[r.email] = checkAll.checked; });
+        renderPreview();
+      });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.row-check'), function (cb) {
+      cb.addEventListener('change', function () {
+        state.selected[cb.getAttribute('data-row')] = cb.checked;
+        renderPreview();
+      });
+    });
+
+    // rows per page (rodapé sincroniza com o knob)
+    var footRpp = $('footRpp');
+    if (footRpp) {
+      footRpp.addEventListener('change', function () {
+        state.knobs.rowsPerPage = parseInt(footRpp.value, 10);
+        renderKnobs();
+        renderPreview();
+        renderCode();
+      });
+    }
+  }
+
+  /* ================= Código gerado ================= */
+
+  function configSource() {
+    var k = state.knobs;
+    var lines = [];
+    lines.push("const config = {");
+    lines.push("  mode: 'dataset',");
+    lines.push(k.emptyState ? "  dataset: [], // estado vazio" : "  dataset: rows,");
+    lines.push("  columns: [");
+    lines.push("    { name: 'name', label: 'Nome' },");
+    lines.push("    { name: 'department', label: 'Área' },");
+    lines.push("    { name: 'status', label: 'Status' },");
+    lines.push("    { name: 'amount', label: 'Valor', type: 'CURRENCY', textAlignment: 'right' },");
+    lines.push("  ],");
+    if (k.searchEnabled !== LIB_DEFAULTS.searchEnabled) lines.push("  searchEnabled: " + k.searchEnabled + ",");
+    if (k.checkboxEnabled !== LIB_DEFAULTS.checkboxEnabled) lines.push("  checkboxEnabled: " + k.checkboxEnabled + ",");
+    if (k.footerSummarizerEnabled !== LIB_DEFAULTS.footerSummarizerEnabled) lines.push("  footerSummarizerEnabled: " + k.footerSummarizerEnabled + ",");
+    if (k.stickyHeaderEnabled !== LIB_DEFAULTS.stickyHeaderEnabled) lines.push("  stickyHeaderEnabled: " + k.stickyHeaderEnabled + ",");
+    if (k.rowsPerPage !== LIB_DEFAULTS.rowsPerPage) lines.push("  rowsPerPage: " + k.rowsPerPage + ",");
+    if (k.responsiveMode !== 'HORIZONTAL_OVERFLOW') lines.push("  responsiveMode: '" + k.responsiveMode + "',");
+    lines.push("}");
+    return lines.join("\n");
+  }
+
+  function rowsSource() {
+    return [
+      "const rows = [",
+      "  { name: 'Ada Lovelace', department: 'Engenharia', status: 'Ativo', amount: 4280 },",
+      "  // … +5 registros (Grace, Alan, Margaret, Edsger, Katherine)",
+      "]"
+    ].join("\n");
+  }
+
+  function generateCode() {
+    var cfg = configSource();
+    var rows = rowsSource();
+
+    if (state.framework === 'react') {
+      return [
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "",
+        rows,
+        "",
+        cfg,
+        "",
+        "export function Example() {",
+        "  return <ArcanaDataTable config={config} />",
+        "}"
+      ].join("\n");
+    }
+
+    return [
+      "<script setup lang=\"ts\">",
+      "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
+      "import '@arcanalabs/datatable/styles.css'",
+      "",
+      rows,
+      "",
+      cfg,
+      "<\/script>",
+      "",
+      "<template>",
+      "  <ArcanaDataTable :config=\"config\" />",
+      "</template>"
+    ].join("\n");
+  }
+
+  function highlight(src) {
+    var store = [];
+    function stash(html) {
+      store.push(html);
+      return '\x01' + (store.length - 1) + '\x01';
+    }
+
+    var code = esc(src);
+
+    // comentários
+    code = code.replace(/\/\/[^\n]*/g, function (m) {
+      return stash('<span class="tk-c">' + m + '</span>');
+    });
+
+    // strings (simples e duplas já escapadas como &quot;)
+    code = code.replace(/'[^'\n]*'/g, function (m) {
+      return stash('<span class="tk-s">' + m + '</span>');
+    });
+    code = code.replace(/&quot;[^\n]*?&quot;/g, function (m) {
+      return stash('<span class="tk-s">' + m + '</span>');
+    });
+
+    // keywords
+    code = code.replace(/\b(import|from|export|function|return|const|true|false|setup|lang)\b/g,
+      '<span class="tk-k">$1</span>');
+
+    // tags / componentes (&lt;Nome, &lt;/nome)
+    code = code.replace(/(&lt;\/?)([A-Za-z][\w-]*)/g,
+      '$1<span class="tk-p">$2</span>');
+
+    // props (identificador seguido de :)
+    code = code.replace(/(^|[\s{,])([A-Za-z_][\w]*)(\s*:)/gm,
+      '$1<span class="tk-p">$2</span>$3');
+
+    // restaura stashes
+    code = code.replace(/\x01(\d+)\x01/g, function (_, i) {
+      return store[parseInt(i, 10)];
+    });
+
+    return code;
+  }
+
+  function renderCode() {
+    var code = generateCode();
+    $('codeOut').innerHTML = highlight(code);
+    $('codeFwLabel').textContent = state.framework === 'react' ? 'React · TSX' : 'Vue · SFC';
+  }
+
+  /* ================= Framework toggle ================= */
+
+  function setFramework(fw) {
+    state.framework = fw;
+    try { localStorage.setItem(LS_KEY, fw); } catch (e) {}
+    $('fwReact').setAttribute('aria-pressed', String(fw === 'react'));
+    $('fwVue').setAttribute('aria-pressed', String(fw === 'vue'));
+    renderCode();
+  }
+
+  $('fwReact').addEventListener('click', function () { setFramework('react'); });
+  $('fwVue').addEventListener('click', function () { setFramework('vue'); });
+
+  /* ================= Copiar ================= */
+
+  var toastTimer = null;
+  function showToast() {
+    var t = $('toast');
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+
+  $('copyBtn').addEventListener('click', function () {
+    var code = generateCode();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(showToast, function () { fallbackCopy(code); });
+    } else {
+      fallbackCopy(code);
+    }
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ================= Painel de código colapsável ================= */
+
+  $('codeToggle').addEventListener('click', function () {
+    var panel = $('codePanel');
+    var collapsed = panel.classList.toggle('collapsed');
+    this.setAttribute('aria-expanded', String(!collapsed));
+    this.textContent = collapsed ? 'expandir ▴' : 'recolher ▾';
+  });
+
+  /* ================= Outros binds ================= */
+
+  $('featureSelect').addEventListener('change', function () {
+    selectFeature(this.value);
+  });
+
+  $('resetKnobs').addEventListener('click', function () {
+    state.knobs = Object.assign({}, DEFAULT_KNOBS);
+    state.selected = {};
+    state.nameFilter = '';
+    state.statusFilter = '';
+    renderKnobs();
+    renderPreview();
+    renderCode();
+  });
+
+  /* ================= Boot ================= */
+
+  function renderAll() {
+    renderFeatureList();
+    renderKnobs();
+    renderPreview();
+    renderCode();
+  }
+
+  setFramework(state.framework);
+  renderAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcana DataTable · Cookbook — Proposta 04</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --grid-line: #e3e6ea;
+    --surface: #ffffff;
+    --ink: #202124;
+    --ink-2: #5f6368;
+    --accent: #107c41;
+    --accent-soft: #e4f2ea;
+    --coord-bg: #fef7cd;
+    --coord-ink: #7a6410;
+    --code-bg: #1b1f23;
+    --code-ink: #e8eaed;
+    --radius: 4px;
+    --font-title: "Space Grotesk", sans-serif;
+    --font-body: "IBM Plex Sans", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 96px 32px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: #cfe9db; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ============ HEADER ============ */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--grid-line);
+    background: rgba(255,255,255,.82);
+    backdrop-filter: blur(6px);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .brand-mark {
+    width: 30px; height: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    flex: none;
+  }
+  .brand-mark span {
+    background: #d3d8dd;
+    border-radius: 2px;
+  }
+  .brand-mark span:first-child { background: var(--accent); }
+
+  .brand-name {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .brand-name em {
+    font-style: normal;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .brand-name em::before { content: "· "; color: #c3c8cd; }
+
+  .topbar-tag {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+    border: 1px solid var(--grid-line);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+
+  /* ============ HERO / BUSCA ============ */
+  .hero {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 8px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-family: var(--font-title);
+    font-size: clamp(28px, 4.4vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .hero h1 .fx { color: var(--accent); }
+
+  .hero p.sub {
+    margin-top: 10px;
+    color: var(--ink-2);
+    font-size: 15.5px;
+  }
+
+  .searchbox {
+    position: relative;
+    margin: 28px auto 0;
+    max-width: 640px;
+  }
+  .searchbox svg {
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-2);
+    pointer-events: none;
+  }
+  .searchbox input {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 16.5px;
+    color: var(--ink);
+    padding: 17px 64px 17px 50px;
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(32,33,36,.05);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .searchbox input::placeholder { color: #9aa0a6; }
+  .searchbox input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent) inset, 0 1px 2px rgba(32,33,36,.05);
+  }
+  .searchbox kbd {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    border: 1px solid var(--grid-line);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--bg);
+    padding: 2px 8px;
+  }
+
+  .facets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .chip {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--grid-line);
+    border-radius: 999px;
+    padding: 7px 15px;
+    cursor: pointer;
+    transition: color .12s ease, background .12s ease, border-color .12s ease;
+  }
+  .chip:hover { border-color: #c9cfd4; color: var(--ink); }
+  .chip[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .result-meta {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+
+  /* ============ PLANILHA DE RECEITAS ============ */
+  .sheet-wrap {
+    max-width: 1280px;
+    margin: 30px auto 0;
+    padding: 0 24px 40px;
+  }
+
+  .sheet {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    grid-template-rows: 22px 1fr;
+    gap: 6px;
+  }
+
+  .sheet-corner {
+    border: 1px solid var(--grid-line);
+    border-radius: 3px;
+    background: linear-gradient(135deg, transparent 55%, #d4d8dd 55%);
+    opacity: .7;
+  }
+
+  .ruler-cols {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+  .ruler-rows {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .ruler-cols span, .ruler-rows span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: #9aa0a6;
+    background: rgba(255,255,255,.65);
+    border: 1px solid var(--grid-line);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+  .ruler-rows span { writing-mode: horizontal-tb; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-auto-flow: column;
+    gap: 14px;
+  }
+
+  /* ---- Card = célula selecionável ---- */
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+    text-align: left;
+    font-family: var(--font-body);
+    background: var(--surface);
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(32,33,36,.04);
+    padding: 16px 14px 14px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: box-shadow .14s ease;
+  }
+  .card::before { /* borda de seleção estilo planilha */
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s ease;
+  }
+  .card::after { /* handle de arrastar, canto inferior direito */
+    content: "";
+    position: absolute;
+    right: -5px; bottom: -5px;
+    width: 9px; height: 9px;
+    background: var(--accent);
+    border: 1.5px solid #fff;
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity .12s ease;
+    pointer-events: none;
+  }
+  .card:hover, .card:focus-visible {
+    box-shadow: 0 3px 10px rgba(16,124,65,.12);
+  }
+  .card:hover::before, .card:focus-visible::before,
+  .card:hover::after, .card:focus-visible::after { opacity: 1; }
+  .card:focus-visible { outline: none; }
+
+  .coord {
+    position: absolute;
+    top: -1px; right: -1px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--coord-ink);
+    background: var(--coord-bg);
+    border: 1px solid #f0e5a8;
+    border-top-right-radius: var(--radius);
+    border-bottom-left-radius: var(--radius);
+    padding: 3px 7px;
+    line-height: 1;
+  }
+
+  .card h3 {
+    font-family: var(--font-title);
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    padding-right: 30px;
+  }
+  .card p {
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: auto;
+  }
+  .tags code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #0b5c30;
+    background: var(--accent-soft);
+    border: 1px solid #cbe5d7;
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+
+  /* ---- Mini-previews esquemáticos ---- */
+  .pv {
+    background: #fbfcfd;
+    border: 1px solid var(--grid-line);
+    border-radius: 3px;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 62px;
+    justify-content: center;
+  }
+  .pv-hd { height: 8px; border-radius: 2px; background: #d4d8dd; }
+  .pv-r  { height: 7px; border-radius: 2px; background: #e8eaed; }
+  .pv-r.hl, .pv-hd.hl, .pv-c.hl { background: var(--accent); }
+  .pv-row { display: flex; gap: 4px; align-items: center; }
+  .pv-c { flex: 1; height: 7px; border-radius: 2px; background: #e8eaed; }
+  .pv-c.w1 { flex: 2.4; } .pv-c.w2 { flex: 1.4; } .pv-c.w3 { flex: .8; }
+  .pv-cb {
+    width: 9px; height: 9px; flex: none;
+    border: 1.5px solid #c4c9cf; border-radius: 2px; background: #fff;
+  }
+  .pv-cb.on { background: var(--accent); border-color: var(--accent); }
+  .pv-rd { border-radius: 50%; }
+  .pv-rd.on { box-shadow: inset 0 0 0 2px #fff; }
+  .pv-dots { display: flex; gap: 4px; justify-content: center; padding-top: 2px; }
+  .pv-dot { width: 6px; height: 6px; border-radius: 50%; background: #d4d8dd; }
+  .pv-dot.hl { background: var(--accent); }
+  .pv-url {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 2px 8px;
+    line-height: 1.2;
+  }
+  .pv-cal {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+  .pv-cal i { display: block; height: 7px; border-radius: 2px; background: #e8eaed; }
+  .pv-cal i.hl { background: var(--accent); }
+  .pv-colwrap { display: flex; gap: 5px; height: 44px; }
+  .pv-col { flex: 1; border-radius: 2px; background: #e8eaed; }
+  .pv-col.off {
+    background: transparent;
+    border: 1.5px dashed #c4c9cf;
+  }
+  .pv-caret {
+    width: 0; height: 0; flex: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--accent);
+  }
+  .pv-list {
+    border: 1px solid var(--grid-line);
+    background: #fff;
+    border-radius: 3px;
+    padding: 4px;
+    display: flex; flex-direction: column; gap: 3px;
+    width: 58%;
+    align-self: flex-end;
+  }
+  .pv-list i { display: block; height: 5px; border-radius: 2px; background: #e8eaed; }
+  .pv-list i.hl { background: var(--accent); }
+  .pv-lockchip {
+    align-self: flex-start;
+    display: flex; align-items: center; gap: 5px;
+    border: 1px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px 8px;
+  }
+  .pv-lockchip b { display: block; width: 22px; height: 6px; border-radius: 2px; background: var(--accent); }
+  .pv-lock { position: relative; width: 9px; height: 7px; background: var(--accent); border-radius: 1.5px; margin-top: 4px; flex: none; }
+  .pv-lock::before {
+    content: ""; position: absolute;
+    top: -4px; left: 1.5px;
+    width: 6px; height: 5px;
+    border: 1.5px solid var(--accent);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+  }
+  .pv-scroll { display: flex; gap: 5px; }
+  .pv-scroll .rows { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .pv-track { width: 4px; border-radius: 2px; background: #eceef1; position: relative; }
+  .pv-thumb { position: absolute; top: 30%; left: 0; right: 0; height: 40%; border-radius: 2px; background: var(--accent); }
+  .pv-menu { display: flex; flex-direction: column; gap: 2px; margin-left: 3px; flex: none; }
+  .pv-menu i { width: 3px; height: 3px; border-radius: 50%; background: var(--accent); display: block; }
+  .pv-cells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .pv-cells i { display: block; height: 12px; border-radius: 2px; background: #e8eaed; }
+  .pv-cells i.hl { background: var(--accent); }
+  .pv-foot {
+    height: 10px; border-radius: 2px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+  }
+
+  /* ---- Estado vazio ---- */
+  .empty {
+    display: none;
+    text-align: center;
+    padding: 64px 20px;
+    background: var(--surface);
+    border: 1px dashed #c9cfd4;
+    border-radius: var(--radius);
+  }
+  .empty.show { display: block; }
+  .empty .coord-ghost {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--coord-ink);
+    background: var(--coord-bg);
+    border: 1px solid #f0e5a8;
+    border-radius: 3px;
+    padding: 3px 8px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+  .empty p { font-size: 15px; color: var(--ink); font-weight: 500; }
+  .empty small { display: block; margin-top: 4px; color: var(--ink-2); font-size: 13px; }
+  .empty button {
+    margin-top: 18px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 9px 18px;
+    cursor: pointer;
+  }
+  .empty button:hover { background: #0d6b38; }
+
+  /* ============ RODAPÉ ============ */
+  .footer {
+    border-top: 1px solid var(--grid-line);
+    background: var(--surface);
+    padding: 30px 28px 88px;
+    text-align: center;
+  }
+  .footer a.ref {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1.5px solid transparent;
+    transition: border-color .12s ease;
+  }
+  .footer a.ref:hover { border-bottom-color: var(--accent); }
+  .footer .note {
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #9aa0a6;
+  }
+
+  /* ============ DRAWER ============ */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(32,33,36,.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease;
+    z-index: 90;
+  }
+  .backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: min(560px, 100vw);
+    background: var(--surface);
+    border-left: 1px solid var(--grid-line);
+    box-shadow: -12px 0 32px rgba(32,33,36,.14);
+    transform: translateX(102%);
+    transition: transform .22s ease;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-head {
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--grid-line);
+    padding: 18px 22px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    z-index: 2;
+  }
+  .drawer-head .coord-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--coord-ink);
+    background: var(--coord-bg);
+    border: 1px solid #f0e5a8;
+    border-radius: 3px;
+    padding: 4px 8px;
+    line-height: 1;
+    flex: none;
+    margin-top: 3px;
+  }
+  .drawer-head h2 {
+    font-family: var(--font-title);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    flex: 1;
+  }
+  .drawer-close {
+    flex: none;
+    width: 32px; height: 32px;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius);
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .drawer-close:hover { color: var(--ink); border-color: #c9cfd4; }
+
+  .drawer-body { padding: 18px 22px 28px; }
+  .drawer-desc { color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+
+  .drawer-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+  .drawer-tags code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #0b5c30;
+    background: var(--accent-soft);
+    border: 1px solid #cbe5d7;
+    border-radius: 3px;
+    padding: 2px 7px;
+  }
+
+  .drawer-section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin: 24px 0 10px;
+  }
+
+  .generic-note {
+    margin-top: 14px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--coord-ink);
+    background: var(--coord-bg);
+    border: 1px solid #f0e5a8;
+    border-radius: var(--radius);
+    padding: 9px 12px;
+  }
+
+  /* demo table fake */
+  .demo-table {
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 13px;
+  }
+  .demo-table table { width: 100%; border-collapse: collapse; }
+  .demo-table th {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    background: #fafbfc;
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--grid-line);
+  }
+  .demo-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef0f2;
+    color: var(--ink);
+  }
+  .demo-table tr:last-child td { border-bottom: none; }
+  .demo-table th.num, .demo-table td.num {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  .demo-table tr.checked td { background: #f2f9f5; }
+  .demo-table .cbcell { width: 34px; padding-right: 0; }
+  .cb {
+    display: inline-block;
+    width: 15px; height: 15px;
+    border: 1.5px solid #c4c9cf;
+    border-radius: 3px;
+    background: #fff;
+    position: relative;
+    vertical-align: middle;
+  }
+  .cb.on { background: var(--accent); border-color: var(--accent); }
+  .cb.on::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 1px;
+    width: 4px; height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(42deg);
+  }
+  .pill {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 3px 10px;
+    line-height: 1.3;
+  }
+  .pill.ok   { color: #0b5c30; background: var(--accent-soft); }
+  .pill.warn { color: #8a6d00; background: var(--coord-bg); }
+  .demo-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    background: #fafbfc;
+    border-top: 1px solid var(--grid-line);
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .demo-foot strong { color: var(--accent); font-family: var(--font-mono); font-size: 12.5px; }
+  .demo-foot .pager { display: flex; gap: 4px; }
+  .demo-foot .pager i {
+    width: 20px; height: 20px;
+    display: grid; place-items: center;
+    border: 1px solid var(--grid-line);
+    border-radius: 3px;
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: #fff;
+  }
+  .demo-foot .pager i.cur { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* framework toggle + code */
+  .code-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  .fw-toggle {
+    display: inline-flex;
+    border: 1px solid var(--grid-line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .fw-toggle button {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-2);
+    background: transparent;
+    border: none;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  .fw-toggle button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .codeblock {
+    margin-top: 10px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--code-bg);
+    border: 1px solid #10141a;
+  }
+  .codeblock-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #23282e;
+    border-bottom: 1px solid #10141a;
+  }
+  .codeblock-head .fname {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: #aab2ba;
+  }
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--code-ink);
+    background: transparent;
+    border: 1px solid #3a4149;
+    border-radius: 3px;
+    padding: 4px 11px;
+    cursor: pointer;
+    transition: border-color .12s ease, color .12s ease;
+  }
+  .copy-btn:hover { border-color: #5a636c; }
+  .copy-btn.done { color: #7ee2a8; border-color: #2f6b48; }
+  .codeblock pre {
+    margin: 0;
+    padding: 16px 16px 18px;
+    overflow-x: auto;
+  }
+  .codeblock code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.62;
+    color: var(--code-ink);
+    white-space: pre;
+  }
+
+  /* ============ PROTO SWITCH ============ */
+  .proto-switch {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--grid-line);
+    border-radius: 999px;
+    padding: 4px;
+    box-shadow: 0 2px 10px rgba(32,33,36,.1);
+  }
+  .proto-switch a {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 999px;
+    transition: color .12s ease, background .12s ease;
+  }
+  .proto-switch a:hover { color: var(--ink); background: var(--bg); }
+  .proto-switch a[aria-current="page"] {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* ============ RESPONSIVO ============ */
+  @media (max-width: 1150px) {
+    .sheet { display: block; }
+    .sheet-corner, .ruler-cols, .ruler-rows { display: none; }
+    .grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-rows: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .topbar { padding: 14px 16px; }
+    .topbar-tag { display: none; }
+    .hero { padding-top: 36px; }
+    .sheet-wrap { padding: 0 14px 32px; }
+    .grid { grid-template-columns: 1fr; }
+    .drawer { width: 100vw; border-left: none; }
+    .searchbox kbd { display: none; }
+    .searchbox input { padding-right: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
+    }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#">
+    <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+    <span class="brand-name">Arcana DataTable <em>Cookbook</em></span>
+  </a>
+  <span class="topbar-tag">v3.2 · Vue 3 + React · TypeScript</span>
+</header>
+
+<section class="hero">
+  <h1>Encontre a receita.<br><span class="fx">Copie. Adapte.</span></h1>
+  <p class="sub">Um catálogo de receitas prontas para a datatable typed do seu stack — sem narrativa, sem rodeio.</p>
+
+  <div class="searchbox">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.8-3.8"></path>
+    </svg>
+    <input id="search" type="search" placeholder="O que você quer fazer? Ex.: paginação, checkbox, filtro de data…" aria-label="Buscar receitas" autocomplete="off">
+    <kbd aria-hidden="true">/</kbd>
+  </div>
+
+  <div class="facets" role="group" aria-label="Filtrar por categoria">
+    <button class="chip" data-facet="all" aria-pressed="true">Todos</button>
+    <button class="chip" data-facet="dados" aria-pressed="false">Dados</button>
+    <button class="chip" data-facet="colunas" aria-pressed="false">Colunas</button>
+    <button class="chip" data-facet="filtros" aria-pressed="false">Filtros</button>
+    <button class="chip" data-facet="selecao" aria-pressed="false">Seleção</button>
+    <button class="chip" data-facet="layout" aria-pressed="false">Layout</button>
+    <button class="chip" data-facet="eventos" aria-pressed="false">Eventos</button>
+  </div>
+
+  <p class="result-meta" id="result-meta" aria-live="polite">14 receitas no catálogo</p>
+</section>
+
+<main class="sheet-wrap">
+  <div class="sheet">
+    <div class="sheet-corner" aria-hidden="true"></div>
+    <div class="ruler-cols" aria-hidden="true">
+      <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+    </div>
+    <div class="ruler-rows" aria-hidden="true">
+      <span>1</span><span>2</span><span>3</span>
+    </div>
+
+    <div class="grid" id="grid">
+
+      <!-- Coluna A · Dados -->
+      <button class="card" data-id="a1" data-cat="dados" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">A1</span>
+        <h3>Tabela local em 10 linhas</h3>
+        <p>Monte uma tabela a partir de um array em memória, sem servidor.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-hd"></div>
+          <div class="pv-r hl"></div>
+          <div class="pv-r"></div>
+          <div class="pv-r"></div>
+        </div>
+        <div class="tags"><code>mode: dataset</code><code>dataset</code><code>columns</code></div>
+      </button>
+
+      <button class="card" data-id="a2" data-cat="dados" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">A2</span>
+        <h3>Paginação vinda do servidor</h3>
+        <p>Delegue paginação, ordenação e filtros ao seu backend.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-hd"></div>
+          <div class="pv-r"></div>
+          <div class="pv-r"></div>
+          <div class="pv-dots"><span class="pv-dot hl"></span><span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-dot"></span></div>
+        </div>
+        <div class="tags"><code>mode: remote</code><code>datasource</code><code>{ rows, total, page }</code></div>
+      </button>
+
+      <button class="card" data-id="a3" data-cat="dados" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">A3</span>
+        <h3>Endpoint direto por URL</h3>
+        <p>Aponte a tabela para uma URL e deixe o fetch por nossa conta.</p>
+        <div class="pv" aria-hidden="true">
+          <span class="pv-url">GET /api/orders</span>
+          <div class="pv-r"></div>
+          <div class="pv-r"></div>
+        </div>
+        <div class="tags"><code>url</code><code>sendRequestOnMounted</code></div>
+      </button>
+
+      <!-- Coluna B · Colunas -->
+      <button class="card" data-id="b1" data-cat="colunas" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">B1</span>
+        <h3>Colunas com largura e alinhamento</h3>
+        <p>Controle largura, alinhamento e mínimo por coluna.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-row"><span class="pv-c w1 hl"></span><span class="pv-c w2"></span><span class="pv-c w3"></span></div>
+          <div class="pv-row"><span class="pv-c w1"></span><span class="pv-c w2"></span><span class="pv-c w3"></span></div>
+          <div class="pv-row"><span class="pv-c w1"></span><span class="pv-c w2"></span><span class="pv-c w3"></span></div>
+        </div>
+        <div class="tags"><code>width</code><code>textAlignment</code><code>cellMinWidth</code></div>
+      </button>
+
+      <button class="card" data-id="b2" data-cat="colunas" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">B2</span>
+        <h3>Renderizar célula customizada</h3>
+        <p>Formate o conteúdo da célula e do cabeçalho com funções.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-cells"><i></i><i></i><i></i><i></i><i class="hl"></i><i></i></div>
+        </div>
+        <div class="tags"><code>valueGetter</code><code>headerContentGetter</code></div>
+      </button>
+
+      <button class="card" data-id="b3" data-cat="colunas" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">B3</span>
+        <h3>Coluna visível por permissão</h3>
+        <p>Mostre ou esconda colunas conforme o papel do usuário.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-colwrap"><span class="pv-col"></span><span class="pv-col off"></span><span class="pv-col"></span></div>
+        </div>
+        <div class="tags"><code>isVisible</code></div>
+      </button>
+
+      <!-- Coluna C · Filtros -->
+      <button class="card" data-id="c1" data-cat="filtros" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">C1</span>
+        <h3>Filtro por coluna com lista</h3>
+        <p>Ofereça um dropdown de opções no filtro da coluna.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-row"><span class="pv-c"></span><span class="pv-c hl"></span><span class="pv-caret"></span></div>
+          <div class="pv-list"><i></i><i class="hl"></i><i></i></div>
+        </div>
+        <div class="tags"><code>searchType: LIST</code><code>searchConfig</code></div>
+      </button>
+
+      <button class="card" data-id="c2" data-cat="filtros" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">C2</span>
+        <h3>Filtros de data e período</h3>
+        <p>Filtre por dia, mês ou intervalo de datas.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-cal">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i class="hl"></i><i class="hl"></i><i class="hl"></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+        <div class="tags"><code>DATE</code><code>DATE_MONTH</code><code>DATE_RANGE</code></div>
+      </button>
+
+      <button class="card" data-id="c3" data-cat="filtros" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">C3</span>
+        <h3>Filtro inicial travado</h3>
+        <p>Aplique filtros na carga e impeça o usuário de alterá-los.</p>
+        <div class="pv" aria-hidden="true">
+          <span class="pv-lockchip"><span class="pv-lock"></span><b></b></span>
+          <div class="pv-r"></div>
+          <div class="pv-r"></div>
+        </div>
+        <div class="tags"><code>initialFilters</code><code>disableFilterWhenPresentOnInitialFilters</code></div>
+      </button>
+
+      <!-- Coluna D · Seleção -->
+      <button class="card" data-id="d1" data-cat="selecao" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">D1</span>
+        <h3>Seleção múltipla com eventos</h3>
+        <p>Habilite checkboxes e reaja a cada linha marcada.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-row"><span class="pv-cb on"></span><span class="pv-c"></span></div>
+          <div class="pv-row"><span class="pv-cb on"></span><span class="pv-c"></span></div>
+          <div class="pv-row"><span class="pv-cb"></span><span class="pv-c"></span></div>
+        </div>
+        <div class="tags"><code>checkboxEnabled</code><code>onRowChecked</code></div>
+      </button>
+
+      <button class="card" data-id="d2" data-cat="selecao" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">D2</span>
+        <h3>Seleção única (radio)</h3>
+        <p>Restrinja a seleção a uma única linha por vez.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-row"><span class="pv-cb pv-rd"></span><span class="pv-c"></span></div>
+          <div class="pv-row"><span class="pv-cb pv-rd on"></span><span class="pv-c"></span></div>
+          <div class="pv-row"><span class="pv-cb pv-rd"></span><span class="pv-c"></span></div>
+        </div>
+        <div class="tags"><code>radioButtonSelectionEnabled</code><code>uniqueKeyIdentifier</code></div>
+      </button>
+
+      <button class="card" data-id="d3" data-cat="selecao" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">D3</span>
+        <h3>Total dos selecionados no rodapé</h3>
+        <p>Some valores das linhas marcadas direto no rodapé.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-row"><span class="pv-cb on"></span><span class="pv-c"></span></div>
+          <div class="pv-row"><span class="pv-cb on"></span><span class="pv-c"></span></div>
+          <div class="pv-foot"></div>
+        </div>
+        <div class="tags"><code>footerSummarizerEnabled</code><code>summarizeOnlyChecked</code></div>
+      </button>
+
+      <!-- Coluna E · Layout / Eventos -->
+      <button class="card" data-id="e1" data-cat="layout" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">E1</span>
+        <h3>Cabeçalho fixo com rolagem</h3>
+        <p>Trave o cabeçalho enquanto o corpo rola.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-scroll">
+            <div class="rows">
+              <div class="pv-hd hl"></div>
+              <div class="pv-r"></div>
+              <div class="pv-r"></div>
+              <div class="pv-r"></div>
+            </div>
+            <div class="pv-track"><span class="pv-thumb"></span></div>
+          </div>
+        </div>
+        <div class="tags"><code>height</code><code>overflowEnabled</code><code>stickyHeaderEnabled</code></div>
+      </button>
+
+      <button class="card" data-id="e2" data-cat="eventos" aria-haspopup="dialog">
+        <span class="coord" aria-hidden="true">E2</span>
+        <h3>Ações por linha e menu de contexto</h3>
+        <p>Adicione botões por linha e um menu de clique direito.</p>
+        <div class="pv" aria-hidden="true">
+          <div class="pv-row"><span class="pv-c"></span><span class="pv-menu"><i></i><i></i><i></i></span></div>
+          <div class="pv-row"><span class="pv-c"></span><span class="pv-menu" style="opacity:.35"><i></i><i></i><i></i></span></div>
+          <div class="pv-row"><span class="pv-c"></span><span class="pv-menu" style="opacity:.35"><i></i><i></i><i></i></span></div>
+        </div>
+        <div class="tags"><code>actions</code><code>onClickRow</code><code>onContextMenu</code></div>
+      </button>
+
+    </div>
+  </div>
+
+  <div class="empty" id="empty" hidden>
+    <span class="coord-ghost">#N/D</span>
+    <p>Nenhuma receita para esse termo.</p>
+    <small>Tente outra palavra-chave ou limpe os filtros.</small>
+    <button type="button" id="clear-search">Limpar busca</button>
+  </div>
+</main>
+
+<footer class="footer">
+  <a class="ref" href="#">Referência completa de propriedades e métodos →</a>
+  <p class="note">Protótipo de layout · Proposta 04 · Cookbook</p>
+</footer>
+
+<nav class="proto-switch" aria-label="Trocar proposta">
+  <a href="index.html">Início</a>
+  <a href="proposal-1-manual.html">01</a>
+  <a href="proposal-2-bancada.html">02</a>
+  <a href="proposal-3-trilha.html">03</a>
+  <a href="proposal-4-cookbook.html" aria-current="page">04</a>
+</nav>
+
+<!-- Drawer -->
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+  <div class="drawer-head">
+    <span class="coord-tag" id="drawer-coord">A1</span>
+    <h2 id="drawer-title">Receita</h2>
+    <button class="drawer-close" id="drawer-close" aria-label="Fechar receita">✕</button>
+  </div>
+  <div class="drawer-body">
+    <p class="drawer-desc" id="drawer-desc"></p>
+    <div class="drawer-tags" id="drawer-tags"></div>
+    <div class="generic-note" id="generic-note" hidden>
+      Exemplo base da receita A1 — neste protótipo, o código completo está detalhado
+      apenas em A1, A2, D1 e D3. Adapte com as props indicadas acima.
+    </div>
+
+    <p class="drawer-section-label">Resultado</p>
+    <div class="demo-table" id="demo-table" aria-label="Demonstração da tabela"></div>
+
+    <p class="drawer-section-label">Receita</p>
+    <div class="code-tools">
+      <div class="fw-toggle" role="group" aria-label="Escolher framework">
+        <button type="button" data-fw="react" aria-pressed="true">React</button>
+        <button type="button" data-fw="vue" aria-pressed="false">Vue</button>
+      </div>
+    </div>
+    <div class="codeblock">
+      <div class="codeblock-head">
+        <span class="fname" id="code-fname">Example.jsx</span>
+        <button class="copy-btn" type="button" id="copy-btn">Copiar</button>
+      </div>
+      <pre><code id="code-body"></code></pre>
+    </div>
+  </div>
+</aside>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ Dados das receitas ============ */
+
+  var ROWS_JS = [
+    "const rows = [",
+    "  { name: 'Ada Lovelace', dept: 'Engenharia', status: 'Ativo', amount: 4280 },",
+    "  { name: 'Grace Hopper', dept: 'Engenharia', status: 'Ativo', amount: 1950 },",
+    "  { name: 'Alan Turing', dept: 'Pesquisa', status: 'Em análise', amount: 8760 },",
+    "  { name: 'Margaret Hamilton', dept: 'Produto', status: 'Ativo', amount: 2340 },",
+    "]"
+  ].join('\n');
+
+  var A1_REACT = [
+    "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
+    "import '@arcanalabs/datatable/styles.css'",
+    "",
+    ROWS_JS,
+    "",
+    "const config = {",
+    "  mode: 'dataset',",
+    "  dataset: rows,",
+    "  columns: [",
+    "    { name: 'name', label: 'Nome' },",
+    "    { name: 'amount', label: 'Valor', type: 'CURRENCY' },",
+    "  ],",
+    "}",
+    "",
+    "export function Example() {",
+    "  return <ArcanaDataTable config={config} />",
+    "}"
+  ].join('\n');
+
+  var A1_VUE = [
+    "<script setup>",
+    "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
+    "import '@arcanalabs/datatable/styles.css'",
+    "",
+    ROWS_JS,
+    "",
+    "const config = {",
+    "  mode: 'dataset',",
+    "  dataset: rows,",
+    "  columns: [",
+    "    { name: 'name', label: 'Nome' },",
+    "    { name: 'amount', label: 'Valor', type: 'CURRENCY' },",
+    "  ],",
+    "}",
+    "<\/script>",
+    "",
+    "<template>",
+    "  <ArcanaDataTable :config=\"config\" />",
+    "</template>"
+  ].join('\n');
+
+  var recipes = {
+    a1: {
+      demo: 'plain',
+      react: A1_REACT,
+      vue: A1_VUE
+    },
+    a2: {
+      demo: 'paged',
+      react: [
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "import { api } from './services/api'",
+        "",
+        "const config = {",
+        "  mode: 'remote',",
+        "  // resposta: { rows, total, page }",
+        "  datasource: (params) => api.orders.list(params),",
+        "  columns: [",
+        "    { name: 'name', label: 'Nome' },",
+        "    { name: 'amount', label: 'Valor', type: 'CURRENCY' },",
+        "  ],",
+        "}",
+        "",
+        "export function Example() {",
+        "  return <ArcanaDataTable config={config} />",
+        "}"
+      ].join('\n'),
+      vue: [
+        "<script setup>",
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "import { api } from './services/api'",
+        "",
+        "const config = {",
+        "  mode: 'remote',",
+        "  // resposta: { rows, total, page }",
+        "  datasource: (params) => api.orders.list(params),",
+        "  columns: [",
+        "    { name: 'name', label: 'Nome' },",
+        "    { name: 'amount', label: 'Valor', type: 'CURRENCY' },",
+        "  ],",
+        "}",
+        "<\/script>",
+        "",
+        "<template>",
+        "  <ArcanaDataTable :config=\"config\" />",
+        "</template>"
+      ].join('\n')
+    },
+    d1: {
+      demo: 'check',
+      react: [
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "",
+        ROWS_JS,
+        "",
+        "const config = {",
+        "  mode: 'dataset',",
+        "  dataset: rows,",
+        "  checkboxEnabled: true,",
+        "  onRowChecked: (row) => console.log(row),",
+        "  columns: [",
+        "    { name: 'name', label: 'Nome' },",
+        "    { name: 'amount', label: 'Valor', type: 'CURRENCY' },",
+        "  ],",
+        "}",
+        "",
+        "export function Example() {",
+        "  return <ArcanaDataTable config={config} />",
+        "}"
+      ].join('\n'),
+      vue: [
+        "<script setup>",
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "",
+        ROWS_JS,
+        "",
+        "const config = {",
+        "  mode: 'dataset',",
+        "  dataset: rows,",
+        "  checkboxEnabled: true,",
+        "  onRowChecked: (row) => console.log(row),",
+        "  columns: [",
+        "    { name: 'name', label: 'Nome' },",
+        "    { name: 'amount', label: 'Valor', type: 'CURRENCY' },",
+        "  ],",
+        "}",
+        "<\/script>",
+        "",
+        "<template>",
+        "  <ArcanaDataTable :config=\"config\" />",
+        "</template>"
+      ].join('\n')
+    },
+    d3: {
+      demo: 'summary',
+      react: [
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "",
+        ROWS_JS,
+        "",
+        "const config = {",
+        "  mode: 'dataset',",
+        "  dataset: rows,",
+        "  checkboxEnabled: true,",
+        "  footerSummarizerEnabled: true,",
+        "  summarizeOnlyChecked: true,",
+        "  columns: [",
+        "    { name: 'name', label: 'Nome' },",
+        "    {",
+        "      name: 'amount',",
+        "      label: 'Valor',",
+        "      type: 'CURRENCY',",
+        "      summarizerValueFormatter: (total) =>",
+        "        total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),",
+        "    },",
+        "  ],",
+        "}",
+        "",
+        "export function Example() {",
+        "  return <ArcanaDataTable config={config} />",
+        "}"
+      ].join('\n'),
+      vue: [
+        "<script setup>",
+        "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
+        "import '@arcanalabs/datatable/styles.css'",
+        "",
+        ROWS_JS,
+        "",
+        "const config = {",
+        "  mode: 'dataset',",
+        "  dataset: rows,",
+        "  checkboxEnabled: true,",
+        "  footerSummarizerEnabled: true,",
+        "  summarizeOnlyChecked: true,",
+        "  columns: [",
+        "    { name: 'name', label: 'Nome' },",
+        "    {",
+        "      name: 'amount',",
+        "      label: 'Valor',",
+        "      type: 'CURRENCY',",
+        "      summarizerValueFormatter: (total) =>",
+        "        total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),",
+        "    },",
+        "  ],",
+        "}",
+        "<\/script>",
+        "",
+        "<template>",
+        "  <ArcanaDataTable :config=\"config\" />",
+        "</template>"
+      ].join('\n')
+    }
+  };
+
+  /* ============ Demo table fake ============ */
+
+  var PEOPLE = [
+    { name: 'Ada Lovelace', dept: 'Engenharia', status: 'Ativo', ok: true,  amount: 'R$ 4.280' },
+    { name: 'Grace Hopper', dept: 'Engenharia', status: 'Ativo', ok: true,  amount: 'R$ 1.950' },
+    { name: 'Alan Turing', dept: 'Pesquisa', status: 'Em análise', ok: false, amount: 'R$ 8.760' },
+    { name: 'Margaret Hamilton', dept: 'Produto', status: 'Ativo', ok: true, amount: 'R$ 2.340' }
+  ];
+
+  function renderDemo(kind) {
+    var withCheck = (kind === 'check' || kind === 'summary');
+    var checkedIdx = [0, 1];
+    var html = '<table><thead><tr>';
+    if (withCheck) html += '<th class="cbcell"><span class="cb" aria-hidden="true"></span></th>';
+    html += '<th>Nome</th><th>Departamento</th><th>Status</th><th class="num">Valor</th></tr></thead><tbody>';
+
+    PEOPLE.forEach(function (p, i) {
+      var checked = withCheck && checkedIdx.indexOf(i) !== -1;
+      html += '<tr class="' + (checked ? 'checked' : '') + '">';
+      if (withCheck) {
+        html += '<td class="cbcell"><span class="cb ' + (checked ? 'on' : '') + '" aria-hidden="true"></span></td>';
+      }
+      html += '<td>' + p.name + '</td>';
+      html += '<td>' + p.dept + '</td>';
+      html += '<td><span class="pill ' + (p.ok ? 'ok' : 'warn') + '">' + p.status + '</span></td>';
+      html += '<td class="num">' + p.amount + '</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    if (kind === 'paged') {
+      html += '<div class="demo-foot"><span>240 registros · página 1 de 12</span>' +
+        '<span class="pager"><i>‹</i><i class="cur">1</i><i>2</i><i>3</i><i>›</i></span></div>';
+    }
+    if (kind === 'summary') {
+      html += '<div class="demo-foot"><span>2 linhas selecionadas</span>' +
+        '<span>Total · <strong>R$ 6.230,00</strong></span></div>';
+    }
+    return html;
+  }
+
+  /* ============ Busca + facetas ============ */
+
+  var searchInput = document.getElementById('search');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var emptyEl = document.getElementById('empty');
+  var metaEl = document.getElementById('result-meta');
+  var activeFacet = 'all';
+
+  var searchIndex = cards.map(function (card) {
+    return (card.textContent || '').toLowerCase();
+  });
+
+  function normalize(s) {
+    return s.toLowerCase();
+  }
+
+  function applyFilter() {
+    var q = normalize(searchInput.value.trim());
+    var visible = 0;
+    cards.forEach(function (card, i) {
+      var matchFacet = activeFacet === 'all' || card.getAttribute('data-cat') === activeFacet;
+      var matchQuery = q === '' || searchIndex[i].indexOf(q) !== -1;
+      var show = matchFacet && matchQuery;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    var isEmpty = visible === 0;
+    emptyEl.hidden = !isEmpty;
+    emptyEl.classList.toggle('show', isEmpty);
+    metaEl.textContent = isEmpty
+      ? 'Nenhum resultado'
+      : (visible === 14 ? '14 receitas no catálogo' : visible + (visible === 1 ? ' receita encontrada' : ' receitas encontradas'));
+  }
+
+  searchInput.addEventListener('input', applyFilter);
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      activeFacet = chip.getAttribute('data-facet');
+      chips.forEach(function (c) {
+        c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
+      });
+      applyFilter();
+    });
+  });
+
+  document.getElementById('clear-search').addEventListener('click', function () {
+    searchInput.value = '';
+    activeFacet = 'all';
+    chips.forEach(function (c) {
+      c.setAttribute('aria-pressed', c.getAttribute('data-facet') === 'all' ? 'true' : 'false');
+    });
+    applyFilter();
+    searchInput.focus();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && !drawerOpen &&
+        e.target !== searchInput &&
+        !/^(input|textarea|select)$/i.test(e.target.tagName)) {
+      e.preventDefault();
+      searchInput.focus();
+    }
+  });
+
+  /* ============ Drawer ============ */
+
+  var drawer = document.getElementById('drawer');
+  var backdrop = document.getElementById('backdrop');
+  var closeBtn = document.getElementById('drawer-close');
+  var titleEl = document.getElementById('drawer-title');
+  var coordEl = document.getElementById('drawer-coord');
+  var descEl = document.getElementById('drawer-desc');
+  var tagsEl = document.getElementById('drawer-tags');
+  var noteEl = document.getElementById('generic-note');
+  var demoEl = document.getElementById('demo-table');
+  var codeEl = document.getElementById('code-body');
+  var fnameEl = document.getElementById('code-fname');
+  var copyBtn = document.getElementById('copy-btn');
+  var fwButtons = Array.prototype.slice.call(document.querySelectorAll('.fw-toggle button'));
+
+  var FW_KEY = 'arcana-docs-framework';
+  var drawerOpen = false;
+  var lastFocused = null;
+  var currentRecipeId = null;
+  var copyTimer = null;
+
+  function getFramework() {
+    try {
+      var v = localStorage.getItem(FW_KEY);
+      return (v === 'vue' || v === 'react') ? v : 'react';
+    } catch (e) { return 'react'; }
+  }
+
+  function setFramework(fw) {
+    try { localStorage.setItem(FW_KEY, fw); } catch (e) { /* noop */ }
+    fwButtons.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-fw') === fw ? 'true' : 'false');
+    });
+    renderCode();
+  }
+
+  function renderCode() {
+    if (!currentRecipeId) return;
+    var fw = getFramework();
+    var recipe = recipes[currentRecipeId] || recipes.a1;
+    codeEl.textContent = recipe[fw];
+    fnameEl.textContent = fw === 'react' ? 'Example.jsx' : 'Example.vue';
+    copyBtn.textContent = 'Copiar';
+    copyBtn.classList.remove('done');
+  }
+
+  fwButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      setFramework(b.getAttribute('data-fw'));
+    });
+  });
+
+  copyBtn.addEventListener('click', function () {
+    var text = codeEl.textContent;
+    function done() {
+      copyBtn.textContent = 'Copiado!';
+      copyBtn.classList.add('done');
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(function () {
+        copyBtn.textContent = 'Copiar';
+        copyBtn.classList.remove('done');
+      }, 1800);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text);
+      done();
+    }
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* noop */ }
+    document.body.removeChild(ta);
+  }
+
+  function openDrawer(card) {
+    lastFocused = card;
+    currentRecipeId = card.getAttribute('data-id');
+    var hasFullRecipe = Object.prototype.hasOwnProperty.call(recipes, currentRecipeId);
+    var recipe = hasFullRecipe ? recipes[currentRecipeId] : recipes.a1;
+
+    coordEl.textContent = card.querySelector('.coord').textContent;
+    titleEl.textContent = card.querySelector('h3').textContent;
+    descEl.textContent = card.querySelector('p').textContent;
+
+    tagsEl.innerHTML = '';
+    Array.prototype.forEach.call(card.querySelectorAll('.tags code'), function (t) {
+      var c = document.createElement('code');
+      c.textContent = t.textContent;
+      tagsEl.appendChild(c);
+    });
+
+    noteEl.hidden = hasFullRecipe;
+    demoEl.innerHTML = renderDemo(recipe.demo);
+    renderCode();
+
+    drawer.hidden = false;
+    // força reflow antes da transição
+    void drawer.offsetWidth;
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    drawerOpen = true;
+    closeBtn.focus();
+  }
+
+  function closeDrawer() {
+    if (!drawerOpen) return;
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+    drawerOpen = false;
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function () {
+      if (!drawerOpen) drawer.hidden = true;
+    }, prefersReduced ? 0 : 230);
+    if (lastFocused) lastFocused.focus();
+  }
+
+  cards.forEach(function (card) {
+    card.addEventListener('click', function () { openDrawer(card); });
+  });
+
+  closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+
+  document.addEventListener('keydown', function (e) {
+    if (!drawerOpen) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeDrawer();
+      return;
+    }
+    if (e.key === 'Tab') {
+      // trap de foco simples dentro do drawer
+      var focusables = drawer.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  /* init */
+  setFramework(getFramework());
+  applyFilter();
+})();
+</script>
+</body>
+</html>

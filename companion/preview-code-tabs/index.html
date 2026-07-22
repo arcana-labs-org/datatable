@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Abas Preview/Código — 4 modelos · Arcana DataTable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --accent: #4f46e5;
+    --code-bg: #0b1120;
+    --sx-kw: #a78bfa;
+    --sx-str: #6ee7b7;
+    --sx-prop: #7dd3fc;
+    --sx-text: #dbe4f3;
+    --radius: 6px;
+    --font-head: "Schibsted Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f8fafc;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+
+  .page-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 34px 20px 30px;
+    text-align: center;
+  }
+  .page-header .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 8px;
+  }
+  .page-header h1 {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -.01em;
+  }
+  .page-header p {
+    margin: 0 auto;
+    max-width: 560px;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+
+  .models { padding: 10px 20px 40px; }
+
+  .model {
+    max-width: 720px;
+    margin: 46px auto 0;
+  }
+  .model-head {
+    max-width: 640px;
+    margin: 0 auto 14px;
+  }
+  .model-head .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 8px;
+    vertical-align: 2px;
+  }
+  .model-head h2 {
+    display: inline;
+    font-family: var(--font-head);
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+  .model-head .thesis {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+  .model-notes {
+    max-width: 640px;
+    margin: 12px auto 0;
+    font-size: 12.5px;
+    color: var(--muted);
+    display: grid;
+    gap: 3px;
+  }
+  .model-notes b { color: var(--ink); font-weight: 600; }
+  .model-notes .pro b { color: #047857; }
+  .model-notes .con b { color: #b45309; }
+
+  /* ---------- réplica do card de seção da docs ---------- */
+  .doc-card {
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 22px 20px;
+  }
+  .doc-card > h3 {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    letter-spacing: -.01em;
+  }
+  .doc-card > .prose {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .doc-card code.inline {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  /* ---------- workbench (moldura do painel) ---------- */
+  .workbench {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    overflow: hidden;
+  }
+  .panel[hidden] { display: none; }
+  .panel--preview { padding: 16px 14px; }
+  .panel--code {
+    background: var(--code-bg);
+    margin: 0;
+  }
+  .panel--code pre {
+    margin: 0;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--sx-text);
+  }
+  .code-file {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .05em;
+    color: #64748b;
+    padding: 9px 18px 0;
+  }
+  .sx-kw { color: var(--sx-kw); }
+  .sx-str { color: var(--sx-str); }
+  .sx-prop { color: var(--sx-prop); }
+
+  /* ---------- tabela fake (imita a datatable) ---------- */
+  .fake-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .fake-table th, .fake-table td {
+    text-align: left;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .fake-table thead th {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: #f8fafc;
+    border-top: 1px solid var(--border);
+  }
+  .fake-table tbody tr:last-child td { border-bottom: 0; }
+  .fake-table tbody tr:hover td { background: #f8fafc; }
+  .fake-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .fake-table input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: var(--accent);
+    margin: 0;
+    display: block;
+  }
+  .fake-table .col-check { width: 30px; }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .pill--ok { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+  .pill--warn { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+  .table-wrap { overflow-x: auto; }
+
+  .icon { width: 14px; height: 14px; flex: none; }
+
+  /* =============================================================
+     MODELO 1 — Segmented control
+     ============================================================= */
+  .m1-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 12px;
+    flex-wrap: wrap;
+  }
+  .m1-header .m1-caption {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .m1-seg {
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2px;
+    gap: 2px;
+  }
+  .m1-seg button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 5px 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color .15s, background .15s, box-shadow .15s;
+  }
+  .m1-seg button:hover { color: var(--ink); }
+  .m1-seg button[aria-selected="true"] {
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .12), 0 0 0 1px rgba(15, 23, 42, .04);
+  }
+  .m1-seg .fw-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 999px;
+    padding: 1px 6px;
+  }
+  .m1-seg button[aria-selected="true"] .icon { color: var(--accent); }
+
+  /* =============================================================
+     MODELO 2 — Underline deslizante
+     ============================================================= */
+  .m2-tabs {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    padding: 0 6px;
+  }
+  .m2-tabs button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 12px 12px;
+    cursor: pointer;
+    transition: color .15s;
+  }
+  .m2-tabs button:hover { color: var(--ink); }
+  .m2-tabs button[aria-selected="true"] { color: var(--ink); }
+  .m2-tabs button[aria-selected="true"] .icon { color: var(--accent); }
+  .m2-tabs .fw-suffix {
+    color: #94a3b8;
+    font-size: 9px;
+    letter-spacing: .02em;
+    text-transform: none;
+  }
+  .m2-ink {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: left;
+    transition: transform .22s cubic-bezier(.4, 0, .2, 1), width .22s cubic-bezier(.4, 0, .2, 1);
+    pointer-events: none;
+  }
+
+  /* =============================================================
+     MODELO 3 — Janela de editor
+     ============================================================= */
+  .m3-window {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+  }
+  .m3-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    background: #1e293b;
+    padding: 6px 8px 0;
+    min-height: 38px;
+  }
+  .m3-dots { display: inline-flex; gap: 5px; margin: 0 8px 11px 4px; }
+  .m3-dots i { width: 8px; height: 8px; border-radius: 50%; background: #475569; }
+  .m3-bar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid transparent;
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+    background: transparent;
+    color: #94a3b8;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    padding: 7px 13px 8px;
+    cursor: pointer;
+    transition: color .15s, background .15s;
+    position: relative;
+    top: 1px;
+  }
+  .m3-bar button:hover { color: #e2e8f0; }
+  /* aba ativa conecta sem emenda com o corpo abaixo */
+  .m3-window[data-tab="preview"] .m3-bar button[data-tab="preview"],
+  .m3-window[data-tab="code"] .m3-bar button[data-tab="code"] {
+    color: var(--ink);
+    background: #fff;
+    border-color: #1e293b;
+  }
+  .m3-window[data-tab="code"] .m3-bar button[data-tab="code"] {
+    color: var(--sx-text);
+    background: var(--code-bg);
+  }
+  .m3-bar .icon { width: 13px; height: 13px; }
+  .m3-bar button[data-tab="preview"] .icon { color: #34d399; }
+  .m3-bar button[data-tab="code"] .icon { color: var(--sx-prop); }
+  .m3-window .panel--preview { border-top: 0; }
+  .m3-window .panel--code { border-top: 0; }
+  .m3-status {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .05em;
+    color: var(--muted);
+    background: #f8fafc;
+    border-top: 1px solid var(--border);
+    padding: 5px 12px;
+  }
+  .m3-window[data-tab="code"] .m3-status {
+    background: #0d1528;
+    border-top-color: #1e293b;
+    color: #64748b;
+  }
+
+  /* =============================================================
+     MODELO 4 — Toggle flutuante
+     ============================================================= */
+  .m4-stage { position: relative; }
+  .m4-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(2px);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    padding: 6px 11px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .08);
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .m4-toggle:hover { color: var(--ink); border-color: #cbd5e1; }
+  .m4-stage[data-tab="code"] .m4-toggle {
+    background: rgba(15, 23, 42, .85);
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+  .m4-stage[data-tab="code"] .m4-toggle:hover { color: #fff; border-color: #475569; }
+  .m4-toggle .icon { width: 13px; height: 13px; color: var(--accent); }
+  .m4-stage[data-tab="code"] .m4-toggle .icon { color: #34d399; }
+  .m4-stage .panel { transition: opacity .18s ease; }
+  .m4-stage .panel.is-fading { opacity: 0; }
+  .m4-stage .panel--preview { padding-top: 44px; }
+  .m4-stage .panel--code .code-file { padding-top: 40px; }
+  .m4-caption {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 0 0 10px;
+  }
+
+  /* aria-pressed helper para os botões todos */
+  button { font-family: inherit; }
+  button:focus-visible,
+  .m4-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .page-footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    text-align: center;
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .04em;
+  }
+
+  @media (max-width: 480px) {
+    .doc-card { padding: 16px 14px; }
+    .m1-header { align-items: flex-start; }
+    .m2-tabs button { padding: 12px 8px; }
+    .m3-bar button { padding: 7px 9px 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m2-ink { transition: none; }
+    .m4-stage .panel { transition: none; }
+    * { transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <p class="kicker">Companion · Arcana DataTable</p>
+  <h1>4 modelos para as abas Preview/Código</h1>
+  <p>Mesma seção da documentação, quatro tratamentos para alternar entre a demo viva e o snippet. Todas as abas funcionam — clique e compare.</p>
+</header>
+
+<main class="models">
+
+  <!-- ============================================================ -->
+  <!-- MODELO 1 — Segmented control -->
+  <!-- ============================================================ -->
+  <section class="model" id="modelo-1">
+    <div class="model-head">
+      <span class="num">1</span><h2>Segmented control</h2>
+      <p class="thesis">Controle segmentado compacto à direita do header: as abas viram um utilitário discreto, não uma barra que domina o card.</p>
+    </div>
+    <article class="doc-card">
+      <h3>Seleção múltipla</h3>
+      <p class="prose">Ative <code class="inline">checkboxEnabled</code> para permitir seleção de linhas. A tabela expõe as linhas marcadas via <code class="inline">getSelectedRows()</code> e emite eventos a cada mudança.</p>
+
+      <div class="m1-header">
+        <span class="m1-caption">componente real · interaja</span>
+        <div class="m1-seg" role="tablist" aria-label="Exemplo de Seleção múltipla">
+          <button type="button" role="tab" aria-selected="true" data-tab="preview">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </button>
+          <button type="button" role="tab" aria-selected="false" data-tab="code">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Código
+            <span class="fw-badge">React</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="workbench" data-workbench>
+        <div class="panel panel--preview" data-panel="preview" role="tabpanel"></div>
+        <div class="panel panel--code" data-panel="code" role="tabpanel" hidden></div>
+      </div>
+    </article>
+    <div class="model-notes">
+      <span class="pro"><b>Prós:</b> ocupa pouco espaço, padrão familiar (macOS/shadcn) e deixa o card respirar.</span>
+      <span class="con"><b>Contras:</b> alvo de clique menor e o rótulo do framework fica apertado dentro do segmento.</span>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- MODELO 2 — Underline deslizante -->
+  <!-- ============================================================ -->
+  <section class="model" id="modelo-2">
+    <div class="model-head">
+      <span class="num">2</span><h2>Underline deslizante</h2>
+      <p class="thesis">Abas de texto minimalistas com indicador índigo que desliza animado — o movimento comunica a troca sem pintar nada de escuro.</p>
+    </div>
+    <article class="doc-card">
+      <h3>Seleção múltipla</h3>
+      <p class="prose">Ative <code class="inline">checkboxEnabled</code> para permitir seleção de linhas. A tabela expõe as linhas marcadas via <code class="inline">getSelectedRows()</code> e emite eventos a cada mudança.</p>
+
+      <div class="workbench" data-workbench>
+        <div class="m2-tabs" role="tablist" aria-label="Exemplo de Seleção múltipla">
+          <button type="button" role="tab" aria-selected="true" data-tab="preview">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </button>
+          <button type="button" role="tab" aria-selected="false" data-tab="code">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Código <span class="fw-suffix">· React</span>
+          </button>
+          <span class="m2-ink" aria-hidden="true"></span>
+        </div>
+        <div class="panel panel--preview" data-panel="preview" role="tabpanel"></div>
+        <div class="panel panel--code" data-panel="code" role="tabpanel" hidden></div>
+      </div>
+    </article>
+    <div class="model-notes">
+      <span class="pro"><b>Prós:</b> o mais leve visualmente; a animação dá vida sem ruído e escala bem para mais abas no futuro.</span>
+      <span class="con"><b>Contras:</b> indicador de 2px é sutil demais em telas ruins e depende da animação para ter personalidade.</span>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- MODELO 3 — Janela de editor -->
+  <!-- ============================================================ -->
+  <section class="model" id="modelo-3">
+    <div class="model-head">
+      <span class="num">3</span><h2>Janela de editor</h2>
+      <p class="thesis">O painel vira uma "janela" com abas de arquivo estilo VS Code: a aba ativa conecta sem emenda com o corpo, claro no preview e escuro no código.</p>
+    </div>
+    <article class="doc-card">
+      <h3>Seleção múltipla</h3>
+      <p class="prose">Ative <code class="inline">checkboxEnabled</code> para permitir seleção de linhas. A tabela expõe as linhas marcadas via <code class="inline">getSelectedRows()</code> e emite eventos a cada mudança.</p>
+
+      <div class="m3-window" data-workbench data-tab="preview">
+        <div class="m3-bar" role="tablist" aria-label="Exemplo de Seleção múltipla">
+          <span class="m3-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <button type="button" role="tab" aria-selected="true" data-tab="preview">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.9-6.86a1.03 1.03 0 0 0 0-1.76L9.56 4.26A1.04 1.04 0 0 0 8 5.14Z"/></svg>
+            Preview
+          </button>
+          <button type="button" role="tab" aria-selected="false" data-tab="code">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Invoices.tsx
+          </button>
+        </div>
+        <div class="panel panel--preview" data-panel="preview" role="tabpanel"></div>
+        <div class="panel panel--code" data-panel="code" role="tabpanel" hidden></div>
+        <div class="m3-status">
+          <span>arcana-datatable · dataset mode</span>
+          <span>React 18</span>
+        </div>
+      </div>
+    </article>
+    <div class="model-notes">
+      <span class="pro"><b>Prós:</b> metáfora instantânea ("isto é uma bancada de código") e o nome do arquivo real vira informação útil.</span>
+      <span class="con"><b>Contras:</b> a barra escura pesa no tema claro da docs e é o modelo mais caro de manter consistente.</span>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- MODELO 4 — Toggle flutuante -->
+  <!-- ============================================================ -->
+  <section class="model" id="modelo-4">
+    <div class="model-head">
+      <span class="num">4</span><h2>Toggle flutuante</h2>
+      <p class="thesis">Sem linha de abas: o preview é o padrão e um botão flutuante discreto no canto alterna para o código — o card ganha altura vertical.</p>
+    </div>
+    <article class="doc-card">
+      <h3>Seleção múltipla</h3>
+      <p class="prose">Ative <code class="inline">checkboxEnabled</code> para permitir seleção de linhas. A tabela expõe as linhas marcadas via <code class="inline">getSelectedRows()</code> e emite eventos a cada mudança.</p>
+
+      <div class="workbench m4-stage" data-workbench data-tab="preview">
+        <button type="button" class="m4-toggle" aria-pressed="false">
+          <svg class="icon icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <svg class="icon icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display:none"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/></svg>
+          <span class="m4-label">Ver código</span>
+        </button>
+        <div class="panel panel--preview" data-panel="preview" role="tabpanel">
+          <div class="m4-caption">componente real · interaja</div>
+        </div>
+        <div class="panel panel--code" data-panel="code" role="tabpanel" hidden></div>
+      </div>
+    </article>
+    <div class="model-notes">
+      <span class="pro"><b>Prós:</b> zero cromo permanente — a demo vira protagonista absoluta e o card fica mais baixo.</span>
+      <span class="con"><b>Contras:</b> o código fica menos descobrível e o botão sobrepõe o conteúdo em tabelas largas.</span>
+    </div>
+  </section>
+
+</main>
+
+<footer class="page-footer">Protótipo · Companion preview-code-tabs · porta 4323</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- conteúdo compartilhado: tabela fake + snippet ---------- */
+  var PREVIEW_HTML =
+    '<div class="table-wrap"><table class="fake-table">' +
+    '<thead><tr>' +
+    '<th class="col-check"><input type="checkbox" aria-label="Selecionar todas as linhas" /></th>' +
+    '<th>Nome</th><th>Departamento</th><th>Status</th><th class="num">Valor</th>' +
+    '</tr></thead><tbody>' +
+    row('Ada Lovelace', 'Engenharia', 'ok', 'Ativo', 'R$ 4.280', true) +
+    row('Grace Hopper', 'Engenharia', 'ok', 'Ativo', 'R$ 1.950', false) +
+    row('Alan Turing', 'Pesquisa', 'warn', 'Em análise', 'R$ 8.760', false) +
+    row('Margaret Hamilton', 'Produto', 'ok', 'Ativo', 'R$ 2.340', true) +
+    '</tbody></table></div>';
+
+  function row(name, dept, kind, status, value, checked) {
+    return '<tr>' +
+      '<td class="col-check"><input type="checkbox" aria-label="Selecionar ' + name + '"' + (checked ? ' checked' : '') + ' /></td>' +
+      '<td>' + name + '</td>' +
+      '<td>' + dept + '</td>' +
+      '<td><span class="pill pill--' + kind + '">' + status + '</span></td>' +
+      '<td class="num">' + value + '</td>' +
+      '</tr>';
+  }
+
+  var CODE_HTML =
+    '<div class="code-file">Invoices.tsx</div>' +
+    '<pre><code>' +
+    '<span class="sx-kw">const</span> <span class="sx-prop">config</span> = {\n' +
+    '  <span class="sx-prop">mode</span>: <span class="sx-str">\'dataset\'</span>,\n' +
+    '  <span class="sx-prop">dataset</span>: rows,\n' +
+    '  <span class="sx-prop">checkboxEnabled</span>: <span class="sx-kw">true</span>,\n' +
+    '  <span class="sx-prop">columns</span>: [...]\n' +
+    '}' +
+    '</code></pre>';
+
+  document.querySelectorAll('[data-panel="preview"]').forEach(function (el) {
+    el.insertAdjacentHTML('beforeend', PREVIEW_HTML);
+  });
+  document.querySelectorAll('[data-panel="code"]').forEach(function (el) {
+    el.insertAdjacentHTML('beforeend', CODE_HTML);
+  });
+
+  /* ---------- troca de painel genérica (modelos 1, 2 e 3) ---------- */
+  function activate(workbench, tab) {
+    var card = workbench.closest('article') || workbench;
+    workbench.setAttribute('data-tab', tab);
+    card.querySelectorAll('[role="tab"]').forEach(function (btn) {
+      btn.setAttribute('aria-selected', String(btn.getAttribute('data-tab') === tab));
+    });
+    workbench.querySelectorAll('[data-panel]').forEach(function (panel) {
+      panel.hidden = panel.getAttribute('data-panel') !== tab;
+    });
+  }
+
+  document.querySelectorAll('[data-workbench]').forEach(function (workbench) {
+    // as abas podem viver fora da moldura (modelo 1: segmented no header do card)
+    var card = workbench.closest('article') || workbench;
+    card.querySelectorAll('[role="tab"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activate(workbench, btn.getAttribute('data-tab'));
+        if (workbench.closest('#modelo-2')) positionInk(workbench);
+      });
+    });
+  });
+
+  /* ---------- modelo 2: underline que desliza ---------- */
+  function positionInk(workbench) {
+    var ink = workbench.querySelector('.m2-ink');
+    if (!ink) return;
+    var active = workbench.querySelector('.m2-tabs [aria-selected="true"]');
+    if (!active) return;
+    ink.style.width = active.offsetWidth + 'px';
+    ink.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+  }
+  var m2 = document.querySelector('#modelo-2 [data-workbench]');
+  if (m2) {
+    positionInk(m2);
+    window.addEventListener('resize', function () { positionInk(m2); });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { positionInk(m2); });
+    }
+  }
+
+  /* ---------- modelo 4: toggle flutuante com fade ---------- */
+  var m4 = document.querySelector('#modelo-4 .m4-stage');
+  if (m4) {
+    var toggle = m4.querySelector('.m4-toggle');
+    var label = toggle.querySelector('.m4-label');
+    var iconCode = toggle.querySelector('.icon-code');
+    var iconEye = toggle.querySelector('.icon-eye');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    toggle.addEventListener('click', function () {
+      var next = m4.getAttribute('data-tab') === 'preview' ? 'code' : 'preview';
+      var current = m4.querySelector('[data-panel]:not([hidden])');
+
+      var swap = function () {
+        m4.setAttribute('data-tab', next);
+        m4.querySelectorAll('[data-panel]').forEach(function (panel) {
+          panel.hidden = panel.getAttribute('data-panel') !== next;
+          panel.classList.remove('is-fading');
+        });
+        toggle.setAttribute('aria-pressed', String(next === 'code'));
+        label.textContent = next === 'code' ? 'Ver preview' : 'Ver código';
+        iconCode.style.display = next === 'code' ? 'none' : '';
+        iconEye.style.display = next === 'code' ? '' : 'none';
+      };
+
+      if (reduced || !current) { swap(); return; }
+      current.classList.add('is-fading');
+      window.setTimeout(swap, 160);
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-fw="react">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcana DataTable — Documentação · Proposta 01 · Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --accent: #4f46e5;
+    --code-bg: #0b1120;
+    --code-ink: #dbe4f3;
+    --code-kw: #a78bfa;
+    --code-str: #6ee7b7;
+    --code-prop: #7dd3fc;
+    --code-com: #64748b;
+    --topbar-h: 56px;
+    --radius: 6px;
+    --font-display: "Schibsted Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ============ Topbar ============ */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--topbar-h);
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+    z-index: 60;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .brand:hover { text-decoration: none; }
+  .brand-mark {
+    width: 24px; height: 24px;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .brand-lib { color: var(--muted); font-weight: 600; }
+
+  .topbar-search {
+    flex: 1;
+    max-width: 380px;
+    margin-left: 8px;
+  }
+  .topbar-search input {
+    width: 100%;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #f8fafc;
+    padding: 0 12px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .topbar-search input::placeholder { color: var(--muted); }
+  .topbar-search input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+    background: #fff;
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .fw-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2px;
+    background: #f8fafc;
+  }
+  .fw-btn {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 4px;
+    transition: color .15s, background .15s;
+  }
+  html[data-fw="react"] .fw-btn[data-fw="react"],
+  html[data-fw="vue"] .fw-btn[data-fw="vue"] {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .gh-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .gh-link:hover { color: var(--accent); text-decoration: none; }
+  .gh-link svg { width: 18px; height: 18px; }
+
+  .menu-btn {
+    display: none;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: var(--radius);
+    width: 34px; height: 34px;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+  }
+  .menu-btn svg { width: 16px; height: 16px; }
+
+  /* ============ Layout ============ */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 420px;
+    gap: 0;
+    padding-top: var(--topbar-h);
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+
+  /* ---- Sidebar ---- */
+  .sidebar {
+    position: sticky;
+    top: var(--topbar-h);
+    height: calc(100vh - var(--topbar-h));
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 28px 12px 48px 24px;
+  }
+
+  .nav-group { margin-bottom: 26px; }
+  .nav-group-title {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    padding-left: 10px;
+  }
+  .nav-group ul { list-style: none; }
+  .nav-group li { margin: 1px 0; }
+  .nav-link {
+    display: block;
+    padding: 5px 10px;
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    border-left: 2px solid transparent;
+    transition: color .12s, background .12s;
+  }
+  .nav-link:hover {
+    color: var(--ink);
+    background: #f8fafc;
+    text-decoration: none;
+  }
+  .nav-link.is-active {
+    color: var(--accent);
+    font-weight: 600;
+    background: #eef2ff;
+  }
+
+  /* ---- Center prose ---- */
+  .content {
+    min-width: 0;
+    padding: 40px 48px 96px;
+  }
+  .content-inner { max-width: 640px; }
+
+  .doc-kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .doc-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 34px;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .doc-lead {
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .group-divider {
+    margin: 56px 0 0;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .doc-section {
+    padding-top: 40px;
+    scroll-margin-top: calc(var(--topbar-h) + 24px);
+  }
+  .doc-section h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.025em;
+    margin-bottom: 12px;
+  }
+  .doc-section h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.015em;
+    margin: 22px 0 8px;
+  }
+  .doc-section p { margin-bottom: 12px; }
+  .doc-section p:last-child { margin-bottom: 0; }
+  .doc-section ul.doc-list {
+    margin: 0 0 12px;
+    padding-left: 20px;
+  }
+  .doc-section ul.doc-list li { margin-bottom: 6px; }
+
+  .doc-section code.inline {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  /* small reference tables */
+  .ref-table-wrap {
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+  table.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.ref-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  table.ref-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.ref-table tr:last-child td { border-bottom: 0; }
+  table.ref-table td code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  table.ref-table td.t-muted { color: var(--muted); }
+  table.ref-table td .t-type {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .callout {
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent);
+    border-radius: var(--radius);
+    background: #f8fafc;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin: 16px 0;
+  }
+  .callout strong { font-weight: 600; }
+
+  /* ---- Demo table (fake datatable) ---- */
+  .demo-table {
+    margin: 20px 0 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+  }
+  .demo-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+  }
+  .demo-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    padding: 5px 10px;
+    color: var(--muted);
+    font-size: 12.5px;
+    flex: 1;
+    max-width: 240px;
+  }
+  .demo-search svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .demo-caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .demo-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .demo-table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink);
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .demo-table th .sort {
+    color: var(--muted);
+    font-size: 10px;
+    margin-left: 4px;
+  }
+  .demo-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+  }
+  .demo-table tbody tr:hover { background: #f8fafc; }
+  .demo-table td.num, .demo-table th.num { text-align: right; }
+  .demo-table td.num { font-family: var(--font-mono); font-size: 12.5px; }
+  .pill {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+  }
+  .pill-ok    { color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; }
+  .pill-warn  { color: #b45309; background: #fffbeb; border: 1px solid #fde68a; }
+  .pill-off   { color: #64748b; background: #f1f5f9; border: 1px solid #e2e8f0; }
+  .demo-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .demo-pager { display: flex; gap: 4px; }
+  .demo-pager button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--muted);
+    border-radius: 4px;
+    width: 26px; height: 26px;
+    font-size: 12px;
+    line-height: 1;
+  }
+  .demo-pager button.pg-active {
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .demo-pager button:hover:not(.pg-active) { color: var(--ink); }
+
+  /* ---- Code blocks ---- */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 0;
+  }
+  .code-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(226,232,240,.09);
+  }
+  .code-file {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: #8b9bb8;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .code-file::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 2px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .copy-btn {
+    border: 1px solid rgba(226,232,240,.16);
+    background: transparent;
+    color: #8b9bb8;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .04em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: color .15s, border-color .15s;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { color: var(--code-ink); border-color: rgba(226,232,240,.36); }
+  .copy-btn.copied { color: var(--code-str); border-color: rgba(110,231,183,.4); }
+  .code-block pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--code-ink);
+    tab-size: 2;
+  }
+  .code-block code { font-family: inherit; }
+  .tok-kw   { color: var(--code-kw); }
+  .tok-str  { color: var(--code-str); }
+  .tok-prop { color: var(--code-prop); }
+  .tok-com  { color: var(--code-com); font-style: italic; }
+
+  /* framework visibility (inline) */
+  html[data-fw="react"] .code-block[data-fw-block="vue"] { display: none; }
+  html[data-fw="vue"]   .code-block[data-fw-block="react"] { display: none; }
+
+  /* inline slots: hidden on desktop, shown when code pane is gone */
+  .code-slot { margin: 18px 0 4px; }
+  @media (min-width: 1200px) {
+    .code-slot { display: none; }
+  }
+
+  /* ---- Code pane (right) ---- */
+  .code-pane {
+    padding: 40px 24px 96px 8px;
+  }
+  .code-pane-sticky {
+    position: sticky;
+    top: calc(var(--topbar-h) + 24px);
+  }
+  .code-pane-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+  .code-pane .code-block { display: none; }
+  .code-pane .code-block pre {
+    max-height: calc(100vh - var(--topbar-h) - 140px);
+    overflow: auto;
+  }
+  html[data-fw="react"] .code-pane .code-block.is-active[data-fw-block="react"],
+  html[data-fw="vue"]   .code-pane .code-block.is-active[data-fw-block="vue"],
+  .code-pane .code-block.is-active[data-fw-block="both"] { display: block; }
+
+  /* ---- Footer ---- */
+  .doc-footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* ---- Proto switch ---- */
+  .proto-switch {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 80;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3px;
+    box-shadow: 0 4px 16px rgba(15,23,42,.08);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .proto-switch a {
+    color: var(--muted);
+    padding: 4px 9px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color .12s, background .12s;
+  }
+  .proto-switch a:hover { color: var(--ink); background: #f1f5f9; }
+  .proto-switch a[aria-current="page"] {
+    color: #fff;
+    background: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ============ Responsive ============ */
+  @media (max-width: 1199px) {
+    .layout { grid-template-columns: 240px minmax(0, 1fr); }
+    .code-pane { display: none; }
+    .content { padding: 36px 36px 88px; }
+  }
+
+  @media (max-width: 899px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .menu-btn { display: inline-flex; }
+    .topbar { gap: 12px; padding: 0 16px; }
+    .topbar-search { display: none; }
+    .sidebar {
+      position: fixed;
+      top: var(--topbar-h);
+      left: 0;
+      bottom: 0;
+      width: 280px;
+      max-width: 85vw;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      z-index: 55;
+      transform: translateX(-105%);
+      transition: transform .2s ease;
+      box-shadow: none;
+      height: auto;
+      padding: 24px 16px 48px 20px;
+    }
+    body.nav-open .sidebar {
+      transform: translateX(0);
+      box-shadow: 0 12px 40px rgba(15,23,42,.16);
+    }
+    .nav-scrim {
+      display: none;
+      position: fixed;
+      inset: var(--topbar-h) 0 0 0;
+      background: rgba(15,23,42,.32);
+      z-index: 50;
+      border: 0;
+    }
+    body.nav-open .nav-scrim { display: block; }
+    .content { padding: 28px 20px 88px; }
+    .doc-title { font-size: 28px; }
+  }
+
+  @media (max-width: 480px) {
+    .gh-link span { display: none; }
+    .fw-btn { padding: 5px 10px; }
+    .content { padding: 24px 14px 88px; }
+    .doc-title { font-size: 25px; }
+    .demo-toolbar { flex-wrap: wrap; }
+    .proto-switch { right: 10px; bottom: 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= Topbar ================= -->
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir navegação" aria-expanded="false" aria-controls="sidebar">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+      <path d="M2 4h12M2 8h12M2 12h12"/>
+    </svg>
+  </button>
+
+  <a class="brand" href="#instalacao">
+    <span class="brand-mark" aria-hidden="true">◈</span>
+    Arcana <span class="brand-lib">DataTable</span>
+  </a>
+
+  <div class="topbar-search" role="search">
+    <input type="search" id="searchInput" placeholder="Buscar na documentação… (⌘K)" aria-label="Buscar na documentação">
+  </div>
+
+  <div class="topbar-right">
+    <div class="fw-toggle" role="group" aria-label="Escolher framework">
+      <button class="fw-btn" data-fw="react" aria-pressed="true">React</button>
+      <button class="fw-btn" data-fw="vue" aria-pressed="false">Vue</button>
+    </div>
+    <a class="gh-link" href="https://github.com/arcanalabs/datatable" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      <span>GitHub</span>
+    </a>
+  </div>
+</header>
+
+<button class="nav-scrim" id="navScrim" aria-label="Fechar navegação" tabindex="-1"></button>
+
+<div class="layout">
+
+  <!-- ================= Sidebar ================= -->
+  <nav class="sidebar" id="sidebar" aria-label="Navegação da documentação">
+    <div class="nav-group">
+      <div class="nav-group-title">Começando</div>
+      <ul>
+        <li><a class="nav-link" href="#instalacao">Instalação</a></li>
+        <li><a class="nav-link" href="#primeiro-uso">Primeiro uso</a></li>
+        <li><a class="nav-link" href="#estilos">Estilos</a></li>
+      </ul>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">Conceitos</div>
+      <ul>
+        <li><a class="nav-link" href="#modos">Modos remote/dataset</a></li>
+        <li><a class="nav-link" href="#colunas">Colunas</a></li>
+        <li><a class="nav-link" href="#paginacao">Paginação</a></li>
+      </ul>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">Recursos</div>
+      <ul>
+        <li><a class="nav-link" href="#filtros">Filtros</a></li>
+        <li><a class="nav-link" href="#tipos-de-busca">Tipos de busca</a></li>
+        <li><a class="nav-link" href="#ordenacao">Ordenação</a></li>
+        <li><a class="nav-link" href="#selecao-multipla">Seleção múltipla</a></li>
+        <li><a class="nav-link" href="#selecao-unica">Seleção única</a></li>
+        <li><a class="nav-link" href="#totais">Totais</a></li>
+        <li><a class="nav-link" href="#responsividade">Responsividade</a></li>
+        <li><a class="nav-link" href="#acoes-eventos">Ações e eventos</a></li>
+        <li><a class="nav-link" href="#hooks">Hooks</a></li>
+      </ul>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">Referência</div>
+      <ul>
+        <li><a class="nav-link" href="#propriedades">Propriedades</a></li>
+        <li><a class="nav-link" href="#metodos">Métodos do controller</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ================= Content ================= -->
+  <main class="content">
+    <div class="content-inner">
+
+      <div class="doc-kicker">Documentação · v1.x</div>
+      <h1 class="doc-title">Arcana DataTable</h1>
+      <p class="doc-lead">
+        Uma datatable tipada para Vue 3 e React. A mesma configuração, o mesmo
+        comportamento, o mesmo resultado — em qualquer um dos dois frameworks.
+      </p>
+
+      <!-- ============ COMEÇANDO ============ -->
+      <div class="group-divider">Começando</div>
+
+      <section class="doc-section" id="instalacao">
+        <h2>Instalação</h2>
+        <p>
+          A biblioteca é distribuída como um único pacote npm. Os adaptadores de
+          React e Vue são expostos em subcaminhos separados
+          (<code class="inline">@arcanalabs/datatable/react</code> e
+          <code class="inline">@arcanalabs/datatable/vue</code>), então o bundle
+          final só carrega o framework que você usa.
+        </p>
+        <p>
+          Instale com o gerenciador de pacotes da sua preferência e pronto — não
+          há dependências transitivas de UI.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="both" data-file="terminal">
+            <div class="code-head"><span class="code-file">terminal</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="shell"># instala o pacote
+npm i @arcanalabs/datatable</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="primeiro-uso">
+        <h2>Primeiro uso</h2>
+        <p>
+          Todo o comportamento da tabela vive em um único objeto
+          <code class="inline">config</code>. Você declara as colunas, aponta a
+          origem dos dados e renderiza o componente
+          <code class="inline">ArcanaDataTable</code> — busca, ordenação e
+          paginação já funcionam sem nenhuma linha extra.
+        </p>
+        <p>
+          O exemplo ao lado usa o modo <code class="inline">remote</code>: a cada
+          interação do usuário, a tabela chama seu
+          <code class="inline">datasource</code> com os parâmetros atuais.
+        </p>
+
+        <div class="demo-table" role="img" aria-label="Prévia da datatable renderizada">
+          <div class="demo-toolbar">
+            <span class="demo-search">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3" stroke-linecap="round"/></svg>
+              Buscar…
+            </span>
+            <span class="demo-caption">resultado renderizado</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Colaborador <span class="sort">▲</span></th>
+                <th>Departamento</th>
+                <th>Status</th>
+                <th class="num">Valor <span class="sort">▼</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Ada Lovelace</td><td>Engenharia</td><td><span class="pill pill-ok">Ativo</span></td><td class="num">R$ 4.280</td></tr>
+              <tr><td>Grace Hopper</td><td>Engenharia</td><td><span class="pill pill-ok">Ativo</span></td><td class="num">R$ 1.950</td></tr>
+              <tr><td>Alan Turing</td><td>Pesquisa</td><td><span class="pill pill-warn">Em análise</span></td><td class="num">R$ 8.760</td></tr>
+              <tr><td>Margaret Hamilton</td><td>Produto</td><td><span class="pill pill-ok">Ativo</span></td><td class="num">R$ 2.340</td></tr>
+            </tbody>
+          </table>
+          <div class="demo-footer">
+            <span>1–4 de 6</span>
+            <span class="demo-pager">
+              <button type="button" aria-label="Página anterior">‹</button>
+              <button type="button" class="pg-active">1</button>
+              <button type="button">2</button>
+              <button type="button" aria-label="Próxima página">›</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="Invoices.tsx">
+            <div class="code-head"><span class="code-file">Invoices.tsx</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">import { ArcanaDataTable } from '@arcanalabs/datatable/react'
+import '@arcanalabs/datatable/styles.css'
+
+const config = {
+  mode: 'remote',
+  columns: [
+    { name: 'client', label: 'Cliente' },
+    { name: 'amount', label: 'Valor', type: 'CURRENCY' }
+  ],
+  datasource: async (params) =&gt; api.invoices.list(params)
+}
+
+export function Invoices() {
+  return &lt;ArcanaDataTable config={config} /&gt;
+}</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="Invoices.vue">
+            <div class="code-head"><span class="code-file">Invoices.vue</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">&lt;script setup lang="ts"&gt;
+import { ArcanaDataTable } from '@arcanalabs/datatable/vue'
+import '@arcanalabs/datatable/styles.css'
+
+const config = {
+  mode: 'remote',
+  columns: [
+    { name: 'client', label: 'Cliente' },
+    { name: 'amount', label: 'Valor', type: 'CURRENCY' }
+  ],
+  datasource: async (params) =&gt; api.invoices.list(params)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;ArcanaDataTable :config="config" /&gt;
+&lt;/template&gt;</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="estilos">
+        <h2>Estilos</h2>
+        <p>
+          A folha de estilos é opt-in: importe
+          <code class="inline">@arcanalabs/datatable/styles.css</code> uma única
+          vez, na raiz da aplicação. Ela cobre a tabela, os filtros, a paginação
+          e os estados de carregamento.
+        </p>
+        <p>
+          Se preferir um visual próprio, basta não importar o CSS — a marcação é
+          semântica e estável, pensada para ser estilizada por fora.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="main.tsx">
+            <div class="code-head"><span class="code-file">main.tsx</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// uma vez, no entrypoint da aplicação
+import '@arcanalabs/datatable/styles.css'</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="main.ts">
+            <div class="code-head"><span class="code-file">main.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// uma vez, no entrypoint da aplicação
+import '@arcanalabs/datatable/styles.css'</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============ CONCEITOS ============ -->
+      <div class="group-divider">Conceitos</div>
+
+      <section class="doc-section" id="modos">
+        <h2>Modos remote/dataset</h2>
+        <p>
+          Existem duas formas de alimentar a tabela, e essa escolha define quem
+          faz o trabalho de filtrar, ordenar e paginar:
+        </p>
+        <ul class="doc-list">
+          <li>
+            <strong>remote</strong> — cada filtro, ordenação ou troca de página
+            dispara uma chamada ao <code class="inline">datasource(params)</code>
+            (ou à <code class="inline">url</code> configurada). A resposta
+            esperada tem o formato
+            <code class="inline">{ rows, total, page }</code>.
+          </li>
+          <li>
+            <strong>dataset</strong> — você entrega a coleção completa em
+            memória e a tabela resolve tudo localmente, com zero requisições.
+          </li>
+        </ul>
+        <div class="ref-table-wrap">
+          <table class="ref-table">
+            <thead>
+              <tr><th></th><th>remote</th><th>dataset</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="t-muted">Origem</td><td><code>datasource</code> / <code>url</code></td><td><code>dataset</code> em memória</td></tr>
+              <tr><td class="t-muted">Filtro / ordenação</td><td>no servidor</td><td>na própria tabela</td></tr>
+              <tr><td class="t-muted">Requisições</td><td>a cada interação</td><td>nenhuma</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          O <code class="inline">mode</code> é inferido a partir do que você
+          fornece; declare-o apenas quando quiser ser explícito.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="modos.ts">
+            <div class="code-head"><span class="code-file">modos.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// remote: cada interação chama o datasource
+const remoteConfig = {
+  mode: 'remote',
+  // resposta esperada: { rows, total, page }
+  datasource: async (params) =&gt; api.invoices.list(params)
+}
+
+// dataset: coleção completa em memória, zero requests
+const datasetConfig = {
+  mode: 'dataset',
+  dataset: invoices // DataTableRow[]
+}</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="modos.ts">
+            <div class="code-head"><span class="code-file">modos.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// remote: cada interação chama o datasource
+const remoteConfig = {
+  mode: 'remote',
+  // resposta esperada: { rows, total, page }
+  datasource: async (params) =&gt; api.invoices.list(params)
+}
+
+// dataset: coleção completa em memória, zero requests
+const datasetConfig = {
+  mode: 'dataset',
+  dataset: invoices // DataTableRow[]
+}</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="colunas">
+        <h2>Colunas</h2>
+        <p>
+          Cada coluna é um objeto <code class="inline">DataTableColumn</code> com
+          um <code class="inline">name</code> (a chave na linha) e um
+          <code class="inline">label</code> (o texto do cabeçalho). Campos como
+          <code class="inline">type</code> controlam a formatação — por exemplo,
+          <code class="inline">CURRENCY</code> renderiza valores monetários — e
+          <code class="inline">searchType</code> define o controle de busca da
+          coluna.
+        </p>
+        <p>
+          A propriedade <code class="inline">columns</code> também aceita uma
+          função <code class="inline">() =&gt; DataTableColumn[]</code>, útil
+          quando as colunas dependem de permissões ou de estado da aplicação.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="colunas.ts">
+            <div class="code-head"><span class="code-file">colunas.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const columns = [
+  { name: 'client', label: 'Cliente' },
+  { name: 'department', label: 'Departamento', searchType: 'LIST' },
+  { name: 'active', label: 'Ativo', searchType: 'BOOLEAN' },
+  { name: 'amount', label: 'Valor', type: 'CURRENCY' }
+]
+
+// estático…
+const config = { columns }
+
+// …ou dinâmico: () =&gt; DataTableColumn[]
+const dynamicConfig = { columns: () =&gt; columns }</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="colunas.ts">
+            <div class="code-head"><span class="code-file">colunas.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const columns = [
+  { name: 'client', label: 'Cliente' },
+  { name: 'department', label: 'Departamento', searchType: 'LIST' },
+  { name: 'active', label: 'Ativo', searchType: 'BOOLEAN' },
+  { name: 'amount', label: 'Valor', type: 'CURRENCY' }
+]
+
+// estático…
+const config = { columns }
+
+// …ou dinâmico: () =&gt; DataTableColumn[]
+const dynamicConfig = { columns: () =&gt; columns }</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="paginacao">
+        <h2>Paginação</h2>
+        <p>
+          A paginação vem habilitada por padrão com
+          <code class="inline">rowsPerPage: 10</code>. No modo
+          <code class="inline">remote</code>, a página atual e o tamanho da
+          página viajam nos <code class="inline">params</code> enviados ao
+          <code class="inline">datasource</code>; o
+          <code class="inline">total</code> retornado pela resposta alimenta o
+          contador do rodapé.
+        </p>
+        <p>
+          Para navegar programaticamente, use
+          <code class="inline">controller.paginate(page, size)</code>.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="paginacao.ts">
+            <div class="code-head"><span class="code-file">paginacao.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  mode: 'remote',
+  rowsPerPage: 10, // padrão
+  datasource: async (params) =&gt; {
+    // params inclui a página atual e o tamanho da página
+    return api.invoices.list(params) // { rows, total, page }
+  }
+}
+
+// navegação programática: página 2, 25 linhas por página
+controller.paginate(2, 25)</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="paginacao.ts">
+            <div class="code-head"><span class="code-file">paginacao.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  mode: 'remote',
+  rowsPerPage: 10, // padrão
+  datasource: async (params) =&gt; {
+    // params inclui a página atual e o tamanho da página
+    return api.invoices.list(params) // { rows, total, page }
+  }
+}
+
+// navegação programática: página 2, 25 linhas por página
+controller.paginate(2, 25)</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============ RECURSOS ============ -->
+      <div class="group-divider">Recursos</div>
+
+      <section class="doc-section" id="filtros">
+        <h2>Filtros</h2>
+        <p>
+          A busca por coluna vem ativa por padrão
+          (<code class="inline">searchEnabled: true</code>). Cada coluna com um
+          <code class="inline">searchType</code> ganha o controle adequado no
+          cabeçalho; no modo <code class="inline">remote</code>, os valores
+          preenchidos são enviados dentro dos <code class="inline">params</code>.
+        </p>
+        <p>
+          Use <code class="inline">initialFilters</code> para aplicar filtros já
+          na primeira requisição, e
+          <code class="inline">setFilter</code> /
+          <code class="inline">setFilters</code> no controller para alterá-los em
+          resposta a ações da sua aplicação.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="filtros.ts">
+            <div class="code-head"><span class="code-file">filtros.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// filtros aplicados já na primeira requisição
+const config = {
+  initialFilters: { status: 'active' }
+}
+
+// programaticamente, via controller
+controller.setFilter('department', 'Engenharia')
+
+controller.setFilters({
+  status: 'active',
+  department: 'Pesquisa'
+})</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="filtros.ts">
+            <div class="code-head"><span class="code-file">filtros.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// filtros aplicados já na primeira requisição
+const config = {
+  initialFilters: { status: 'active' }
+}
+
+// programaticamente, via controller
+controller.setFilter('department', 'Engenharia')
+
+controller.setFilters({
+  status: 'active',
+  department: 'Pesquisa'
+})</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="tipos-de-busca">
+        <h2>Tipos de busca</h2>
+        <p>
+          O <code class="inline">searchType</code> de cada coluna define o
+          controle exibido para o usuário. São sete tipos:
+        </p>
+        <div class="ref-table-wrap">
+          <table class="ref-table">
+            <thead>
+              <tr><th>searchType</th><th>Controle</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>DATE</code></td><td class="t-muted">Seletor de data única</td></tr>
+              <tr><td><code>DATE_MONTH</code></td><td class="t-muted">Seletor de mês/ano (competência)</td></tr>
+              <tr><td><code>DATE_RANGE</code></td><td class="t-muted">Intervalo entre duas datas</td></tr>
+              <tr><td><code>BOOLEAN</code></td><td class="t-muted">Alternador sim/não</td></tr>
+              <tr><td><code>LIST</code></td><td class="t-muted">Lista fixa de opções</td></tr>
+              <tr><td><code>REMOTE</code></td><td class="t-muted">Opções carregadas de um endpoint</td></tr>
+              <tr><td><code>COMPONENT</code></td><td class="t-muted">Componente customizado seu</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="tipos-de-busca.ts">
+            <div class="code-head"><span class="code-file">tipos-de-busca.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const columns = [
+  { name: 'created_at', label: 'Criado em', searchType: 'DATE' },
+  { name: 'period', label: 'Competência', searchType: 'DATE_MONTH' },
+  { name: 'due_date', label: 'Vencimento', searchType: 'DATE_RANGE' },
+  { name: 'active', label: 'Ativo', searchType: 'BOOLEAN' },
+  { name: 'status', label: 'Status', searchType: 'LIST' },
+  { name: 'client', label: 'Cliente', searchType: 'REMOTE' },
+  { name: 'tags', label: 'Tags', searchType: 'COMPONENT' }
+]</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="tipos-de-busca.ts">
+            <div class="code-head"><span class="code-file">tipos-de-busca.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const columns = [
+  { name: 'created_at', label: 'Criado em', searchType: 'DATE' },
+  { name: 'period', label: 'Competência', searchType: 'DATE_MONTH' },
+  { name: 'due_date', label: 'Vencimento', searchType: 'DATE_RANGE' },
+  { name: 'active', label: 'Ativo', searchType: 'BOOLEAN' },
+  { name: 'status', label: 'Status', searchType: 'LIST' },
+  { name: 'client', label: 'Cliente', searchType: 'REMOTE' },
+  { name: 'tags', label: 'Tags', searchType: 'COMPONENT' }
+]</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="ordenacao">
+        <h2>Ordenação</h2>
+        <p>
+          A ordenação por coluna vem habilitada por padrão
+          (<code class="inline">orderByEnabled: true</code>): clicar no cabeçalho
+          alterna entre ascendente e descendente. No modo
+          <code class="inline">remote</code>, a ordenação atual segue junto nos
+          <code class="inline">params</code>; no modo
+          <code class="inline">dataset</code>, é resolvida em memória.
+        </p>
+        <p>
+          Para aplicar uma ordenação por código, use
+          <code class="inline">controller.applyOrderBy(orderBy)</code> — a tabela
+          atualiza os indicadores do cabeçalho e refaz a consulta.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="ordenacao.ts">
+            <div class="code-head"><span class="code-file">ordenacao.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  orderByEnabled: true // padrão
+}
+
+// aplica a ordenação e refaz a consulta atual
+controller.applyOrderBy(orderBy)</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="ordenacao.ts">
+            <div class="code-head"><span class="code-file">ordenacao.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  orderByEnabled: true // padrão
+}
+
+// aplica a ordenação e refaz a consulta atual
+controller.applyOrderBy(orderBy)</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="selecao-multipla">
+        <h2>Seleção múltipla</h2>
+        <p>
+          Com <code class="inline">checkboxEnabled: true</code>, cada linha ganha
+          um checkbox e o cabeçalho permite selecionar a página inteira. A
+          seleção sobrevive à troca de página.
+        </p>
+        <p>
+          Leia as linhas marcadas com
+          <code class="inline">getCheckedRows()</code> e limpe tudo com
+          <code class="inline">clearCheckedRows()</code> — típico em ações em
+          lote como "exportar selecionados".
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="selecao-multipla.ts">
+            <div class="code-head"><span class="code-file">selecao-multipla.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  checkboxEnabled: true
+}
+
+// ação em lote
+const selected = controller.getCheckedRows()
+await api.invoices.export(selected)
+
+controller.clearCheckedRows()</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="selecao-multipla.ts">
+            <div class="code-head"><span class="code-file">selecao-multipla.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  checkboxEnabled: true
+}
+
+// ação em lote
+const selected = controller.getCheckedRows()
+await api.invoices.export(selected)
+
+controller.clearCheckedRows()</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="selecao-unica">
+        <h2>Seleção única</h2>
+        <p>
+          Quando o fluxo pede exatamente um registro — escolher um cliente em um
+          diálogo, por exemplo — habilite
+          <code class="inline">radioButtonSelectionEnabled: true</code>. Cada
+          linha exibe um radio button e marcar uma linha desmarca a anterior.
+        </p>
+        <p>
+          A linha escolhida também é lida via
+          <code class="inline">getCheckedRows()</code>, que nesse modo retorna no
+          máximo um item.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="selecao-unica.ts">
+            <div class="code-head"><span class="code-file">selecao-unica.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  radioButtonSelectionEnabled: true
+}
+
+// no modo de seleção única, retorna no máximo um item
+const [chosen] = controller.getCheckedRows()</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="selecao-unica.ts">
+            <div class="code-head"><span class="code-file">selecao-unica.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  radioButtonSelectionEnabled: true
+}
+
+// no modo de seleção única, retorna no máximo um item
+const [chosen] = controller.getCheckedRows()</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="totais">
+        <h2>Totais</h2>
+        <p>
+          Com <code class="inline">footerSummarizerEnabled: true</code>, a tabela
+          adiciona uma linha de rodapé com o total das colunas numéricas —
+          colunas <code class="inline">CURRENCY</code> são somadas e formatadas
+          como moeda.
+        </p>
+        <p>
+          O valor consolidado de uma coluna também fica disponível por código,
+          via <code class="inline">getSummarizedValue(column)</code>.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="totais.ts">
+            <div class="code-head"><span class="code-file">totais.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  footerSummarizerEnabled: true,
+  columns: [
+    { name: 'client', label: 'Cliente' },
+    { name: 'amount', label: 'Valor', type: 'CURRENCY' }
+  ]
+}
+
+// lê o total consolidado da coluna
+const total = controller.getSummarizedValue('amount')</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="totais.ts">
+            <div class="code-head"><span class="code-file">totais.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  footerSummarizerEnabled: true,
+  columns: [
+    { name: 'client', label: 'Cliente' },
+    { name: 'amount', label: 'Valor', type: 'CURRENCY' }
+  ]
+}
+
+// lê o total consolidado da coluna
+const total = controller.getSummarizedValue('amount')</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="responsividade">
+        <h2>Responsividade</h2>
+        <p>
+          Em telas estreitas, escolha o comportamento com
+          <code class="inline">responsiveMode</code>:
+        </p>
+        <ul class="doc-list">
+          <li>
+            <code class="inline">HORIZONTAL_OVERFLOW</code> — mantém a estrutura
+            de tabela e habilita rolagem horizontal.
+          </li>
+          <li>
+            <code class="inline">VERTICAL_RECORD</code> — cada linha vira um
+            cartão vertical, com o rótulo da coluna ao lado de cada valor.
+          </li>
+        </ul>
+        <p>
+          Em listas longas, <code class="inline">stickyHeaderEnabled: true</code>
+          mantém o cabeçalho visível durante a rolagem.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="responsividade.ts">
+            <div class="code-head"><span class="code-file">responsividade.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// rolagem horizontal em telas estreitas
+const overflowConfig = {
+  responsiveMode: 'HORIZONTAL_OVERFLOW'
+}
+
+// cada linha vira um cartão vertical
+const recordConfig = {
+  responsiveMode: 'VERTICAL_RECORD'
+}
+
+// cabeçalho fixo durante a rolagem
+const stickyConfig = {
+  stickyHeaderEnabled: true
+}</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="responsividade.ts">
+            <div class="code-head"><span class="code-file">responsividade.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// rolagem horizontal em telas estreitas
+const overflowConfig = {
+  responsiveMode: 'HORIZONTAL_OVERFLOW'
+}
+
+// cada linha vira um cartão vertical
+const recordConfig = {
+  responsiveMode: 'VERTICAL_RECORD'
+}
+
+// cabeçalho fixo durante a rolagem
+const stickyConfig = {
+  stickyHeaderEnabled: true
+}</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="acoes-eventos">
+        <h2>Ações e eventos</h2>
+        <p>
+          A requisição inicial acontece na montagem
+          (<code class="inline">sendRequestOnMounted: true</code>); desative-a
+          quando a tabela depender de um filtro que o usuário ainda vai escolher.
+          Falhas do <code class="inline">datasource</code> caem em
+          <code class="inline">onRequestError</code>, onde você decide como
+          notificar.
+        </p>
+        <p>
+          Para refletir mutações sem refazer a consulta — o clássico "editei uma
+          linha no diálogo" — use as mutações pontuais do controller:
+          <code class="inline">addRow</code>,
+          <code class="inline">updateRow</code> e
+          <code class="inline">removeRow</code>. Quando quiser recarregar tudo,
+          <code class="inline">refresh()</code>.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="acoes-eventos.ts">
+            <div class="code-head"><span class="code-file">acoes-eventos.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  sendRequestOnMounted: true, // padrão
+  onRequestError: (error) =&gt; {
+    toast.error('Falha ao carregar os dados')
+  }
+}
+
+// mutações pontuais, sem nova requisição
+controller.addRow(row)
+controller.updateRow(uuid, { status: 'inactive' })
+controller.removeRow(uuid)
+
+// refaz a consulta atual
+controller.refresh()</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="acoes-eventos.ts">
+            <div class="code-head"><span class="code-file">acoes-eventos.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  sendRequestOnMounted: true, // padrão
+  onRequestError: (error) =&gt; {
+    toast.error('Falha ao carregar os dados')
+  }
+}
+
+// mutações pontuais, sem nova requisição
+controller.addRow(row)
+controller.updateRow(uuid, { status: 'inactive' })
+controller.removeRow(uuid)
+
+// refaz a consulta atual
+controller.refresh()</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="hooks">
+        <h2>Hooks</h2>
+        <p>
+          O <strong>controller</strong> é a instância que expõe os métodos
+          programáticos da tabela. Obtenha-o com uma
+          <code class="inline">ref</code> apontada para o componente — o padrão
+          idiomático de cada framework — e chame qualquer método a partir da sua
+          UI.
+        </p>
+        <p>
+          A lista completa de métodos está em
+          <a href="#metodos">Métodos do controller</a>.
+        </p>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="InvoicesToolbar.tsx">
+            <div class="code-head"><span class="code-file">InvoicesToolbar.tsx</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">import { useRef } from 'react'
+import { ArcanaDataTable } from '@arcanalabs/datatable/react'
+
+export function Invoices() {
+  const table = useRef(null)
+
+  return (
+    &lt;&gt;
+      &lt;button onClick={() =&gt; table.current?.refresh()}&gt;
+        Atualizar
+      &lt;/button&gt;
+      &lt;ArcanaDataTable ref={table} config={config} /&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="InvoicesToolbar.vue">
+            <div class="code-head"><span class="code-file">InvoicesToolbar.vue</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">&lt;script setup lang="ts"&gt;
+import { ref } from 'vue'
+import { ArcanaDataTable } from '@arcanalabs/datatable/vue'
+
+const table = ref()
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button @click="table?.refresh()"&gt;Atualizar&lt;/button&gt;
+  &lt;ArcanaDataTable ref="table" :config="config" /&gt;
+&lt;/template&gt;</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============ REFERÊNCIA ============ -->
+      <div class="group-divider">Referência</div>
+
+      <section class="doc-section" id="propriedades">
+        <h2>Propriedades</h2>
+        <p>
+          Todas as propriedades aceitas pelo objeto
+          <code class="inline">config</code>:
+        </p>
+        <div class="ref-table-wrap">
+          <table class="ref-table">
+            <thead>
+              <tr><th>Propriedade</th><th>Tipo</th><th>Padrão</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>mode</code></td><td class="t-muted"><span class="t-type">'remote' | 'dataset'</span></td><td class="t-muted">inferido</td></tr>
+              <tr><td><code>dataset</code></td><td class="t-muted"><span class="t-type">DataTableRow[]</span></td><td class="t-muted">—</td></tr>
+              <tr><td><code>columns</code></td><td class="t-muted"><span class="t-type">DataTableColumn[] | () =&gt; …</span></td><td class="t-muted">—</td></tr>
+              <tr><td><code>datasource</code></td><td class="t-muted"><span class="t-type">(params) =&gt; rows | response</span></td><td class="t-muted">—</td></tr>
+              <tr><td><code>url</code></td><td class="t-muted"><span class="t-type">string</span></td><td class="t-muted">—</td></tr>
+              <tr><td><code>rowsPerPage</code></td><td class="t-muted"><span class="t-type">number</span></td><td class="t-muted"><code>10</code></td></tr>
+              <tr><td><code>searchEnabled</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>true</code></td></tr>
+              <tr><td><code>orderByEnabled</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>true</code></td></tr>
+              <tr><td><code>checkboxEnabled</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>false</code></td></tr>
+              <tr><td><code>radioButtonSelectionEnabled</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>false</code></td></tr>
+              <tr><td><code>footerSummarizerEnabled</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>false</code></td></tr>
+              <tr><td><code>responsiveMode</code></td><td class="t-muted"><span class="t-type">HORIZONTAL_OVERFLOW | VERTICAL_RECORD</span></td><td class="t-muted">—</td></tr>
+              <tr><td><code>stickyHeaderEnabled</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>false</code></td></tr>
+              <tr><td><code>sendRequestOnMounted</code></td><td class="t-muted"><span class="t-type">boolean</span></td><td class="t-muted"><code>true</code></td></tr>
+              <tr><td><code>initialFilters</code></td><td class="t-muted"><span class="t-type">object</span></td><td class="t-muted"><code>{}</code></td></tr>
+              <tr><td><code>onRequestError</code></td><td class="t-muted"><span class="t-type">(error) =&gt; void</span></td><td class="t-muted">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout">
+          <strong>Dica:</strong> declare apenas o que difere do padrão — um
+          <code class="inline">config</code> com <code class="inline">columns</code>
+          e <code class="inline">datasource</code> já é uma tabela completa.
+        </div>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="config-completo.ts">
+            <div class="code-head"><span class="code-file">config-completo.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  mode: 'remote',
+  columns,
+  datasource,
+  rowsPerPage: 10,
+  searchEnabled: true,
+  orderByEnabled: true,
+  checkboxEnabled: false,
+  radioButtonSelectionEnabled: false,
+  footerSummarizerEnabled: false,
+  responsiveMode: 'HORIZONTAL_OVERFLOW',
+  stickyHeaderEnabled: false,
+  sendRequestOnMounted: true,
+  initialFilters: {},
+  onRequestError: (error) =&gt; reportError(error)
+}</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="config-completo.ts">
+            <div class="code-head"><span class="code-file">config-completo.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">const config = {
+  mode: 'remote',
+  columns,
+  datasource,
+  rowsPerPage: 10,
+  searchEnabled: true,
+  orderByEnabled: true,
+  checkboxEnabled: false,
+  radioButtonSelectionEnabled: false,
+  footerSummarizerEnabled: false,
+  responsiveMode: 'HORIZONTAL_OVERFLOW',
+  stickyHeaderEnabled: false,
+  sendRequestOnMounted: true,
+  initialFilters: {},
+  onRequestError: (error) =&gt; reportError(error)
+}</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section" id="metodos">
+        <h2>Métodos do controller</h2>
+        <p>
+          Métodos disponíveis na instância do controller (veja
+          <a href="#hooks">Hooks</a> para obtê-la):
+        </p>
+        <div class="ref-table-wrap">
+          <table class="ref-table">
+            <thead>
+              <tr><th>Método</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>refresh()</code></td><td class="t-muted">Refaz a consulta atual</td></tr>
+              <tr><td><code>setRows(rows)</code></td><td class="t-muted">Substitui as linhas exibidas</td></tr>
+              <tr><td><code>setDataset(rows)</code></td><td class="t-muted">Substitui a coleção do modo dataset</td></tr>
+              <tr><td><code>getDataset()</code></td><td class="t-muted">Retorna a coleção completa</td></tr>
+              <tr><td><code>addRow(row)</code></td><td class="t-muted">Insere uma linha</td></tr>
+              <tr><td><code>updateRow(uuid, patch)</code></td><td class="t-muted">Atualiza campos de uma linha</td></tr>
+              <tr><td><code>removeRow(uuid)</code></td><td class="t-muted">Remove uma linha</td></tr>
+              <tr><td><code>getRows()</code></td><td class="t-muted">Retorna as linhas visíveis</td></tr>
+              <tr><td><code>getCheckedRows()</code></td><td class="t-muted">Retorna as linhas selecionadas</td></tr>
+              <tr><td><code>clearCheckedRows()</code></td><td class="t-muted">Limpa a seleção</td></tr>
+              <tr><td><code>setFilter(name, value)</code></td><td class="t-muted">Define um filtro</td></tr>
+              <tr><td><code>setFilters(filters)</code></td><td class="t-muted">Define vários filtros de uma vez</td></tr>
+              <tr><td><code>paginate(page, size)</code></td><td class="t-muted">Navega para uma página</td></tr>
+              <tr><td><code>applyOrderBy(orderBy)</code></td><td class="t-muted">Aplica uma ordenação</td></tr>
+              <tr><td><code>getSummarizedValue(column)</code></td><td class="t-muted">Lê o total de uma coluna</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-slot">
+          <figure class="code-block" data-fw-block="react" data-file="controller.ts">
+            <div class="code-head"><span class="code-file">controller.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// dados
+controller.refresh()
+controller.setRows(rows)
+controller.setDataset(rows)
+controller.getDataset()
+controller.getRows()
+
+// mutações pontuais
+controller.addRow(row)
+controller.updateRow(uuid, patch)
+controller.removeRow(uuid)
+
+// seleção
+controller.getCheckedRows()
+controller.clearCheckedRows()
+
+// filtros, paginação e ordenação
+controller.setFilter(name, value)
+controller.setFilters(filters)
+controller.paginate(page, size)
+controller.applyOrderBy(orderBy)
+
+// totais
+controller.getSummarizedValue(column)</code></pre>
+          </figure>
+          <figure class="code-block" data-fw-block="vue" data-file="controller.ts">
+            <div class="code-head"><span class="code-file">controller.ts</span><button class="copy-btn" type="button">Copiar</button></div>
+            <pre><code data-lang="js">// dados
+controller.refresh()
+controller.setRows(rows)
+controller.setDataset(rows)
+controller.getDataset()
+controller.getRows()
+
+// mutações pontuais
+controller.addRow(row)
+controller.updateRow(uuid, patch)
+controller.removeRow(uuid)
+
+// seleção
+controller.getCheckedRows()
+controller.clearCheckedRows()
+
+// filtros, paginação e ordenação
+controller.setFilter(name, value)
+controller.setFilters(filters)
+controller.paginate(page, size)
+controller.applyOrderBy(orderBy)
+
+// totais
+controller.getSummarizedValue(column)</code></pre>
+          </figure>
+        </div>
+      </section>
+
+      <footer class="doc-footer">
+        Protótipo de layout · Proposta 01 · Manual
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- ================= Code pane ================= -->
+  <aside class="code-pane" aria-label="Código da seção visível">
+    <div class="code-pane-sticky">
+      <div class="code-pane-label">Código da seção</div>
+      <div class="code-pane-body" id="codePaneBody"><!-- clones injetados por JS --></div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ================= Proto switch ================= -->
+<nav class="proto-switch" aria-label="Trocar proposta">
+  <a href="index.html">Início</a>
+  <a href="proposal-1-manual.html" aria-current="page">01</a>
+  <a href="proposal-2-bancada.html">02</a>
+  <a href="proposal-3-trilha.html">03</a>
+  <a href="proposal-4-cookbook.html">04</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ Syntax highlight (fake, regex) ============ */
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlight(src) {
+    var re = /(\/\/[^\n]*)|(#[^\n]*)|('(?:[^'\\\n]|\\.)*')|(\b(?:import|from|export|const|let|var|function|return|async|await|new|true|false|null|setup|lang)\b)|([A-Za-z_$][\w$]*)(?=\s*:)/g;
+    var out = '';
+    var last = 0;
+    var m;
+    while ((m = re.exec(src)) !== null) {
+      out += escapeHtml(src.slice(last, m.index));
+      if (m[1] || m[2]) {
+        out += '<span class="tok-com">' + escapeHtml(m[0]) + '</span>';
+      } else if (m[3]) {
+        out += '<span class="tok-str">' + escapeHtml(m[0]) + '</span>';
+      } else if (m[4]) {
+        out += '<span class="tok-kw">' + escapeHtml(m[0]) + '</span>';
+      } else {
+        out += '<span class="tok-prop">' + escapeHtml(m[0]) + '</span>';
+      }
+      last = re.lastIndex;
+    }
+    out += escapeHtml(src.slice(last));
+    return out;
+  }
+
+  document.querySelectorAll('.code-block pre code').forEach(function (code) {
+    code.innerHTML = highlight(code.textContent);
+  });
+
+  /* ============ Clona os blocos de código para o painel direito ============ */
+  var paneBody = document.getElementById('codePaneBody');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.doc-section'));
+
+  sections.forEach(function (sec) {
+    sec.querySelectorAll('.code-slot .code-block').forEach(function (block) {
+      var clone = block.cloneNode(true);
+      clone.setAttribute('data-section', sec.id);
+      paneBody.appendChild(clone);
+    });
+  });
+
+  /* ============ Scroll-spy ============ */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+  var activeId = null;
+
+  function setActive(id) {
+    if (!id || id === activeId) return;
+    activeId = id;
+
+    navLinks.forEach(function (link) {
+      var match = link.getAttribute('href') === '#' + id;
+      link.classList.toggle('is-active', match);
+      if (match) {
+        link.setAttribute('aria-current', 'true');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+
+    paneBody.querySelectorAll('.code-block').forEach(function (block) {
+      block.classList.toggle('is-active', block.getAttribute('data-section') === id);
+    });
+  }
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-80px 0px -62% 0px', threshold: 0 });
+
+  sections.forEach(function (sec) { observer.observe(sec); });
+
+  // Fallback: perto do fim da página, ativa a última seção
+  window.addEventListener('scroll', function () {
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 8) {
+      setActive(sections[sections.length - 1].id);
+    }
+  }, { passive: true });
+
+  setActive((location.hash || '').replace('#', '') || sections[0].id);
+
+  // clique na nav ativa imediatamente (feedback instantâneo)
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', function () {
+      setActive(link.getAttribute('href').slice(1));
+      document.body.classList.remove('nav-open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  /* ============ Toggle React | Vue ============ */
+  var FW_KEY = 'arcana-docs-framework';
+  var fwButtons = Array.prototype.slice.call(document.querySelectorAll('.fw-btn'));
+
+  function setFramework(fw) {
+    if (fw !== 'react' && fw !== 'vue') fw = 'react';
+    document.documentElement.setAttribute('data-fw', fw);
+    fwButtons.forEach(function (btn) {
+      btn.setAttribute('aria-pressed', String(btn.getAttribute('data-fw') === fw));
+    });
+    try { localStorage.setItem(FW_KEY, fw); } catch (e) { /* modo privado */ }
+  }
+
+  fwButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setFramework(btn.getAttribute('data-fw'));
+    });
+  });
+
+  var storedFw = null;
+  try { storedFw = localStorage.getItem(FW_KEY); } catch (e) { /* modo privado */ }
+  setFramework(storedFw || 'react');
+
+  /* ============ Copiar código ============ */
+  document.addEventListener('click', function (event) {
+    var btn = event.target.closest('.copy-btn');
+    if (!btn) return;
+    var block = btn.closest('.code-block');
+    var text = block.querySelector('pre code').textContent;
+
+    function done() {
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = 'Copiar';
+        btn.classList.remove('copied');
+      }, 1600);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) { /* noop */ }
+      document.body.removeChild(ta);
+      done();
+    }
+  });
+
+  /* ============ Menu mobile ============ */
+  var menuBtn = document.getElementById('menuBtn');
+  var navScrim = document.getElementById('navScrim');
+
+  menuBtn.addEventListener('click', function () {
+    var open = document.body.classList.toggle('nav-open');
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  navScrim.addEventListener('click', function () {
+    document.body.classList.remove('nav-open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  });
+
+  /* ============ Busca fake: ⌘K foca o campo ============ */
+  var searchInput = document.getElementById('searchInput');
+  document.addEventListener('keydown', function (event) {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      searchInput.focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>

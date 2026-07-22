@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-fw="react">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcana DataTable — Guia de campo (Trilha)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Fira+Code:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600&display=swap" rel="stylesheet">
+<script>
+/* aplica o framework salvo antes do primeiro paint (evita flash) */
+(function(){
+  try{
+    var fw = localStorage.getItem('arcana-docs-framework');
+    if(fw === 'vue' || fw === 'react'){ document.documentElement.setAttribute('data-fw', fw); }
+  }catch(e){}
+})();
+</script>
+<style>
+:root{
+  --bg:#fafaf8;
+  --ink:#1f2a44;
+  --muted:#5b6478;
+  --accent:#0e9f6e;
+  --accent-soft:#e6f6ef;
+  --accent-soft-ink:#0b7f58;
+  --border:#e5e4df;
+  --code-bg:#101726;
+  --code-bar:#0b111e;
+  --code-ink:#dce4f5;
+  --code-str:#7ee2b8;
+  --code-kw:#93a7ff;
+  --code-cm:#64719b;
+  --code-num:#eac489;
+  --rail-w:56px;
+  --font-display:"Bricolage Grotesque", system-ui, sans-serif;
+  --font-prose:"Source Serif 4", Georgia, serif;
+  --font-ui:"Fira Code", ui-monospace, monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+@media (prefers-reduced-motion: no-preference){
+  html{scroll-behavior:smooth}
+}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-prose);
+  font-size:17px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(14,159,110,.22)}
+a{color:var(--accent)}
+a:focus-visible,
+button:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+  border-radius:4px;
+}
+code,kbd{font-family:var(--font-ui)}
+
+/* ============ Framework switching ============ */
+html[data-fw="react"] .code[data-fw="vue"]{display:none}
+html[data-fw="vue"] .code[data-fw="react"]{display:none}
+
+/* ============ Rail de progresso (assinatura) ============ */
+.rail{
+  position:fixed;
+  top:0;left:0;bottom:0;
+  width:var(--rail-w);
+  z-index:50;
+}
+.rail-line{
+  position:absolute;
+  left:50%;
+  top:96px;
+  bottom:96px;
+  width:2px;
+  margin-left:-1px;
+  background:var(--border);
+  border-radius:2px;
+}
+.rail-fill{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:0%;
+  background:var(--accent);
+  border-radius:2px;
+  transition:height .15s linear;
+}
+.rail-marker{
+  position:absolute;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;
+  border:2px solid var(--border);
+  border-radius:50%;
+  font-family:var(--font-ui);
+  font-size:10px;
+  font-weight:600;
+  color:var(--muted);
+  text-decoration:none;
+  transition:border-color .2s ease, background .2s ease, color .2s ease, transform .2s ease;
+}
+.rail-marker:hover{border-color:var(--accent);color:var(--accent-soft-ink)}
+.rail-marker.is-done{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+.rail-marker.is-active{
+  background:#fff;
+  border-color:var(--accent);
+  color:var(--accent-soft-ink);
+  transform:translate(-50%,-50%) scale(1.22);
+  box-shadow:0 0 0 5px rgba(14,159,110,.14);
+}
+/* tooltip */
+.rail-marker::after{
+  content:attr(data-title);
+  position:absolute;
+  left:calc(100% + 12px);
+  top:50%;
+  transform:translateY(-50%);
+  background:var(--ink);
+  color:#fff;
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:500;
+  line-height:1;
+  padding:7px 10px;
+  border-radius:7px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+}
+.rail-marker::before{ /* setinha do tooltip */
+  content:"";
+  position:absolute;
+  left:calc(100% + 6px);
+  top:50%;
+  transform:translateY(-50%);
+  border:4px solid transparent;
+  border-right-color:var(--ink);
+  opacity:0;
+  transition:opacity .18s ease;
+}
+.rail-marker:hover::after,
+.rail-marker:focus-visible::after,
+.rail-marker.is-active::after,
+.rail-marker:hover::before,
+.rail-marker:focus-visible::before,
+.rail-marker.is-active::before{opacity:1}
+
+/* barra de progresso mobile */
+.mobile-progress{
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;
+  height:4px;
+  background:var(--border);
+  z-index:50;
+}
+.mobile-progress-fill{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:width .15s linear;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .rail-fill,.mobile-progress-fill,.rail-marker,.rail-marker::after,.rail-marker::before{transition:none !important}
+}
+
+/* ============ Layout central ============ */
+.page{padding-left:var(--rail-w)}
+.wrap{max-width:720px;margin:0 auto;padding:0 28px}
+
+/* ============ Cabeçalho ============ */
+.doc-header{padding:64px 0 20px;border-bottom:1px solid var(--border)}
+.brand-row{display:flex;align-items:center;gap:12px}
+.brand-mark{
+  width:34px;height:34px;
+  border-radius:9px;
+  background:var(--ink);
+  color:#7ee2b8;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);
+  font-weight:600;
+  font-size:15px;
+  flex:none;
+}
+.brand-name{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:26px;
+  letter-spacing:-.01em;
+}
+.brand-name small{
+  display:block;
+  font-family:var(--font-ui);
+  font-weight:500;
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent-soft-ink);
+}
+.doc-sub{
+  margin-top:18px;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(28px,5vw,40px);
+  line-height:1.12;
+  letter-spacing:-.02em;
+}
+.doc-lead{margin-top:14px;color:var(--muted);max-width:56ch}
+.doc-meta{
+  margin-top:26px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  font-family:var(--font-ui);
+  font-size:12px;
+  color:var(--muted);
+}
+.meta-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
+}
+.meta-chip b{color:var(--ink);font-weight:600}
+.fw-toggle{
+  margin-left:auto;
+  display:inline-flex;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
+  padding:3px;
+  gap:2px;
+}
+.fw-toggle button{
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+  padding:5px 14px;
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+.fw-toggle button:hover{color:var(--ink)}
+.fw-toggle button.is-on{background:var(--accent);color:#fff}
+
+/* ============ Capítulos ============ */
+.chapter{
+  padding:72px 0 56px;
+  border-bottom:1px solid var(--border);
+  scroll-margin-top:28px;
+}
+.chapter-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:22px}
+.chapter-num{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:64px;
+  line-height:.9;
+  letter-spacing:-.03em;
+  color:#9ed9c0;
+  flex:none;
+  user-select:none;
+}
+@supports (-webkit-text-stroke: 2px green){
+  .chapter-num{
+    color:transparent;
+    -webkit-text-stroke:2px rgba(14,159,110,.5);
+  }
+}
+.chapter-kicker{
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent-soft-ink);
+  margin-top:6px;
+}
+.chapter h2{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(24px,4vw,31px);
+  line-height:1.15;
+  letter-spacing:-.015em;
+  margin-top:2px;
+}
+.objective{
+  margin:0 0 20px;
+  padding:12px 16px;
+  background:var(--accent-soft);
+  border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;
+  font-size:16px;
+}
+.objective strong{
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent-soft-ink);
+  margin-right:6px;
+}
+.chapter p{margin:0 0 18px}
+.chapter p.tight{margin-bottom:10px}
+.chapter code.inline{
+  background:#eef1f0;
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:1px 6px;
+  font-size:13px;
+  color:var(--ink);
+}
+.you-have{
+  margin-top:28px;
+  padding-top:18px;
+  border-top:1px dashed var(--border);
+  color:var(--ink);
+}
+.you-have .check{
+  color:var(--accent);
+  font-weight:700;
+  margin-right:6px;
+}
+.you-have strong{font-weight:600}
+.next-link{
+  display:inline-block;
+  margin-top:10px;
+  font-family:var(--font-ui);
+  font-size:13px;
+  font-weight:600;
+  color:var(--accent-soft-ink);
+  text-decoration:none;
+  border-bottom:1px solid rgba(14,159,110,.4);
+  padding-bottom:2px;
+}
+.next-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ============ Blocos de código ============ */
+.code{
+  margin:24px 0;
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--code-bg);
+  box-shadow:0 1px 2px rgba(31,42,68,.06),0 12px 28px -20px rgba(16,23,38,.55);
+}
+.code figcaption{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 14px;
+  background:var(--code-bar);
+  font-family:var(--font-ui);
+  font-size:11.5px;
+  color:#8b97b8;
+}
+.code-lang{display:inline-flex;align-items:center;gap:8px}
+.code-lang::before{
+  content:"";
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--accent);
+  flex:none;
+}
+.copy-btn{
+  font-family:var(--font-ui);
+  font-size:11px;
+  font-weight:500;
+  color:#aab6d4;
+  background:transparent;
+  border:1px solid #2a3550;
+  border-radius:6px;
+  padding:4px 10px;
+  cursor:pointer;
+  transition:color .15s ease,border-color .15s ease;
+}
+.copy-btn:hover{color:#fff;border-color:#46557d}
+.copy-btn.is-done{color:var(--code-str);border-color:rgba(126,226,184,.5)}
+.code pre{
+  padding:18px 20px;
+  overflow-x:auto;
+  font-family:var(--font-ui);
+  font-size:13px;
+  line-height:1.7;
+  color:var(--code-ink);
+}
+.code pre code{font-family:inherit}
+.tk-k{color:var(--code-kw)}
+.tk-s{color:var(--code-str)}
+.tk-c{color:var(--code-cm)}
+.tk-n{color:var(--code-num)}
+
+/* ============ Demos fake ============ */
+.demo{
+  margin:26px 0;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(31,42,68,.04),0 10px 26px -22px rgba(31,42,68,.25);
+}
+.demo-cap{
+  padding:8px 16px;
+  border-bottom:1px solid var(--border);
+  font-family:var(--font-ui);
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  background:#fcfcfa;
+}
+.demo-filters{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  background:#fcfcfa;
+}
+.fchip{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-family:var(--font-ui);
+  font-size:12px;
+  color:var(--ink);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:6px 11px;
+}
+.fchip em{
+  font-style:normal;
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.fchip i{font-style:normal;color:var(--muted);font-size:10px}
+.fchip--on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-soft-ink)}
+.fchip--on em{color:var(--accent-soft-ink)}
+.demo-scroll{overflow-x:auto}
+.dtable{
+  width:100%;
+  border-collapse:collapse;
+  font-family:var(--font-ui);
+  font-size:13px;
+  min-width:520px;
+}
+.dtable th{
+  text-align:left;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:11px 16px;
+  border-bottom:1px solid var(--border);
+  background:#fcfcfa;
+  white-space:nowrap;
+}
+.dtable td{
+  padding:12px 16px;
+  border-bottom:1px solid #f0efe9;
+  white-space:nowrap;
+}
+.dtable tr:last-child td{border-bottom:0}
+.dtable .num{text-align:right;font-variant-numeric:tabular-nums}
+.dtable .sort{color:var(--accent);font-weight:600}
+.pill{
+  display:inline-block;
+  font-size:11px;
+  font-weight:500;
+  padding:3px 10px;
+  border-radius:999px;
+  background:#f0efe9;
+  color:var(--muted);
+}
+.pill--ok{background:var(--accent-soft);color:var(--accent-soft-ink)}
+.pill--warn{background:#fdf3e1;color:#9a6b1f}
+.cb{
+  display:inline-block;
+  width:16px;height:16px;
+  border:1.5px solid #c9c8c1;
+  border-radius:4px;
+  background:#fff;
+  vertical-align:middle;
+  position:relative;
+}
+.cb--on{background:var(--accent);border-color:var(--accent)}
+.cb--on::after{
+  content:"✓";
+  position:absolute;
+  inset:0;
+  color:#fff;
+  font-size:11px;
+  line-height:16px;
+  text-align:center;
+  font-family:var(--font-ui);
+}
+.demo-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  background:#fcfcfa;
+  font-family:var(--font-ui);
+  font-size:12px;
+  color:var(--muted);
+}
+.pager{display:inline-flex;align-items:center;gap:6px}
+.pager b{font-weight:400;color:#c9c8c1}
+.pg{
+  font-style:normal;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;height:24px;
+  border-radius:7px;
+  border:1px solid var(--border);
+}
+.pg--on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.sum b{color:var(--ink);font-weight:600}
+
+/* ============ Referência de métodos (cap. 08) ============ */
+.method-grid{
+  margin:24px 0;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  background:#fff;
+}
+.method{
+  display:grid;
+  grid-template-columns:minmax(180px,240px) 1fr;
+  gap:14px;
+  padding:11px 16px;
+  border-bottom:1px solid #f0efe9;
+  align-items:baseline;
+}
+.method:last-child{border-bottom:0}
+.method:nth-child(odd){background:#fcfcfa}
+.method code{
+  font-size:12.5px;
+  font-weight:500;
+  color:var(--accent-soft-ink);
+  word-break:break-word;
+}
+.method span{
+  font-size:14.5px;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+/* ============ Fim: cartões ============ */
+.chapter--end{border-bottom:0;padding-bottom:24px}
+.end-cards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:26px;
+}
+.end-card{
+  display:block;
+  padding:22px 20px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#fff;
+  text-decoration:none;
+  color:var(--ink);
+  transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.end-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-2px);
+  box-shadow:0 14px 30px -22px rgba(14,159,110,.45);
+}
+.end-card h3{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:19px;
+  letter-spacing:-.01em;
+  line-height:1.25;
+}
+.end-card p{
+  margin:8px 0 14px;
+  font-size:14.5px;
+  color:var(--muted);
+  line-height:1.6;
+}
+.end-card span{
+  font-family:var(--font-ui);
+  font-size:12px;
+  font-weight:600;
+  color:var(--accent-soft-ink);
+}
+@media (prefers-reduced-motion: reduce){
+  .end-card{transition:none}
+  .end-card:hover{transform:none}
+}
+
+/* ============ Rodapé ============ */
+.doc-footer{
+  padding:36px 0 96px;
+  text-align:center;
+  font-family:var(--font-ui);
+  font-size:11.5px;
+  color:var(--muted);
+}
+
+/* ============ Barra de troca de protótipos ============ */
+.proto-switch{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  z-index:60;
+  display:flex;
+  gap:2px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:4px;
+  box-shadow:0 4px 18px rgba(31,42,68,.10);
+  font-family:var(--font-ui);
+  font-size:12px;
+}
+.proto-switch a{
+  padding:4px 11px;
+  border-radius:999px;
+  color:var(--muted);
+  text-decoration:none;
+}
+.proto-switch a:hover{color:var(--ink);background:#f1f0ec}
+.proto-switch a[aria-current="page"]{background:var(--accent);color:#fff}
+
+/* ============ Responsivo ============ */
+@media (max-width: 900px){
+  .rail{display:none}
+  .mobile-progress{display:block}
+  .page{padding-left:0}
+  .chapter{scroll-margin-top:44px}
+}
+@media (max-width: 560px){
+  body{font-size:16px}
+  .wrap{padding:0 18px}
+  .doc-header{padding-top:44px}
+  .doc-meta{gap:10px}
+  .fw-toggle{margin-left:0}
+  .chapter{padding:52px 0 44px}
+  .chapter-head{gap:14px}
+  .chapter-num{font-size:46px}
+  .end-cards{grid-template-columns:1fr}
+  .method{grid-template-columns:1fr;gap:2px;padding:10px 14px}
+  .proto-switch{right:10px;bottom:10px;font-size:11px}
+  .proto-switch a{padding:4px 8px}
+  .code pre{font-size:12px;padding:14px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- Barra de progresso (mobile) -->
+<div class="mobile-progress" aria-hidden="true"><div class="mobile-progress-fill"></div></div>
+
+<!-- Rail de progresso (desktop) -->
+<nav class="rail" aria-label="Progresso da trilha">
+  <div class="rail-line">
+    <div class="rail-fill"></div>
+    <a class="rail-marker" href="#cap-01" data-title="01 · Instalar e importar estilos" aria-label="Capítulo 01 — Instalar e importar estilos"><span aria-hidden="true">1</span></a>
+    <a class="rail-marker" href="#cap-02" data-title="02 · Primeira tabela" aria-label="Capítulo 02 — Primeira tabela"><span aria-hidden="true">2</span></a>
+    <a class="rail-marker" href="#cap-03" data-title="03 · Colunas" aria-label="Capítulo 03 — Colunas"><span aria-hidden="true">3</span></a>
+    <a class="rail-marker" href="#cap-04" data-title="04 · Filtros e tipos de busca" aria-label="Capítulo 04 — Filtros e tipos de busca"><span aria-hidden="true">4</span></a>
+    <a class="rail-marker" href="#cap-05" data-title="05 · Ordenação e paginação" aria-label="Capítulo 05 — Ordenação e paginação"><span aria-hidden="true">5</span></a>
+    <a class="rail-marker" href="#cap-06" data-title="06 · Modo remote" aria-label="Capítulo 06 — Modo remote"><span aria-hidden="true">6</span></a>
+    <a class="rail-marker" href="#cap-07" data-title="07 · Seleção e totais" aria-label="Capítulo 07 — Seleção e totais"><span aria-hidden="true">7</span></a>
+    <a class="rail-marker" href="#cap-08" data-title="08 · Controller" aria-label="Capítulo 08 — Controller"><span aria-hidden="true">8</span></a>
+  </div>
+</nav>
+
+<div class="page">
+<main class="wrap">
+
+  <!-- ============ Cabeçalho ============ -->
+  <header class="doc-header">
+    <div class="brand-row">
+      <div class="brand-mark" aria-hidden="true">◈</div>
+      <div class="brand-name">Arcana DataTable
+        <small>Arcana Labs · v2</small>
+      </div>
+    </div>
+    <h1 class="doc-sub">Guia de campo — da instalação à tabela completa</h1>
+    <p class="doc-lead">Uma trilha em oito capítulos curtos. Leia de cima a baixo: cada capítulo declara um objetivo, entrega um pedaço da tabela e diz exatamente o que você tem em mãos ao final.</p>
+    <div class="doc-meta">
+      <span class="meta-chip">⏱ <b>~15 min</b> de leitura</span>
+      <span class="meta-chip"><b>8</b> capítulos</span>
+      <div class="fw-toggle" role="group" aria-label="Escolher framework dos exemplos">
+        <button type="button" data-fw="react" aria-pressed="true">React</button>
+        <button type="button" data-fw="vue" aria-pressed="false">Vue</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Capítulo 01 ============ -->
+  <section class="chapter" id="cap-01">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">01</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 01</p>
+        <h2>Instalar e importar estilos</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Deixar o pacote instalado e os estilos globais carregados no seu app.</p>
+    <p>Um único pacote atende os dois mundos: os componentes de React e de Vue vivem em subcaminhos separados do mesmo <code class="inline">@arcanalabs/datatable</code>. Instale uma vez.</p>
+
+    <figure class="code">
+      <figcaption><span class="code-lang">Terminal</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code>npm install @arcanalabs/datatable</code></pre>
+    </figure>
+
+    <p>Depois, importe a folha de estilos <em>uma única vez</em>, no ponto de entrada da aplicação. Sem ela a tabela renderiza, mas sem forma.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · main.jsx</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-c">// uma vez, na raiz do app</span>
+<span class="tk-k">import</span> <span class="tk-s">'@arcanalabs/datatable/styles.css'</span></code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · main.ts</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-c">// uma vez, na raiz do app</span>
+<span class="tk-k">import</span> <span class="tk-s">'@arcanalabs/datatable/styles.css'</span></code></pre>
+    </figure>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> o pacote instalado e os estilos carregados — pronto para renderizar a primeira tabela.</p>
+    <a class="next-link" href="#cap-02">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 02 ============ -->
+  <section class="chapter" id="cap-02">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">02</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 02</p>
+        <h2>Primeira tabela (modo dataset)</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Renderizar sua primeira tabela a partir de um array local.</p>
+    <p>Tudo na Arcana DataTable parte de um objeto <code class="inline">config</code>. No modo <code class="inline">dataset</code>, você entrega as linhas prontas em memória e a tabela cuida do resto — paginação, busca e ordenação acontecem no cliente.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · Equipe.jsx</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">import</span> { ArcanaDataTable } <span class="tk-k">from</span> <span class="tk-s">'@arcanalabs/datatable/react'</span>
+
+<span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  rowsPerPage: <span class="tk-n">10</span>,
+  dataset: [
+    { nome: <span class="tk-s">'Ada Lovelace'</span>,      departamento: <span class="tk-s">'Engenharia'</span>, status: <span class="tk-s">'Ativo'</span>,      custo: <span class="tk-n">4280</span> },
+    { nome: <span class="tk-s">'Grace Hopper'</span>,      departamento: <span class="tk-s">'Engenharia'</span>, status: <span class="tk-s">'Ativo'</span>,      custo: <span class="tk-n">1950</span> },
+    { nome: <span class="tk-s">'Alan Turing'</span>,       departamento: <span class="tk-s">'Pesquisa'</span>,   status: <span class="tk-s">'Em análise'</span>, custo: <span class="tk-n">8760</span> },
+    { nome: <span class="tk-s">'Margaret Hamilton'</span>, departamento: <span class="tk-s">'Produto'</span>,    status: <span class="tk-s">'Ativo'</span>,      custo: <span class="tk-n">2340</span> },
+  ],
+  columns: [
+    { name: <span class="tk-s">'nome'</span>,         label: <span class="tk-s">'Nome'</span> },
+    { name: <span class="tk-s">'departamento'</span>, label: <span class="tk-s">'Departamento'</span> },
+    { name: <span class="tk-s">'status'</span>,       label: <span class="tk-s">'Status'</span> },
+    { name: <span class="tk-s">'custo'</span>,        label: <span class="tk-s">'Custo mensal'</span> },
+  ],
+}
+
+<span class="tk-k">export function</span> Equipe() {
+  <span class="tk-k">return</span> &lt;ArcanaDataTable config={config} /&gt;
+}</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · Equipe.vue</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code>&lt;<span class="tk-k">script setup</span>&gt;
+<span class="tk-k">import</span> { ArcanaDataTable } <span class="tk-k">from</span> <span class="tk-s">'@arcanalabs/datatable/vue'</span>
+
+<span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  rowsPerPage: <span class="tk-n">10</span>,
+  dataset: [
+    { nome: <span class="tk-s">'Ada Lovelace'</span>,      departamento: <span class="tk-s">'Engenharia'</span>, status: <span class="tk-s">'Ativo'</span>,      custo: <span class="tk-n">4280</span> },
+    { nome: <span class="tk-s">'Grace Hopper'</span>,      departamento: <span class="tk-s">'Engenharia'</span>, status: <span class="tk-s">'Ativo'</span>,      custo: <span class="tk-n">1950</span> },
+    { nome: <span class="tk-s">'Alan Turing'</span>,       departamento: <span class="tk-s">'Pesquisa'</span>,   status: <span class="tk-s">'Em análise'</span>, custo: <span class="tk-n">8760</span> },
+    { nome: <span class="tk-s">'Margaret Hamilton'</span>, departamento: <span class="tk-s">'Produto'</span>,    status: <span class="tk-s">'Ativo'</span>,      custo: <span class="tk-n">2340</span> },
+  ],
+  columns: [
+    { name: <span class="tk-s">'nome'</span>,         label: <span class="tk-s">'Nome'</span> },
+    { name: <span class="tk-s">'departamento'</span>, label: <span class="tk-s">'Departamento'</span> },
+    { name: <span class="tk-s">'status'</span>,       label: <span class="tk-s">'Status'</span> },
+    { name: <span class="tk-s">'custo'</span>,        label: <span class="tk-s">'Custo mensal'</span> },
+  ],
+}
+&lt;/<span class="tk-k">script</span>&gt;
+
+&lt;<span class="tk-k">template</span>&gt;
+  &lt;ArcanaDataTable :config=<span class="tk-s">"config"</span> /&gt;
+&lt;/<span class="tk-k">template</span>&gt;</code></pre>
+    </figure>
+
+    <div class="demo">
+      <div class="demo-cap">Demonstração · visual ilustrativo</div>
+      <div class="demo-scroll">
+        <table class="dtable">
+          <thead>
+            <tr><th>Nome</th><th>Departamento</th><th>Status</th><th class="num">Custo mensal</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Ada Lovelace</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 4.280</td></tr>
+            <tr><td>Grace Hopper</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 1.950</td></tr>
+            <tr><td>Alan Turing</td><td>Pesquisa</td><td><span class="pill pill--warn">Em análise</span></td><td class="num">R$ 8.760</td></tr>
+            <tr><td>Margaret Hamilton</td><td>Produto</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 2.340</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> uma tabela real renderizando quatro pessoas a partir de um array — sem servidor, sem cerimônia.</p>
+    <a class="next-link" href="#cap-03">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 03 ============ -->
+  <section class="chapter" id="cap-03">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">03</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 03</p>
+        <h2>Colunas: largura, alinhamento, renderizadores</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Dar forma às colunas — largura fixa, alinhamento e células ricas.</p>
+    <p>Cada item de <code class="inline">columns</code> aceita mais do que <code class="inline">name</code> e <code class="inline">label</code>. Com <code class="inline">width</code> você trava a largura, com <code class="inline">textAlignment</code> alinha o conteúdo e com <code class="inline">valueGetter</code> substitui o texto cru pelo HTML que você imaginar — pílulas de status, moeda formatada, avatares.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · colunas com valueGetter</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code>columns: [
+  { name: <span class="tk-s">'nome'</span>, label: <span class="tk-s">'Nome'</span>, width: <span class="tk-k">240</span> },
+  { name: <span class="tk-s">'departamento'</span>, label: <span class="tk-s">'Departamento'</span>, textAlignment: <span class="tk-s">'center'</span> },
+  {
+    name: <span class="tk-s">'status'</span>,
+    label: <span class="tk-s">'Status'</span>,
+    valueGetter: (value) =&gt;
+      <span class="tk-s">`&lt;span class="${value === 'Ativo' ? 'pill pill-ok' : 'pill'}"&gt;${value}&lt;/span&gt;`</span>,
+  },
+  {
+    name: <span class="tk-s">'custo'</span>,
+    label: <span class="tk-s">'Custo mensal'</span>,
+    type: <span class="tk-s">'CURRENCY'</span>,
+    textAlignment: <span class="tk-s">'right'</span>,
+    valueGetter: (value) =&gt;
+      Number(value).toLocaleString(<span class="tk-s">'pt-BR'</span>, { style: <span class="tk-s">'currency'</span>, currency: <span class="tk-s">'BRL'</span> }),
+  },
+],</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · colunas com valueGetter</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code>columns: [
+  { name: <span class="tk-s">'nome'</span>, label: <span class="tk-s">'Nome'</span>, width: <span class="tk-k">240</span> },
+  { name: <span class="tk-s">'departamento'</span>, label: <span class="tk-s">'Departamento'</span>, textAlignment: <span class="tk-s">'center'</span> },
+  {
+    name: <span class="tk-s">'status'</span>,
+    label: <span class="tk-s">'Status'</span>,
+    valueGetter: (value) =&gt;
+      <span class="tk-s">`&lt;span class="${value === 'Ativo' ? 'pill pill-ok' : 'pill'}"&gt;${value}&lt;/span&gt;`</span>,
+  },
+  {
+    name: <span class="tk-s">'custo'</span>,
+    label: <span class="tk-s">'Custo mensal'</span>,
+    type: <span class="tk-s">'CURRENCY'</span>,
+    textAlignment: <span class="tk-s">'right'</span>,
+    valueGetter: (value) =&gt;
+      Number(value).toLocaleString(<span class="tk-s">'pt-BR'</span>, { style: <span class="tk-s">'currency'</span>, currency: <span class="tk-s">'BRL'</span> }),
+  },
+],</code></pre>
+    </figure>
+
+    <p>Foi exatamente assim que as pílulas de status e a coluna de moeda da demonstração do capítulo anterior nasceram.</p>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> colunas com largura, alinhamento e células customizadas por renderizador.</p>
+    <a class="next-link" href="#cap-04">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 04 ============ -->
+  <section class="chapter" id="cap-04">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">04</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 04</p>
+        <h2>Filtros e tipos de busca</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Ligar a busca e escolher o tipo de filtro certo para cada coluna.</p>
+    <p>Com <code class="inline">searchEnabled: true</code>, cada coluna ganha um campo de busca. Por padrão é texto livre — mas o <code class="inline">searchType</code> troca o controle por algo mais adequado ao dado: calendário, intervalo de datas, alternador booleano, lista de opções, busca remota ou um componente seu.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · searchType por coluna</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  searchEnabled: <span class="tk-k">true</span>,
+  initialFilters: { status: <span class="tk-k">true</span> }, <span class="tk-c">// já abre mostrando só ativos</span>
+  columns: [
+    { name: <span class="tk-s">'admissao'</span>,     label: <span class="tk-s">'Admissão'</span>,     searchType: <span class="tk-s">'DATE'</span> },
+    { name: <span class="tk-s">'vigencia'</span>,     label: <span class="tk-s">'Vigência'</span>,     searchType: <span class="tk-s">'DATE_RANGE'</span> },
+    { name: <span class="tk-s">'status'</span>,       label: <span class="tk-s">'Ativo?'</span>,       searchType: <span class="tk-s">'BOOLEAN'</span> },
+    { name: <span class="tk-s">'departamento'</span>, label: <span class="tk-s">'Departamento'</span>, searchType: <span class="tk-s">'LIST'</span>,
+      searchConfig: () =&gt; areas },  <span class="tk-c">// [{ value, label }]</span>
+    { name: <span class="tk-s">'gestor'</span>,       label: <span class="tk-s">'Gestor'</span>,       searchType: <span class="tk-s">'REMOTE'</span>,
+      searchConfig: <span class="tk-k">async</span> () =&gt; buscarGestores() },
+    { name: <span class="tk-s">'custo'</span>,        label: <span class="tk-s">'Custo mensal'</span>, searchType: <span class="tk-s">'COMPONENT'</span>,
+      searchTypeRenderer: FaixaDeCustoFilter },
+  ],
+}</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · searchType por coluna</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">import</span> FaixaDeCustoFilter <span class="tk-k">from</span> <span class="tk-s">'./FaixaDeCustoFilter.vue'</span>
+
+<span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  searchEnabled: <span class="tk-k">true</span>,
+  initialFilters: { status: <span class="tk-k">true</span> }, <span class="tk-c">// já abre mostrando só ativos</span>
+  columns: [
+    { name: <span class="tk-s">'admissao'</span>,     label: <span class="tk-s">'Admissão'</span>,     searchType: <span class="tk-s">'DATE'</span> },
+    { name: <span class="tk-s">'vigencia'</span>,     label: <span class="tk-s">'Vigência'</span>,     searchType: <span class="tk-s">'DATE_RANGE'</span> },
+    { name: <span class="tk-s">'status'</span>,       label: <span class="tk-s">'Ativo?'</span>,       searchType: <span class="tk-s">'BOOLEAN'</span> },
+    { name: <span class="tk-s">'departamento'</span>, label: <span class="tk-s">'Departamento'</span>, searchType: <span class="tk-s">'LIST'</span>,
+      searchConfig: () =&gt; areas },  <span class="tk-c">// [{ value, label }]</span>
+    { name: <span class="tk-s">'gestor'</span>,       label: <span class="tk-s">'Gestor'</span>,       searchType: <span class="tk-s">'REMOTE'</span>,
+      searchConfig: <span class="tk-k">async</span> () =&gt; buscarGestores() },
+    { name: <span class="tk-s">'custo'</span>,        label: <span class="tk-s">'Custo mensal'</span>, searchType: <span class="tk-s">'COMPONENT'</span>,
+      searchTypeRenderer: FaixaDeCustoFilter },
+  ],
+}</code></pre>
+    </figure>
+
+    <p>Há ainda o tipo <code class="inline">DATE_MONTH</code>, para filtrar por mês/ano fechado — útil em folhas de pagamento e fechamentos. E <code class="inline">initialFilters</code> deixa a tabela nascer já filtrada, como abaixo.</p>
+
+    <div class="demo">
+      <div class="demo-cap">Demonstração · filtro BOOLEAN "Ativos" aplicado</div>
+      <div class="demo-filters" aria-hidden="true">
+        <span class="fchip"><em>Departamento</em> Todos <i>▾</i></span>
+        <span class="fchip fchip--on"><em>Ativo?</em> Sim</span>
+        <span class="fchip"><em>Admissão</em> dd/mm/aaaa <i>▾</i></span>
+      </div>
+      <div class="demo-scroll">
+        <table class="dtable">
+          <thead>
+            <tr><th>Nome</th><th>Departamento</th><th>Status</th><th class="num">Custo mensal</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Ada Lovelace</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 4.280</td></tr>
+            <tr><td>Grace Hopper</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 1.950</td></tr>
+            <tr><td>Margaret Hamilton</td><td>Produto</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 2.340</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="demo-foot"><span>Filtro ativo: status = sim</span><span>3 de 4 linhas</span></div>
+    </div>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> busca por coluna com sete tipos de filtro prontos, incluindo o seu próprio componente.</p>
+    <a class="next-link" href="#cap-05">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 05 ============ -->
+  <section class="chapter" id="cap-05">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">05</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 05</p>
+        <h2>Ordenação e paginação</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Deixar o usuário ordenar por clique e navegar por páginas.</p>
+    <p>Duas chaves resolvem: <code class="inline">orderByEnabled</code> torna os cabeçalhos clicáveis (um clique ordena, outro inverte) e <code class="inline">rowsPerPage</code> define o tamanho da página. De quebra, dois confortos de leitura para tabelas longas:</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · ordenação + paginação</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  orderByEnabled: <span class="tk-k">true</span>,      <span class="tk-c">// cabeçalhos clicáveis</span>
+  rowsPerPage: <span class="tk-n">25</span>,            <span class="tk-c">// páginas de 25 linhas</span>
+  stickyHeaderEnabled: <span class="tk-k">true</span>, <span class="tk-c">// cabeçalho fixo ao rolar</span>
+  responsiveMode: <span class="tk-s">'VERTICAL_RECORD'</span>, <span class="tk-c">// vira registros no mobile</span>
+  <span class="tk-c">// ...dataset e columns dos capítulos anteriores</span>
+}</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · ordenação + paginação</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  orderByEnabled: <span class="tk-k">true</span>,      <span class="tk-c">// cabeçalhos clicáveis</span>
+  rowsPerPage: <span class="tk-n">25</span>,            <span class="tk-c">// páginas de 25 linhas</span>
+  stickyHeaderEnabled: <span class="tk-k">true</span>, <span class="tk-c">// cabeçalho fixo ao rolar</span>
+  responsiveMode: <span class="tk-s">'VERTICAL_RECORD'</span>, <span class="tk-c">// vira registros no mobile</span>
+  <span class="tk-c">// ...dataset e columns dos capítulos anteriores</span>
+}</code></pre>
+    </figure>
+
+    <div class="demo">
+      <div class="demo-cap">Demonstração · ordenado por custo mensal ↓</div>
+      <div class="demo-scroll">
+        <table class="dtable">
+          <thead>
+            <tr><th>Nome</th><th>Departamento</th><th>Status</th><th class="num" aria-sort="descending">Custo mensal <span class="sort">↓</span></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Alan Turing</td><td>Pesquisa</td><td><span class="pill pill--warn">Em análise</span></td><td class="num">R$ 8.760</td></tr>
+            <tr><td>Ada Lovelace</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 4.280</td></tr>
+            <tr><td>Margaret Hamilton</td><td>Produto</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 2.340</td></tr>
+            <tr><td>Grace Hopper</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 1.950</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="demo-foot">
+        <span>1–4 de 4</span>
+        <span class="pager"><b>‹</b><i class="pg pg--on">1</i><b>›</b></span>
+      </div>
+    </div>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> ordenação por clique no cabeçalho, páginas de 25 linhas e cabeçalho fixo em listas longas.</p>
+    <a class="next-link" href="#cap-06">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 06 ============ -->
+  <section class="chapter" id="cap-06">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">06</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 06</p>
+        <h2>Modo remote: datasource(params)</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Trocar o array local por dados vindos da sua API.</p>
+    <p>Quando a base cresce, mude <code class="inline">mode</code> para <code class="inline">remote</code> e entregue um <code class="inline">datasource</code>: uma função que recebe os <code class="inline">params</code> atuais (página, filtros, ordenação) e devolve <code class="inline">{ rows, total, page }</code>. A tabela passa a delegar tudo ao servidor — filtros e paginação viram parâmetros de requisição.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · datasource</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'remote'</span>,
+  rowsPerPage: <span class="tk-n">25</span>,
+  sendRequestOnMounted: <span class="tk-k">true</span>, <span class="tk-c">// busca a primeira página ao montar</span>
+  datasource: <span class="tk-k">async</span> (params) =&gt; {
+    <span class="tk-c">// params traz página, filtros e ordenação atuais</span>
+    <span class="tk-k">const</span> res  = <span class="tk-k">await</span> fetch(<span class="tk-s">'/api/equipe?'</span> + <span class="tk-k">new</span> URLSearchParams(params))
+    <span class="tk-k">const</span> json = <span class="tk-k">await</span> res.json()
+    <span class="tk-k">return</span> { rows: json.itens, total: json.total, page: json.pagina }
+  },
+}
+
+<span class="tk-c">// Se a sua API já responde { rows, total, page },</span>
+<span class="tk-c">// dispense o datasource e aponte direto:</span>
+<span class="tk-k">const</span> configSimples = { mode: <span class="tk-s">'remote'</span>, url: <span class="tk-s">'/api/equipe'</span>, columns }</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · datasource</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'remote'</span>,
+  rowsPerPage: <span class="tk-n">25</span>,
+  sendRequestOnMounted: <span class="tk-k">true</span>, <span class="tk-c">// busca a primeira página ao montar</span>
+  datasource: <span class="tk-k">async</span> (params) =&gt; {
+    <span class="tk-c">// params traz página, filtros e ordenação atuais</span>
+    <span class="tk-k">const</span> res  = <span class="tk-k">await</span> fetch(<span class="tk-s">'/api/equipe?'</span> + <span class="tk-k">new</span> URLSearchParams(params))
+    <span class="tk-k">const</span> json = <span class="tk-k">await</span> res.json()
+    <span class="tk-k">return</span> { rows: json.itens, total: json.total, page: json.pagina }
+  },
+}
+
+<span class="tk-c">// Se a sua API já responde { rows, total, page },</span>
+<span class="tk-c">// dispense o datasource e aponte direto:</span>
+<span class="tk-k">const</span> configSimples = { mode: <span class="tk-s">'remote'</span>, url: <span class="tk-s">'/api/equipe'</span>, columns }</code></pre>
+    </figure>
+
+    <p>Dica: com <code class="inline">sendRequestOnMounted: false</code> a tabela monta vazia e espera um comando seu — combina com telas de consulta em que o usuário precisa preencher filtros antes.</p>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> uma tabela alimentada pelo servidor, com paginação, filtros e ordenação de verdade.</p>
+    <a class="next-link" href="#cap-07">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 07 ============ -->
+  <section class="chapter" id="cap-07">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">07</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 07</p>
+        <h2>Seleção (checkbox/radio) e totais</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Permitir marcar linhas e somar valores no rodapé.</p>
+    <p><code class="inline">checkboxEnabled</code> adiciona uma coluna de seleção múltipla — ideal para ações em massa. Se o fluxo pede uma escolha única (aprovar <em>uma</em> pessoa, vincular <em>um</em> registro), troque por <code class="inline">radioButtonSelectionEnabled</code>. E <code class="inline">footerSummarizerEnabled</code> acrescenta a linha de totais no rodapé, somando as colunas numéricas da página.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · seleção + totais</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  checkboxEnabled: <span class="tk-k">true</span>,         <span class="tk-c">// seleção múltipla</span>
+  <span class="tk-c">// radioButtonSelectionEnabled: true — para seleção única</span>
+  footerSummarizerEnabled: <span class="tk-k">true</span>, <span class="tk-c">// linha de totais no rodapé</span>
+  <span class="tk-c">// ...dataset e columns</span>
+}</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · seleção + totais</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">const</span> config = {
+  mode: <span class="tk-s">'dataset'</span>,
+  checkboxEnabled: <span class="tk-k">true</span>,         <span class="tk-c">// seleção múltipla</span>
+  <span class="tk-c">// radioButtonSelectionEnabled: true — para seleção única</span>
+  footerSummarizerEnabled: <span class="tk-k">true</span>, <span class="tk-c">// linha de totais no rodapé</span>
+  <span class="tk-c">// ...dataset e columns</span>
+}</code></pre>
+    </figure>
+
+    <div class="demo">
+      <div class="demo-cap">Demonstração · duas linhas marcadas + rodapé somando</div>
+      <div class="demo-scroll">
+        <table class="dtable">
+          <thead>
+            <tr><th style="width:36px"><span class="cb" aria-hidden="true"></span></th><th>Nome</th><th>Departamento</th><th>Status</th><th class="num">Custo mensal</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="cb cb--on" aria-hidden="true"></span></td><td>Ada Lovelace</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 4.280</td></tr>
+            <tr><td><span class="cb cb--on" aria-hidden="true"></span></td><td>Grace Hopper</td><td>Engenharia</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 1.950</td></tr>
+            <tr><td><span class="cb" aria-hidden="true"></span></td><td>Alan Turing</td><td>Pesquisa</td><td><span class="pill pill--warn">Em análise</span></td><td class="num">R$ 8.760</td></tr>
+            <tr><td><span class="cb" aria-hidden="true"></span></td><td>Margaret Hamilton</td><td>Produto</td><td><span class="pill pill--ok">Ativo</span></td><td class="num">R$ 2.340</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="demo-foot">
+        <span>2 linhas selecionadas</span>
+        <span class="sum">Total da página <b>R$ 17.330</b></span>
+      </div>
+    </div>
+
+    <p>O valor somado também fica disponível por código, via <code class="inline">getSummarizedValue('custo')</code> — você verá o controller no próximo capítulo.</p>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> seleção de linhas (múltipla ou única) e uma linha de totais viva no rodapé.</p>
+    <a class="next-link" href="#cap-08">Próximo capítulo ↓</a>
+  </section>
+
+  <!-- ============ Capítulo 08 ============ -->
+  <section class="chapter" id="cap-08">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">08</span>
+      <div>
+        <p class="chapter-kicker">Capítulo 08</p>
+        <h2>Controller: comandando a tabela por código</h2>
+      </div>
+    </div>
+    <p class="objective"><strong>Objetivo</strong> Controlar a tabela de fora — recarregar, filtrar, paginar e ler seleções via métodos.</p>
+    <p>Toda instância expõe um controller pela <code class="inline">ref</code> do componente. É por ele que o resto da sua tela conversa com a tabela: um botão "Aprovar selecionados", um atalho de filtro, um recarregamento após salvar.</p>
+
+    <figure class="code" data-fw="react">
+      <figcaption><span class="code-lang">React · controller via useRef</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code><span class="tk-k">import</span> { useRef } <span class="tk-k">from</span> <span class="tk-s">'react'</span>
+<span class="tk-k">import</span> { ArcanaDataTable } <span class="tk-k">from</span> <span class="tk-s">'@arcanalabs/datatable/react'</span>
+
+<span class="tk-k">export function</span> Equipe() {
+  <span class="tk-k">const</span> tabela = useRef(<span class="tk-k">null</span>)
+
+  <span class="tk-k">async function</span> aprovarSelecionados() {
+    <span class="tk-k">const</span> marcados = tabela.current.getCheckedRows()
+    <span class="tk-k">await</span> aprovar(marcados)
+    tabela.current.clearCheckedRows()
+    tabela.current.refresh()
+  }
+
+  <span class="tk-k">function</span> focarEngenharia() {
+    tabela.current.setFilter(<span class="tk-s">'departamento'</span>, <span class="tk-s">'Engenharia'</span>)
+    tabela.current.applyOrderBy({ field: <span class="tk-s">'custo'</span>, direction: <span class="tk-s">'desc'</span> })
+    tabela.current.paginate(<span class="tk-n">1</span>)
+  }
+
+  <span class="tk-k">return</span> &lt;ArcanaDataTable ref={tabela} config={config} /&gt;
+}</code></pre>
+    </figure>
+
+    <figure class="code" data-fw="vue">
+      <figcaption><span class="code-lang">Vue · controller via ref</span><button class="copy-btn" type="button">Copiar</button></figcaption>
+      <pre><code>&lt;<span class="tk-k">script setup</span>&gt;
+<span class="tk-k">import</span> { ref } <span class="tk-k">from</span> <span class="tk-s">'vue'</span>
+<span class="tk-k">import</span> { ArcanaDataTable } <span class="tk-k">from</span> <span class="tk-s">'@arcanalabs/datatable/vue'</span>
+
+<span class="tk-k">const</span> tabela = ref(<span class="tk-k">null</span>)
+
+<span class="tk-k">async function</span> aprovarSelecionados() {
+  <span class="tk-k">const</span> marcados = tabela.value.getCheckedRows()
+  <span class="tk-k">await</span> aprovar(marcados)
+  tabela.value.clearCheckedRows()
+  tabela.value.refresh()
+}
+
+<span class="tk-k">function</span> focarEngenharia() {
+  tabela.value.setFilter(<span class="tk-s">'departamento'</span>, <span class="tk-s">'Engenharia'</span>)
+  tabela.value.applyOrderBy({ field: <span class="tk-s">'custo'</span>, direction: <span class="tk-s">'desc'</span> })
+  tabela.value.paginate(<span class="tk-n">1</span>)
+}
+&lt;/<span class="tk-k">script</span>&gt;
+
+&lt;<span class="tk-k">template</span>&gt;
+  &lt;ArcanaDataTable ref=<span class="tk-s">"tabela"</span> :config=<span class="tk-s">"config"</span> /&gt;
+&lt;/<span class="tk-k">template</span>&gt;</code></pre>
+    </figure>
+
+    <p class="tight">A caixa de ferramentas completa do controller:</p>
+    <div class="method-grid">
+      <div class="method"><code>refresh()</code><span>Refaz a consulta atual (remote) ou re-renderiza as linhas (dataset).</span></div>
+      <div class="method"><code>setRows(rows)</code><span>Substitui as linhas exibidas na página atual.</span></div>
+      <div class="method"><code>setDataset(rows)</code><span>Troca o dataset inteiro, resetando a paginação.</span></div>
+      <div class="method"><code>getDataset()</code><span>Devolve o dataset completo em memória.</span></div>
+      <div class="method"><code>getRows()</code><span>Devolve as linhas visíveis na página atual.</span></div>
+      <div class="method"><code>addRow(row)</code><span>Insere uma linha sem recarregar a tabela.</span></div>
+      <div class="method"><code>updateRow(uuid, patch)</code><span>Atualiza uma linha existente no lugar.</span></div>
+      <div class="method"><code>removeRow(uuid)</code><span>Remove uma linha da tabela.</span></div>
+      <div class="method"><code>getCheckedRows()</code><span>Devolve as linhas marcadas via checkbox.</span></div>
+      <div class="method"><code>clearCheckedRows()</code><span>Desmarca todas as seleções.</span></div>
+      <div class="method"><code>setFilter(coluna, valor)</code><span>Aplica um filtro em uma coluna e reconsulta.</span></div>
+      <div class="method"><code>setFilters(filtros)</code><span>Aplica vários filtros de uma vez.</span></div>
+      <div class="method"><code>paginate(page, size)</code><span>Navega para a página indicada.</span></div>
+      <div class="method"><code>applyOrderBy(orderBy)</code><span>Ordena programaticamente por uma coluna.</span></div>
+      <div class="method"><code>getSummarizedValue(coluna)</code><span>Lê o total calculado pelo sumarizador do rodapé.</span></div>
+    </div>
+
+    <p class="you-have"><span class="check">✔</span> <strong>Você tem agora:</strong> controle total da tabela por código — filtros, páginas, linhas e seleção, sem remontar nada.</p>
+    <a class="next-link" href="#fim">E agora? ↓</a>
+  </section>
+
+  <!-- ============ Fim ============ -->
+  <section class="chapter chapter--end" id="fim">
+    <div class="chapter-head">
+      <span class="chapter-num" aria-hidden="true">✔</span>
+      <div>
+        <p class="chapter-kicker">Trilha concluída</p>
+        <h2>E agora?</h2>
+      </div>
+    </div>
+    <p>Você saiu da instalação e chegou a uma tabela remota com filtros tipados, seleção, totais e controller. Daqui em diante a documentação vira consulta, não leitura:</p>
+    <div class="end-cards">
+      <a class="end-card" href="#">
+        <h3>Referência completa de propriedades</h3>
+        <p>Todas as opções de <code class="inline">config</code> e de <code class="inline">columns</code>, com tipos, padrões e observações de cada modo.</p>
+        <span>Abrir referência →</span>
+      </a>
+      <a class="end-card" href="#">
+        <h3>Catálogo de exemplos</h3>
+        <p>Receitas prontas para copiar: CRUD completo, ações em massa, filtros remotos encadeados, exportação e mais.</p>
+        <span>Ver exemplos →</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    Protótipo de layout · Proposta 03 · Trilha
+  </footer>
+
+</main>
+</div>
+
+<nav class="proto-switch" aria-label="Trocar proposta">
+  <a href="index.html">Início</a>
+  <a href="proposal-1-manual.html">01</a>
+  <a href="proposal-2-bancada.html">02</a>
+  <a href="proposal-3-trilha.html" aria-current="page">03</a>
+  <a href="proposal-4-cookbook.html">04</a>
+</nav>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============ Toggle React | Vue ============ */
+  var FW_KEY = 'arcana-docs-framework';
+  var root = document.documentElement;
+  var fwButtons = Array.prototype.slice.call(document.querySelectorAll('.fw-toggle button'));
+
+  function setFramework(fw, persist){
+    if(fw !== 'react' && fw !== 'vue') fw = 'react';
+    root.setAttribute('data-fw', fw);
+    fwButtons.forEach(function(btn){
+      var on = btn.getAttribute('data-fw') === fw;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if(persist){
+      try{ localStorage.setItem(FW_KEY, fw); }catch(e){}
+    }
+  }
+
+  var saved = 'react';
+  try{ saved = localStorage.getItem(FW_KEY) || 'react'; }catch(e){}
+  setFramework(saved, false);
+
+  fwButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      setFramework(btn.getAttribute('data-fw'), true);
+    });
+  });
+
+  /* ============ Botões "Copiar" ============ */
+  Array.prototype.forEach.call(document.querySelectorAll('.copy-btn'), function(btn){
+    btn.addEventListener('click', function(){
+      var codeEl = btn.closest('.code').querySelector('pre code');
+      if(!codeEl) return;
+      var text = codeEl.innerText;
+      function done(){
+        btn.textContent = 'Copiado ✓';
+        btn.classList.add('is-done');
+        setTimeout(function(){
+          btn.textContent = 'Copiar';
+          btn.classList.remove('is-done');
+        }, 1600);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, done);
+      }else{
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly','');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try{ document.execCommand('copy'); }catch(e){}
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+
+  /* ============ Rail de progresso ============ */
+  var sections   = Array.prototype.slice.call(document.querySelectorAll('section.chapter[id^="cap-"]'));
+  var markers    = Array.prototype.slice.call(document.querySelectorAll('.rail-marker'));
+  var railFill   = document.querySelector('.rail-fill');
+  var mobileFill = document.querySelector('.mobile-progress-fill');
+  var fracs = [];
+  var activeIdx = -1;
+
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function scrollMax(){
+    return Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  }
+
+  /* posiciona os marcadores na linha, na mesma fração de scroll em que
+     o capítulo correspondente entra em foco — assim o preenchimento
+     "alcança" o marcador exatamente quando o capítulo começa */
+  function layoutMarkers(){
+    var max = scrollMax();
+    var vh  = window.innerHeight;
+    fracs = sections.map(function(sec){
+      return clamp((sec.offsetTop - vh * 0.35) / max, 0.02, 0.98);
+    });
+    markers.forEach(function(m, i){
+      if(fracs[i] != null) m.style.top = (fracs[i] * 100) + '%';
+    });
+    updateProgress();
+  }
+
+  function setActive(idx){
+    if(idx === activeIdx) return;
+    activeIdx = idx;
+    markers.forEach(function(m, i){
+      m.classList.toggle('is-done',   i < idx);
+      m.classList.toggle('is-active', i === idx);
+      if(i === idx){ m.setAttribute('aria-current', 'true'); }
+      else{ m.removeAttribute('aria-current'); }
+    });
+  }
+
+  function computeActiveFromScroll(){
+    var p = clamp(window.scrollY / scrollMax(), 0, 1);
+    var idx = -1;
+    for(var i = 0; i < fracs.length; i++){
+      if(p >= fracs[i] - 0.001) idx = i;
+    }
+    return idx;
+  }
+
+  function updateProgress(){
+    var p = clamp(window.scrollY / scrollMax(), 0, 1);
+    var pct = (p * 100) + '%';
+    if(railFill)   railFill.style.height = pct;
+    if(mobileFill) mobileFill.style.width = pct;
+    setActive(computeActiveFromScroll());
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', layoutMarkers);
+  window.addEventListener('load', layoutMarkers); /* re-mede após fontes carregarem */
+  layoutMarkers();
+
+  /* IntersectionObserver reforça o capítulo ativo (cobre navegação por
+     âncora e cenários com prefers-reduced-motion, sem depender só do scroll) */
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var i = sections.indexOf(entry.target);
+          if(i > -1) setActive(i);
+        }
+      });
+    }, { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
+    sections.forEach(function(sec){ io.observe(sec); });
+  }
+})();
+</script>
+</body>
+</html>
