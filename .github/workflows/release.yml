@@ -43,7 +43,7 @@ jobs:
 
       - name: Publica no npm (com provenance)
         # --ignore-scripts: o prepublishOnly repetiria o npm run check já executado acima
-        run: npm publish --ignore-scripts
+        run: npm publish --ignore-scripts --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
