@@ -27,7 +27,7 @@ export interface DocsGroup {
 }
 
 const FW_KEY = "arcana-docs-framework";
-const GITHUB_URL = "https://github.com/x-arcana-labs/datatable";
+const GITHUB_URL = "https://github.com/arcana-labs-org/datatable";
 
 function ReactLogo() {
   return <svg className="fw-logo" viewBox="-11.5 -10.23 23 20.46" aria-hidden="true">
@@ -292,7 +292,7 @@ export function DocsShell({ groups }: { groups: DocsGroup[] }) {
           </div>)}
 
           <footer className="doc-footer">
-            Arcana DataTable · MIT · <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">github.com/x-arcana-labs/datatable</a>
+            Arcana DataTable · MIT · <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">github.com/arcana-labs-org/datatable</a>
           </footer>
         </div>
       </main>

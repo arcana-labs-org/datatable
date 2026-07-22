@@ -2,7 +2,7 @@
 
 Data table pública, tipada e compatível com Vue 3, React, Angular e Svelte. Um núcleo TypeScript compartilhado mantém paginação, filtros, ordenação, seleção, busca remota e sumarização consistentes em todos os frameworks.
 
-[Documentação](https://leonardocaldas.github.io/arcanalabs-datatable/) · [Issues](https://github.com/x-arcana-labs/datatable/issues) · [Changelog](./CHANGELOG.md)
+[Documentação](https://leonardocaldas.github.io/arcanalabs-datatable/) · [Issues](https://github.com/arcana-labs-org/datatable/issues) · [Changelog](./CHANGELOG.md)
 
 ## Requisitos
 

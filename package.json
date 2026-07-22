@@ -14,13 +14,13 @@
   ],
   "license": "MIT",
   "author": "Arcana Labs",
-  "homepage": "https://x-arcana-labs.github.io/datatable/",
+  "homepage": "https://arcana-labs-org.github.io/datatable/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/x-arcana-labs/datatable.git"
+    "url": "git+https://github.com/arcana-labs-org/datatable.git"
   },
   "bugs": {
-    "url": "https://github.com/x-arcana-labs/datatable/issues"
+    "url": "https://github.com/arcana-labs-org/datatable/issues"
   },
   "type": "module",
   "sideEffects": [
