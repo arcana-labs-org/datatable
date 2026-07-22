@@ -41,6 +41,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           npm version "${{ github.event.inputs.version }}" --allow-same-version -m "release: v%s"
 
+      - name: Garante visibilidade pública do pacote
+        # o pacote 0.0.22 nasceu privado; publish não muda visibilidade de pacote existente
+        run: npm access set status=public @arcanalabs/datatable
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publica no npm (com provenance)
         # --ignore-scripts: o prepublishOnly repetiria o npm run check já executado acima
         run: npm publish --ignore-scripts --access public
