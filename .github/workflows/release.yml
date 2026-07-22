@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versão exata (ex.: 1.0.0) ou incremento: patch | minor | major"
+        required: true
+        default: "patch"
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: Checks (typecheck + testes + build da lib e da docs)
+        run: npm run check
+
+      - name: Bump de versão + tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version "${{ github.event.inputs.version }}" --allow-same-version -m "release: v%s"
+
+      - name: Publica no npm (com provenance)
+        # --ignore-scripts: o prepublishOnly repetiria o npm run check já executado acima
+        run: npm publish --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push do commit de versão e da tag
+        run: git push --follow-tags
+
+      - name: GitHub Release com notas geradas
+        run: gh release create "v$(node -p "require('./package.json').version")" --generate-notes --title "v$(node -p "require('./package.json').version")"
+        env:
+          GH_TOKEN: ${{ github.token }}
