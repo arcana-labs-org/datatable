@@ -3,7 +3,8 @@ import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref, shallowR
 import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
-import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, dropSide, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+import { startColumnDrag } from "../core/drag";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, StyleMap } from "../core/types";
 import FilterField from "./FilterField.vue";
 import "../assets/SparkGrid.css";
@@ -17,7 +18,7 @@ const sortMenu = ref<{ x: number; y: number; name: string; col: string } | null>
 const focusedRow = ref<string | null>(null);
 const focusedCell = ref<string | null>(null);
 const columnWidths = ref<Record<string, number>>({});
-const drag = ref<{ name: string; over: string | null; side: "before" | "after" } | null>(null);
+const drag = ref<string | null>(null);
 let didDrag = false;
 let unsubscribe = grid.value.subscribe(() => { revision.value += 1; });
 
@@ -79,12 +80,7 @@ const menuColumnOrderable = computed(() => {
   const column = sortMenu.value ? columns.value.find((item) => item.name === sortMenu.value!.col) : undefined;
   return column ? orderable(column) : false;
 });
-const dragClass = (column: DataTableColumn<DataTableRow>) => {
-  if (!drag.value) return "";
-  const dragging = drag.value.name === column.name ? " arcana-col-dragging" : "";
-  const over = drag.value.over === column.name && drag.value.name !== column.name ? (drag.value.side === "before" ? " arcana-drop-before" : " arcana-drop-after") : "";
-  return `${dragging}${over}`;
-};
+const dragClass = (column: DataTableColumn<DataTableRow>) => drag.value === column.name ? " arcana-col-dragging" : "";
 const onHeaderClick = (event: MouseEvent, column: DataTableColumn<DataTableRow>) => {
   if (didDrag) return;
   const isOrderable = orderable(column);
@@ -107,31 +103,11 @@ const applyPin = (pin: "left" | "right" | null) => {
 };
 const startReorder = (event: PointerEvent, column: DataTableColumn<DataTableRow>) => {
   if (!isColumnReorderable(column, grid.value) || event.button !== 0) return;
-  const startX = event.clientX;
-  const startY = event.clientY;
-  let dragging = false;
-  const overEl = (x: number, y: number) => (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>(".grid-header-cell") ?? null;
-  const onMove = (move: PointerEvent) => {
-    if (!dragging) {
-      if (Math.abs(move.clientX - startX) < 5 && Math.abs(move.clientY - startY) < 5) return;
-      dragging = true;
-    }
-    const el = overEl(move.clientX, move.clientY);
-    drag.value = { name: column.name, over: el?.getAttribute("data-col-name") ?? null, side: el ? dropSide(move.clientX, el.getBoundingClientRect()) : "after" };
-  };
-  const onUp = (up: PointerEvent) => {
-    window.removeEventListener("pointermove", onMove);
-    window.removeEventListener("pointerup", onUp);
-    if (!dragging) return;
-    didDrag = true;
-    const el = overEl(up.clientX, up.clientY);
-    const over = el?.getAttribute("data-col-name") ?? null;
-    if (over && over !== column.name && el) grid.value.moveColumn(column.name, over, dropSide(up.clientX, el.getBoundingClientRect()));
-    drag.value = null;
-    window.setTimeout(() => { didDrag = false; }, 0);
-  };
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp);
+  startColumnDrag(event, column, grid.value, event.currentTarget as HTMLElement, {
+    ghostClassName: themeClass.value,
+    setDraggingColumn: (name) => { drag.value = name; },
+    markDidDrag: () => { didDrag = true; window.setTimeout(() => { didDrag = false; }, 0); }
+  });
 };
 const onHeaderKeyDown = (event: KeyboardEvent, column: DataTableColumn<DataTableRow>) => {
   if (!isColumnReorderable(column, grid.value) || !(event.ctrlKey || event.metaKey)) return;

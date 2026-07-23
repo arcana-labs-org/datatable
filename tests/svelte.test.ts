@@ -154,6 +154,31 @@ describe("Svelte adapter", () => {
     expect(target.querySelector<HTMLElement>('.grid-header [data-col-name="c"]')!.classList.contains("arcana-pin-right")).toBe(true);
   });
 
+  it("reorders columns live while dragging a header and cancels with Escape", () => {
+    const { target } = renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
+      columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }, { name: "c", label: "C" }]
+    });
+    const order = () => Array.from(target.querySelectorAll(".grid-header [data-col-name]")).map((cell) => cell.getAttribute("data-col-name"));
+    expect(order()).toEqual(["a", "b", "c"]);
+    const headerA = target.querySelector<HTMLElement>('[data-col-name="a"]')!;
+    headerA.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 5, button: 0 }));
+    window.dispatchEvent(new MouseEvent("pointermove", { clientX: 200, clientY: 5 }));
+    flushSync();
+    // Live reorder: zero-sized rects put every midpoint left of the pointer,
+    // so "a" moves to the end DURING the drag — no drop needed.
+    expect(order()).toEqual(["b", "c", "a"]);
+    expect(headerA.classList.contains("arcana-col-dragging")).toBe(true);
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeTruthy();
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    flushSync();
+    expect(order()).toEqual(["a", "b", "c"]);
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeNull();
+    window.dispatchEvent(new MouseEvent("pointerup", { clientX: 200, clientY: 5 }));
+    flushSync();
+  });
+
   it("escapes raw cell values as text (no HTML injection without column.html)", () => {
     const { target } = renderTable({
       mode: "dataset", searchEnabled: false, footerVisible: false,

@@ -12,7 +12,8 @@
    ============================================ */
 .spark-grid,
 .arcana-select__panel,
-.arcana-cal__panel {
+.arcana-cal__panel,
+.arcana-drag-ghost {
     /* surfaces */
     --arcana-bg: transparent;
     --arcana-surface: #ffffff;
@@ -1325,42 +1326,54 @@
     box-shadow: inset 0 0 0 1px var(--arcana-drop-indicator, #1467b8);
 }
 
-/* Drop indicator: a bold vertical accent line spanning the whole header,
-   with a soft glow so it reads on any theme… */
-.spark-grid .grid-header .grid-header-cell.arcana-drop-before::after,
-.spark-grid .grid-header .grid-header-cell.arcana-drop-after::after {
-    content: "";
-    position: absolute;
+/* Floating drag ghost: a chip with the column label that follows the pointer
+   during a header drag. It is portaled to <body> (positioned via transform),
+   repeats the grid theme class and shares the token defaults at the top of
+   this file, so it themes exactly like the portaled panels. */
+.arcana-drag-ghost {
+    position: fixed;
     top: 0;
-    bottom: 0;
-    width: 3px;
-    border-radius: 2px;
-    background: var(--arcana-drop-indicator, #1467b8);
-    box-shadow: 0 0 8px 2px var(--arcana-drop-indicator-glow, rgba(20, 103, 184, 0.45));
-    z-index: 7;
+    left: 0;
+    z-index: 10000;
     pointer-events: none;
+    will-change: transform;
 }
 
-.spark-grid .grid-header .grid-header-cell.arcana-drop-before::after { left: -2px; }
-.spark-grid .grid-header .grid-header-cell.arcana-drop-after::after { right: -2px; }
-
-/* …plus a triangular cap at the top pointing at the exact insertion edge. */
-.spark-grid .grid-header .grid-header-cell.arcana-drop-before::before,
-.spark-grid .grid-header .grid-header-cell.arcana-drop-after::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid var(--arcana-drop-indicator, #1467b8);
-    z-index: 8;
-    pointer-events: none;
+.arcana-drag-ghost__chip {
+    display: inline-block;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 5px 12px;
+    border-radius: 7px;
+    background: var(--arcana-surface, #ffffff);
+    color: var(--arcana-text, #263238);
+    border: 1px solid var(--arcana-drop-indicator, #1467b8);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25), 0 0 0 3px var(--arcana-drop-indicator-glow, rgba(20, 103, 184, 0.25));
+    font-size: 12.5px;
+    font-weight: 600;
+    transform: rotate(2deg);
 }
 
-.spark-grid .grid-header .grid-header-cell.arcana-drop-before::before { left: -5px; }
-.spark-grid .grid-header .grid-header-cell.arcana-drop-after::before { right: -5px; }
+/* FLIP transition on displaced headers while a live reorder runs: the drag
+   session measures the header positions before/after `moveColumn`, applies
+   the inverse transform inline and lets this class transition it to zero.
+   The column's own gap is the drop indicator — there is no drop line. */
+.spark-grid .grid-header .grid-header-cell.arcana-header-flip {
+    transition: transform 150ms ease-out;
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .arcana-drag-ghost__chip {
+        transform: none;
+    }
+
+    .spark-grid .grid-header .grid-header-cell.arcana-header-flip {
+        transition: none;
+    }
+}
 
 /* Pinned (frozen) cells stay opaque so scrolled content passes behind them. */
 .spark-grid .grid-cell.arcana-pin {

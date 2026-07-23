@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createDataTable } from "../src";
-import { computePinPlan } from "../src/core/view";
+import { computeLiveReorderTarget, computePinPlan } from "../src/core/view";
 
 type Person = { id: number; name: string; amount: number; _uuid?: string };
 
@@ -223,6 +223,28 @@ describe("DataTableController", () => {
     const lastCall = calls[calls.length - 1][0] as Record<string, unknown>;
     expect(grid.getSnapshot().orderBy).toBeUndefined();
     expect(Object.keys(lastCall).some((key) => key.startsWith("order_by"))).toBe(false);
+  });
+
+  it("computes the live reorder target from the pointer with midpoint hysteresis", () => {
+    const headers = [
+      { name: "a", left: 0, width: 100 },
+      { name: "b", left: 100, width: 100 },
+      { name: "c", left: 200, width: 100 }
+    ];
+    // Pointer over its own slot (or short of a midpoint): no move.
+    expect(computeLiveReorderTarget(50, "a", headers, 8)).toBeNull();
+    expect(computeLiveReorderTarget(149, "a", headers, 8)).toBeNull();
+    // Rightwards: b's midpoint is 150 — 150 + 8 must be cleared first.
+    expect(computeLiveReorderTarget(155, "a", headers, 8)).toBeNull();
+    expect(computeLiveReorderTarget(159, "a", headers, 8)).toEqual({ target: "b", position: "after" });
+    expect(computeLiveReorderTarget(270, "a", headers, 8)).toEqual({ target: "c", position: "after" });
+    // Leftwards: b's midpoint is 150 — the pointer must drop below 150 - 8.
+    expect(computeLiveReorderTarget(145, "c", headers, 8)).toBeNull();
+    expect(computeLiveReorderTarget(141, "c", headers, 8)).toEqual({ target: "b", position: "before" });
+    expect(computeLiveReorderTarget(10, "c", headers, 8)).toEqual({ target: "a", position: "before" });
+    // Unknown or lone columns are inert.
+    expect(computeLiveReorderTarget(50, "zz", headers, 8)).toBeNull();
+    expect(computeLiveReorderTarget(500, "a", [headers[0]], 8)).toBeNull();
   });
 
   it("reorders columns via setColumnOrder and moveColumn, and getColumns respects it", () => {

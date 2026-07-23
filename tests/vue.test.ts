@@ -85,6 +85,30 @@ describe("Vue adapter", () => {
     expect((wrapper.findAll(".grid-header-cell.grid-header-order")[0].element as HTMLElement).style.width).toBe("150px");
   });
 
+  it("reorders columns live while dragging a header and cancels with Escape", async () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
+      columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }, { name: "c", label: "C" }]
+    } } });
+    await wrapper.vm.$nextTick();
+    const order = () => wrapper.findAll(".grid-header [data-col-name]").map((cell) => cell.attributes("data-col-name"));
+    expect(order()).toEqual(["a", "b", "c"]);
+    await wrapper.find('[data-col-name="a"]').trigger("pointerdown", { clientX: 10, clientY: 5, button: 0 });
+    window.dispatchEvent(new MouseEvent("pointermove", { clientX: 200, clientY: 5 }));
+    await wrapper.vm.$nextTick();
+    // Live reorder: zero-sized rects put every midpoint left of the pointer,
+    // so "a" moves to the end DURING the drag — no drop needed.
+    expect(order()).toEqual(["b", "c", "a"]);
+    expect(wrapper.find('[data-col-name="a"]').classes()).toContain("arcana-col-dragging");
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeTruthy();
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    await wrapper.vm.$nextTick();
+    expect(order()).toEqual(["a", "b", "c"]);
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeNull();
+    window.dispatchEvent(new MouseEvent("pointerup", { clientX: 200, clientY: 5 }));
+  });
+
   it("escapes raw cell values as text (no HTML injection without column.html)", async () => {
     const wrapper = mount(ArcanaDataTable, { props: { config: {
       mode: "dataset", searchEnabled: false, footerVisible: false,

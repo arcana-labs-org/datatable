@@ -104,7 +104,7 @@ export const en: Messages = {
     columnManagement: {
       title: "Reorder and pin columns",
       previewLabel: "real component · drag the headers and scroll horizontally",
-      p1: "Drag a header cell sideways to reorder the columns — a drop indicator line shows exactly where the column will land. A short click still opens the sort menu and the right-edge resize handle keeps priority, so dragging never gets in the way. It is on by default (<c>columnReorderEnabled</c>); keep a single column locked in place with <c>reorderable: false</c>.",
+      p1: "Drag a header cell sideways to reorder the columns — the other columns shift live to open the gap where it will land, while a floating chip with the column label follows the pointer (Esc cancels the drag). A short click still opens the sort menu and the right-edge resize handle keeps priority, so dragging never gets in the way. It is on by default (<c>columnReorderEnabled</c>); keep a single column locked in place with <c>reorderable: false</c>.",
       p2: "The header menu (the same one that carries the sort options) gains <i>Pin to left</i>, <i>Pin to right</i> and <i>Unpin</i>. A pinned column freezes to its edge and stays visible during horizontal scroll — pinned-left columns stick to the start, pinned-right to the end, with a subtle divider/shadow. Set it up front with <c>pinned: 'left'</c> or <c>pinned: 'right'</c> on the column, or change it at runtime from the menu; the system columns (checkbox/expander) freeze on the left and the actions column on the right. Both reorder and pin are disabled by <c>columnPinEnabled</c> and ignored in <c>VERTICAL_RECORD</c> responsive mode."
     },
     resize: {

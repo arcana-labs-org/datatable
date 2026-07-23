@@ -5,7 +5,8 @@ import {
 import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
-import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, dropSide, expanderStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, type PinPlan, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+import { startColumnDrag } from "../core/drag";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expanderStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, type PinPlan, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type {
   ContextMenuItem, DataTableAction, DataTableApi, DataTableColumn, DataTableConfig,
   DataTableRow, DataTableSnapshot, OrderBy, Renderable, SortDirection
@@ -182,7 +183,7 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   focusedRow: string | null = null;
   focusedCell: string | null = null;
   columnWidths: Record<string, number> = {};
-  drag: { name: string; over: string | null; side: "before" | "after" } | null = null;
+  drag: string | null = null;
   private didDrag = false;
   private pinPlan: PinPlan = { active: false, cellStyle: () => ({}), className: () => "" };
 
@@ -315,10 +316,7 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
     return this.pinPlan.className(column.name);
   }
   dragClass(column: DataTableColumn<DataTableRow>): string {
-    if (!this.drag) return "";
-    const dragging = this.drag.name === column.name ? " arcana-col-dragging" : "";
-    const over = this.drag.over === column.name && this.drag.name !== column.name ? (this.drag.side === "before" ? " arcana-drop-before" : " arcana-drop-after") : "";
-    return `${dragging}${over}`;
+    return this.drag === column.name ? " arcana-col-dragging" : "";
   }
   isReorderable(column: DataTableColumn<DataTableRow>): boolean { return isColumnReorderable(column, this.grid); }
   get pinnable(): boolean { return isColumnPinnable(this.grid); }
@@ -336,33 +334,11 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
 
   startReorder(event: PointerEvent, column: DataTableColumn<DataTableRow>): void {
     if (!isColumnReorderable(column, this.grid) || event.button !== 0) return;
-    const startX = event.clientX;
-    const startY = event.clientY;
-    let dragging = false;
-    const overEl = (x: number, y: number) => (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>(".grid-header-cell") ?? null;
-    const onMove = (move: PointerEvent): void => {
-      if (!dragging) {
-        if (Math.abs(move.clientX - startX) < 5 && Math.abs(move.clientY - startY) < 5) return;
-        dragging = true;
-      }
-      const el = overEl(move.clientX, move.clientY);
-      this.drag = { name: column.name, over: el?.getAttribute("data-col-name") ?? null, side: el ? dropSide(move.clientX, el.getBoundingClientRect()) : "after" };
-      this.cdr.markForCheck();
-    };
-    const onUp = (up: PointerEvent): void => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      if (!dragging) return;
-      this.didDrag = true;
-      const el = overEl(up.clientX, up.clientY);
-      const over = el?.getAttribute("data-col-name") ?? null;
-      if (over && over !== column.name && el) this.grid.moveColumn(column.name, over, dropSide(up.clientX, el.getBoundingClientRect()));
-      this.drag = null;
-      window.setTimeout(() => { this.didDrag = false; }, 0);
-      this.cdr.markForCheck();
-    };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+    startColumnDrag(event, column, this.grid, event.currentTarget as HTMLElement, {
+      ghostClassName: this.themeClass(),
+      setDraggingColumn: (name) => { this.drag = name; this.cdr.markForCheck(); },
+      markDidDrag: () => { this.didDrag = true; window.setTimeout(() => { this.didDrag = false; }, 0); }
+    });
   }
 
   onHeaderKeyDown(event: KeyboardEvent, column: DataTableColumn<DataTableRow>): void {

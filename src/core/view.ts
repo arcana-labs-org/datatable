@@ -171,12 +171,40 @@ export function isColumnPinnable<Row extends DataTableRow>(grid: DataTableApi<Ro
   return grid.config.columnPinEnabled !== false && grid.config.responsiveMode !== "VERTICAL_RECORD";
 }
 
+/** Header geometry used by the live drag-reorder (visual order, one pin group). */
+export interface HeaderRect { name: string; left: number; width: number; }
+
 /**
- * Given a drop `clientX` over a header cell of known bounds, whether the dragged
- * column should land before or after it (left half → before, right half → after).
+ * Live reorder decision for a pointer position. Given the dragged column and
+ * the header rects of its pin group (in visual order, dragged included),
+ * returns the `moveColumn` call that brings the dragged column under the
+ * pointer, or `null` when it is already there. A neighbour is only displaced
+ * once the pointer clears its midpoint by `hysteresis` px in the direction of
+ * travel, so hovering right on the boundary never flickers back and forth.
  */
-export function dropSide(clientX: number, rect: { left: number; width: number }): "before" | "after" {
-  return clientX < rect.left + rect.width / 2 ? "before" : "after";
+export function computeLiveReorderTarget(
+  pointerX: number,
+  draggedName: string,
+  headers: HeaderRect[],
+  hysteresis = 8
+): { target: string; position: "before" | "after" } | null {
+  const draggedIndex = headers.findIndex((header) => header.name === draggedName);
+  if (draggedIndex === -1) return null;
+  const others = headers.filter((header) => header.name !== draggedName);
+  if (!others.length) return null;
+  // `draggedIndex` doubles as "how many neighbours currently sit before the
+  // dragged column"; `desiredSlot` recounts that from the pointer position.
+  let desiredSlot = 0;
+  others.forEach((other, index) => {
+    const midpoint = other.left + other.width / 2;
+    // Neighbours currently before the dragged column stay counted until the
+    // pointer clears their midpoint leftwards; the ones after it only count
+    // once the pointer clears their midpoint rightwards (the hysteresis gap).
+    if (index < draggedIndex ? pointerX >= midpoint - hysteresis : pointerX > midpoint + hysteresis) desiredSlot += 1;
+  });
+  if (desiredSlot === draggedIndex) return null;
+  if (desiredSlot < draggedIndex) return { target: others[desiredSlot].name, position: "before" };
+  return { target: others[desiredSlot - 1].name, position: "after" };
 }
 
 export const selectionStyle: StyleMap = {

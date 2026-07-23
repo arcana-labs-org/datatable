@@ -135,7 +135,7 @@ describe("React adapter", () => {
     expect(pinnedCell.style.position).toBe("sticky");
   });
 
-  it("reorders columns by dragging a header cell over another", () => {
+  it("reorders columns live while dragging, with a ghost chip following the pointer", () => {
     const { container } = render(<ArcanaDataTable config={{
       mode: "dataset", searchEnabled: false, footerVisible: false,
       dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
@@ -144,16 +144,118 @@ describe("React adapter", () => {
     const order = () => Array.from(container.querySelectorAll<HTMLElement>(".grid-header [data-col-name]")).map((cell) => cell.getAttribute("data-col-name"));
     expect(order()).toEqual(["a", "b", "c"]);
     const headerA = container.querySelector<HTMLElement>('[data-col-name="a"]')!;
-    const headerC = container.querySelector<HTMLElement>('[data-col-name="c"]')!;
-    // happy-dom has no layout; drive the drop target through elementFromPoint.
-    const original = document.elementFromPoint;
-    document.elementFromPoint = vi.fn(() => headerC) as typeof document.elementFromPoint;
+    fireEvent.pointerDown(headerA, { clientX: 10, clientY: 5, button: 0 });
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeNull();
+    fireEvent.pointerMove(window, { clientX: 200, clientY: 5 });
+    // Live reorder: happy-dom rects are zero-sized, so every midpoint is left
+    // of the pointer and "a" moves to the end DURING the drag, before drop.
+    expect(order()).toEqual(["b", "c", "a"]);
+    expect(container.querySelector('[data-col-name="a"]')!.classList.contains("arcana-col-dragging")).toBe(true);
+    const ghost = document.body.querySelector<HTMLElement>(".arcana-drag-ghost")!;
+    expect(ghost).toBeTruthy();
+    expect(ghost.textContent).toBe("A");
+    expect(ghost.style.transform).toContain("212px"); // pointer x + chip offset
+    fireEvent.pointerUp(window, { clientX: 200, clientY: 5 });
+    expect(order()).toEqual(["b", "c", "a"]);
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeNull();
+    expect(container.querySelector(".arcana-col-dragging")).toBeNull();
+  });
+
+  it("cancels an in-flight drag with Escape, restoring the order from before the gesture", () => {
+    const { container } = render(<ArcanaDataTable config={{
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
+      columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }, { name: "c", label: "C" }]
+    }} />);
+    const order = () => Array.from(container.querySelectorAll<HTMLElement>(".grid-header [data-col-name]")).map((cell) => cell.getAttribute("data-col-name"));
+    const headerA = container.querySelector<HTMLElement>('[data-col-name="a"]')!;
     fireEvent.pointerDown(headerA, { clientX: 10, clientY: 5, button: 0 });
     fireEvent.pointerMove(window, { clientX: 200, clientY: 5 });
-    fireEvent.pointerUp(window, { clientX: 200, clientY: 5 });
-    document.elementFromPoint = original;
-    // "a" dropped after "c" (rects are zero-sized → right half → after).
     expect(order()).toEqual(["b", "c", "a"]);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(order()).toEqual(["a", "b", "c"]);
+    expect(document.body.querySelector(".arcana-drag-ghost")).toBeNull();
+    fireEvent.pointerUp(window, { clientX: 200, clientY: 5 });
+    expect(order()).toEqual(["a", "b", "c"]);
+  });
+
+  it("plays a FLIP on displaced headers: inverse translateX animating to zero (~150ms ease-out)", async () => {
+    const originalRect = HTMLElement.prototype.getBoundingClientRect;
+    // Give header cells layout: 100px wide, at 100 * their DOM index — so a
+    // swap produces a real, measurable ±100px delta for the FLIP to replay.
+    HTMLElement.prototype.getBoundingClientRect = function (this: HTMLElement) {
+      const parent = this.parentElement;
+      if (this.classList.contains("grid-header-cell") && parent) {
+        const index = Array.prototype.indexOf.call(parent.children, this);
+        const left = index * 100;
+        return { left, right: left + 100, width: 100, top: 0, bottom: 30, height: 30, x: left, y: 0, toJSON: () => ({}) } as DOMRect;
+      }
+      return originalRect.call(this);
+    };
+    // happy-dom has no Web Animations API; install a spy so we can assert the
+    // exact keyframes/timing the production code hands to `element.animate`.
+    const animateSpy = vi.fn(() => ({ addEventListener: () => {}, cancel: () => {}, finish: () => {} }));
+    const proto = HTMLElement.prototype as unknown as { animate?: unknown };
+    const hadAnimate = "animate" in proto;
+    proto.animate = animateSpy;
+    try {
+      const { container } = render(<ArcanaDataTable config={{
+        mode: "dataset", searchEnabled: false, footerVisible: false,
+        dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
+        columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }, { name: "c", label: "C" }]
+      }} />);
+      const order = () => Array.from(container.querySelectorAll<HTMLElement>(".grid-header [data-col-name]")).map((cell) => cell.getAttribute("data-col-name"));
+      const headerA = container.querySelector<HTMLElement>('[data-col-name="a"]')!;
+      fireEvent.pointerDown(headerA, { clientX: 10, clientY: 5, button: 0 });
+      // 160 clears b's midpoint (150) + hysteresis → "a" and "b" swap live.
+      fireEvent.pointerMove(window, { clientX: 160, clientY: 5 });
+      expect(order()).toEqual(["b", "a", "c"]);
+      // The FLIP measurement polls animation frames until the DOM commits.
+      await act(() => new Promise((resolve) => setTimeout(resolve, 120)));
+      // The displaced header "b" (dragged "a" is excluded) was animated with an
+      // inverse transform that resolves to zero, over 150ms ease-out.
+      expect(animateSpy).toHaveBeenCalled();
+      const call = animateSpy.mock.calls[0] as unknown as [Array<{ transform: string }>, { duration: number; easing: string }];
+      const [keyframes, options] = call;
+      const startShift = Number.parseFloat(keyframes[0].transform.replace(/[^-\d.]/g, ""));
+      expect(Math.abs(startShift)).toBeGreaterThan(1);
+      expect(keyframes[keyframes.length - 1].transform).toBe("translateX(0)");
+      expect(options.duration).toBe(150);
+      expect(options.easing).toBe("ease-out");
+      const headerB = container.querySelector<HTMLElement>('[data-col-name="b"]')!;
+      expect(headerB.classList.contains("arcana-header-flip")).toBe(true);
+      fireEvent.pointerUp(window, { clientX: 160, clientY: 5 });
+    } finally {
+      if (!hadAnimate) delete proto.animate;
+      HTMLElement.prototype.getBoundingClientRect = originalRect;
+    }
+  });
+
+  it("skips the FLIP animation under prefers-reduced-motion (reorder still applies, ghost still shows)", () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({ matches: query.includes("reduce"), media: query, addListener: () => {}, removeListener: () => {}, addEventListener: () => {}, removeEventListener: () => {}, dispatchEvent: () => false, onchange: null })) as typeof window.matchMedia;
+    const animateSpy = vi.fn();
+    const proto = HTMLElement.prototype as unknown as { animate?: unknown };
+    const hadAnimate = "animate" in proto;
+    proto.animate = animateSpy;
+    try {
+      const { container } = render(<ArcanaDataTable config={{
+        mode: "dataset", searchEnabled: false, footerVisible: false,
+        dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
+        columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }, { name: "c", label: "C" }]
+      }} />);
+      const order = () => Array.from(container.querySelectorAll<HTMLElement>(".grid-header [data-col-name]")).map((cell) => cell.getAttribute("data-col-name"));
+      const headerA = container.querySelector<HTMLElement>('[data-col-name="a"]')!;
+      fireEvent.pointerDown(headerA, { clientX: 10, clientY: 5, button: 0 });
+      fireEvent.pointerMove(window, { clientX: 200, clientY: 5 });
+      expect(order()).toEqual(["b", "c", "a"]); // reorder happens instantly
+      expect(document.body.querySelector(".arcana-drag-ghost")).toBeTruthy(); // ghost still shown
+      expect(animateSpy).not.toHaveBeenCalled(); // but no motion
+      fireEvent.pointerUp(window, { clientX: 200, clientY: 5 });
+    } finally {
+      if (!hadAnimate) delete proto.animate;
+      window.matchMedia = originalMatchMedia;
+    }
   });
 
   it("renders a config-pinned column as sticky with the pin classes", () => {

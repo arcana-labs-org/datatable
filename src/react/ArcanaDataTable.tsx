@@ -2,7 +2,8 @@ import React, { Fragment, forwardRef, useEffect, useImperativeHandle, useMemo, u
 import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
-import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, dropSide, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+import { startColumnDrag } from "../core/drag";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { ContextMenuItem, DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, SearchOption, StyleMap } from "../core/types";
 import { ArcanaSelect } from "./ArcanaSelect";
 import { ArcanaDatePicker } from "./ArcanaDatePicker";
@@ -95,7 +96,7 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
   const [focusedRow, setFocusedRow] = useState<string | null>(null);
   const [focusedCell, setFocusedCell] = useState<string | null>(null);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
-  const [drag, setDrag] = useState<{ name: string; over: string | null; side: "before" | "after" } | null>(null);
+  const [dragName, setDragName] = useState<string | null>(null);
   const didDrag = useRef(false);
   useImperativeHandle(ref, () => grid, [grid]);
   useEffect(() => {
@@ -154,32 +155,11 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
   const menuDirection = (name: string) => state.orderByList.find((order) => order.name === name)?.direction ?? null;
   const startReorder = (event: React.PointerEvent, column: DataTableColumn<Row>) => {
     if (!isColumnReorderable(column, grid) || event.button !== 0) return;
-    const startX = event.clientX;
-    const startY = event.clientY;
-    let dragging = false;
-    const overOf = (x: number, y: number) => (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>(".grid-header-cell")?.getAttribute("data-col-name") ?? null;
-    const onMove = (move: PointerEvent) => {
-      if (!dragging) {
-        if (Math.abs(move.clientX - startX) < 5 && Math.abs(move.clientY - startY) < 5) return;
-        dragging = true;
-      }
-      const el = (document.elementFromPoint(move.clientX, move.clientY) as HTMLElement | null)?.closest<HTMLElement>(".grid-header-cell");
-      const over = el?.getAttribute("data-col-name") ?? null;
-      setDrag({ name: column.name, over, side: el ? dropSide(move.clientX, el.getBoundingClientRect()) : "after" });
-    };
-    const onUp = (up: PointerEvent) => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      if (!dragging) return;
-      didDrag.current = true;
-      const over = overOf(up.clientX, up.clientY);
-      const el = (document.elementFromPoint(up.clientX, up.clientY) as HTMLElement | null)?.closest<HTMLElement>(".grid-header-cell");
-      if (over && over !== column.name && el) grid.moveColumn(column.name, over, dropSide(up.clientX, el.getBoundingClientRect()));
-      setDrag(null);
-      window.setTimeout(() => { didDrag.current = false; }, 0);
-    };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+    startColumnDrag(event.nativeEvent, column, grid, event.currentTarget as HTMLElement, {
+      ghostClassName: themeClass,
+      setDraggingColumn: setDragName,
+      markDidDrag: () => { didDrag.current = true; window.setTimeout(() => { didDrag.current = false; }, 0); }
+    });
   };
   const onHeaderKeyDown = (event: React.KeyboardEvent, column: DataTableColumn<Row>) => {
     if (!isColumnReorderable(column, grid) || !(event.ctrlKey || event.metaKey)) return;
@@ -193,12 +173,7 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
   };
   const pinClass = (key: string) => pinPlan.className(key);
   const pinStyle = (key: string): StyleMap => pinPlan.cellStyle(key);
-  const dragClass = (column: DataTableColumn<Row>) => {
-    if (!drag) return "";
-    const dragging = drag.name === column.name ? " arcana-col-dragging" : "";
-    const over = drag.over === column.name && drag.name !== column.name ? (drag.side === "before" ? " arcana-drop-before" : " arcana-drop-after") : "";
-    return `${dragging}${over}`;
-  };
+  const dragClass = (column: DataTableColumn<Row>) => dragName === column.name ? " arcana-col-dragging" : "";
   const startResize = (event: React.PointerEvent, column: DataTableColumn<Row>) => {
     event.preventDefault();
     event.stopPropagation();
