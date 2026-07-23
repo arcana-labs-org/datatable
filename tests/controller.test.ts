@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createDataTable } from "../src";
+import { computePinPlan } from "../src/core/view";
 
 type Person = { id: number; name: string; amount: number; _uuid?: string };
 
@@ -146,6 +147,163 @@ describe("DataTableController", () => {
     expect(datasource).toHaveBeenNthCalledWith(5, expect.objectContaining({ name: "Ada" }));
     expect(datasource).toHaveBeenNthCalledWith(6, expect.objectContaining({ page: 3, limit: 25 }));
     expect(grid.currentPage).toBe(3);
+  });
+
+  it("sorts a local dataset by multiple keys in priority order (stable)", async () => {
+    type Employee = { id: number; dept: string; amount: number };
+    const grid = createDataTable<Employee>({
+      mode: "dataset",
+      rowsPerPage: 10,
+      dataset: [
+        { id: 1, dept: "B", amount: 20 },
+        { id: 2, dept: "A", amount: 30 },
+        { id: 3, dept: "B", amount: 10 },
+        { id: 4, dept: "A", amount: 30 },
+        { id: 5, dept: "A", amount: 10 }
+      ],
+      columns: [{ name: "dept", label: "Dept" }, { name: "amount", label: "Valor", type: "NUMBER" }]
+    });
+
+    // dept asc, then amount desc — ties on (A,30) keep original order (2 before 4).
+    await grid.applyOrderBy([{ name: "dept", direction: "asc" }, { name: "amount", direction: "desc" }]);
+    expect(grid.getRows().map((row) => row.id)).toEqual([2, 4, 5, 1, 3]);
+    expect(grid.orderByList).toHaveLength(2);
+    // snapshot.orderBy stays the primary column for backward compatibility.
+    expect(grid.getSnapshot().orderBy).toEqual({ name: "dept", direction: "asc" });
+    expect(grid.getSnapshot().orderByList).toEqual([{ name: "dept", direction: "asc" }, { name: "amount", direction: "desc" }]);
+  });
+
+  it("cycles a column with toggleOrderBy, additively and as sole sort", async () => {
+    type Employee = { id: number; dept: string; amount: number };
+    const grid = createDataTable<Employee>({
+      mode: "dataset", rowsPerPage: 10,
+      dataset: [{ id: 1, dept: "A", amount: 1 }],
+      columns: [{ name: "dept", label: "Dept" }, { name: "amount", label: "Valor" }]
+    });
+
+    // Sole (non-additive) cycle: asc → desc → cleared.
+    await grid.toggleOrderBy("dept");
+    expect(grid.orderByList).toEqual([{ name: "dept", direction: "asc" }]);
+    await grid.toggleOrderBy("dept");
+    expect(grid.orderByList).toEqual([{ name: "dept", direction: "desc" }]);
+    await grid.toggleOrderBy("dept");
+    expect(grid.orderByList).toEqual([]);
+
+    // Additive keeps other columns; new column appends at the end.
+    await grid.toggleOrderBy("dept", { additive: true });
+    await grid.toggleOrderBy("amount", { additive: true });
+    expect(grid.orderByList).toEqual([{ name: "dept", direction: "asc" }, { name: "amount", direction: "asc" }]);
+    // Cycle the first column asc → desc while keeping the second.
+    await grid.toggleOrderBy("dept", { additive: true });
+    expect(grid.orderByList).toEqual([{ name: "dept", direction: "desc" }, { name: "amount", direction: "asc" }]);
+    // Remove it (desc → gone); the second stays and becomes primary.
+    await grid.toggleOrderBy("dept", { additive: true });
+    expect(grid.orderByList).toEqual([{ name: "amount", direction: "asc" }]);
+    expect(grid.getSnapshot().orderBy).toEqual({ name: "amount", direction: "asc" });
+  });
+
+  it("keeps applyOrderBy(object|null) compatible and serializes multi-sort with indexed params", async () => {
+    const datasource = vi.fn(async (_params: Record<string, unknown>) => ({ rows: [] as Person[], total: 0, page: 1 }));
+    const grid = createDataTable<Person>({ mode: "remote", datasource, columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }] });
+
+    // Single object → legacy keys.
+    await grid.applyOrderBy({ name: "a", direction: "asc" });
+    expect(datasource).toHaveBeenLastCalledWith(expect.objectContaining({ "order_by[field]": "a", "order_by[direction]": "asc" }));
+
+    // Array → indexed keys, preserving priority order.
+    await grid.applyOrderBy([{ name: "a", direction: "asc" }, { name: "b", direction: "desc" }]);
+    expect(datasource).toHaveBeenLastCalledWith(expect.objectContaining({
+      "order_by[0][field]": "a", "order_by[0][direction]": "asc",
+      "order_by[1][field]": "b", "order_by[1][direction]": "desc"
+    }));
+
+    // null → cleared, no order params leak.
+    await grid.applyOrderBy(null);
+    const calls = datasource.mock.calls;
+    const lastCall = calls[calls.length - 1][0] as Record<string, unknown>;
+    expect(grid.getSnapshot().orderBy).toBeUndefined();
+    expect(Object.keys(lastCall).some((key) => key.startsWith("order_by"))).toBe(false);
+  });
+
+  it("reorders columns via setColumnOrder and moveColumn, and getColumns respects it", () => {
+    const grid = createDataTable({
+      mode: "dataset", dataset: [{ id: 1 }],
+      columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }, { name: "c", label: "C" }]
+    });
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["a", "b", "c"]);
+
+    grid.setColumnOrder(["c", "a", "b"]);
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["c", "a", "b"]);
+    expect(grid.getSnapshot().columnOrder).toEqual(["c", "a", "b"]);
+
+    // Move "c" after "b" → [a, b, c].
+    grid.moveColumn("c", "b", "after");
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["a", "b", "c"]);
+    // Move "a" before "c" → [b, a, c].
+    grid.moveColumn("a", "c", "before");
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["b", "a", "c"]);
+    // A null target sends the column to the end.
+    grid.moveColumn("b", null);
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["a", "c", "b"]);
+  });
+
+  it("groups pinned columns to the edges (left, unpinned, right) preserving order", () => {
+    const grid = createDataTable({
+      mode: "dataset", dataset: [{ id: 1 }],
+      columns: [
+        { name: "a", label: "A" },
+        { name: "b", label: "B", pinned: "right" },
+        { name: "c", label: "C" },
+        { name: "d", label: "D", pinned: "left" }
+      ]
+    });
+    // Seeded from config.pinned: left group first (d), middle (a, c), right (b).
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["d", "a", "c", "b"]);
+    expect(grid.getColumnPin("d")).toBe("left");
+    expect(grid.getColumnPin("b")).toBe("right");
+    expect(grid.getColumnPin("a")).toBeNull();
+
+    // Runtime pin change: pin "a" left, unpin "d".
+    grid.setColumnPinned("a", "left");
+    grid.setColumnPinned("d", null);
+    expect(grid.getColumnPin("a")).toBe("left");
+    expect(grid.getColumnPin("d")).toBeNull();
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["a", "c", "d", "b"]);
+    expect(grid.getSnapshot().columnPins.a).toBe("left");
+  });
+
+  it("computes accumulating sticky offsets for pinned columns", () => {
+    const grid = createDataTable({
+      mode: "dataset", dataset: [{ id: 1 }],
+      checkboxEnabled: true,
+      actions: [{ element: () => "x" }],
+      columns: [
+        { name: "a", label: "A", width: 120, pinned: "left" },
+        { name: "b", label: "B", width: 100, pinned: "left" },
+        { name: "c", label: "C", width: 90 },
+        { name: "z", label: "Z", width: 80, pinned: "right" }
+      ]
+    });
+    const plan = computePinPlan(grid, grid.getColumns(), {});
+    expect(plan.active).toBe(true);
+    // System checkbox (60) freezes left first, then a at 60, b at 60+120.
+    expect(plan.cellStyle("__arcana_checkbox")).toMatchObject({ position: "sticky", left: "0px" });
+    expect(plan.cellStyle("a")).toMatchObject({ position: "sticky", left: "60px" });
+    expect(plan.cellStyle("b")).toMatchObject({ position: "sticky", left: "180px" });
+    // Right region: actions (1*50+50 = 100) at 0, z at 100.
+    expect(plan.cellStyle("__arcana_actions")).toMatchObject({ position: "sticky", right: "0px" });
+    expect(plan.cellStyle("z")).toMatchObject({ position: "sticky", right: "100px" });
+    expect(plan.className("b")).toContain("arcana-pin-left-edge");
+    expect(plan.className("z")).toContain("arcana-pin-right-edge");
+    expect(plan.className("c")).toBe("");
+  });
+
+  it("disables the pin plan in VERTICAL_RECORD mode and when nothing is pinned", () => {
+    const base = { mode: "dataset" as const, dataset: [{ id: 1 }], columns: [{ name: "a", label: "A", pinned: "left" as const }] };
+    const vertical = createDataTable({ ...base, responsiveMode: "VERTICAL_RECORD" });
+    expect(computePinPlan(vertical, vertical.getColumns(), {}).active).toBe(false);
+    const unpinned = createDataTable({ mode: "dataset", dataset: [{ id: 1 }], columns: [{ name: "a", label: "A" }] });
+    expect(computePinPlan(unpinned, unpinned.getColumns(), {}).active).toBe(false);
   });
 
   it("expands and collapses rows programmatically, collapsing everything on page changes", async () => {

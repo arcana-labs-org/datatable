@@ -37,9 +37,9 @@
 </script>
 
 {#if detail.status === "loading"}
-  <Content value={grid.config.expandedRowLoadingRenderer?.(row, grid) ?? expandedRowLoadingContent(msg)} />
+  <Content value={grid.config.expandedRowLoadingRenderer?.(row, grid) ?? expandedRowLoadingContent(msg)} html />
 {:else if detail.status === "error"}
   <div class="grid-detail-error">{msg.expandedError}</div>
 {:else}
-  <Content value={detail.content} />
+  <Content value={detail.content} html />
 {/if}

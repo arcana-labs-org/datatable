@@ -130,6 +130,63 @@ describe("Svelte adapter", () => {
     expect(target.querySelector(".grid-detail-loading")).toBeNull();
   });
 
+  it("renders a config-pinned column as sticky and pins another via the header menu", async () => {
+    const { target } = renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false, overflowEnabled: true,
+      dataset: [{ id: 1, a: "1", b: "2", c: "3" }],
+      columns: [{ name: "a", label: "A", width: 120, pinned: "left" }, { name: "b", label: "B", width: 200 }, { name: "c", label: "C", width: 200 }]
+    });
+    await Promise.resolve();
+    flushSync();
+    const order = () => Array.from(target.querySelectorAll(".grid-header [data-col-name]")).map((cell) => cell.getAttribute("data-col-name"));
+    // "a" is left-pinned so it leads and sticks.
+    expect(order()).toEqual(["a", "b", "c"]);
+    const pinnedHeader = target.querySelector<HTMLElement>('.grid-header [data-col-name="a"]')!;
+    expect(pinnedHeader.classList.contains("arcana-pin-left")).toBe(true);
+    expect(pinnedHeader.style.position).toBe("sticky");
+
+    // Pin "c" to the right through the header menu → it groups to the end.
+    click(target.querySelector('[data-col-name="c"]'));
+    const pinRight = Array.from(target.querySelectorAll<HTMLButtonElement>(".arcana-pin-menu button")).find((button) => button.textContent?.includes("Fixar à direita"))!;
+    expect(pinRight).toBeTruthy();
+    click(pinRight);
+    expect(order()).toEqual(["a", "b", "c"]);
+    expect(target.querySelector<HTMLElement>('.grid-header [data-col-name="c"]')!.classList.contains("arcana-pin-right")).toBe(true);
+  });
+
+  it("escapes raw cell values as text (no HTML injection without column.html)", () => {
+    const { target } = renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, name: "<img src=x onerror=\"window.__xssSvelte=1\">" }],
+      columns: [{ name: "name", label: "Name" }]
+    });
+    flushSync();
+    expect(target.querySelector(".grid-body img")).toBeNull();
+    expect(target.querySelector(".grid-body .grid-cell")?.textContent).toContain("<img src=x onerror=");
+    expect((window as unknown as { __xssSvelte?: number }).__xssSvelte).toBeUndefined();
+  });
+
+  it("renders HTML from a valueGetter only when the column opts in with html: true", () => {
+    const { target } = renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, status: "ok" }],
+      columns: [{ name: "status", label: "Status", html: true, valueGetter: (value) => `<span class="pill">${String(value)}</span>` }]
+    });
+    flushSync();
+    expect(target.querySelector(".grid-body .pill")?.textContent).toBe("ok");
+  });
+
+  it("renders a valueGetter string as text by default (no html flag)", () => {
+    const { target } = renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, status: "ok" }],
+      columns: [{ name: "status", label: "Status", valueGetter: (value) => `<span class="pill">${String(value)}</span>` }]
+    });
+    flushSync();
+    expect(target.querySelector(".grid-body .pill")).toBeNull();
+    expect(target.querySelector(".grid-body .grid-cell")?.textContent).toBe('<span class="pill">ok</span>');
+  });
+
   it("localizes the built-in strings with locale: 'en' and honors messages overrides", async () => {
     const rows = Array.from({ length: 7 }, (_, index) => ({ id: index + 1, name: `Person ${index + 1}` }));
     const { target } = renderTable({

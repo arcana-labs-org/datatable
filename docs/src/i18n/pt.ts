@@ -98,8 +98,13 @@ export const pt: Messages = {
     },
     columns: {
       title: "Colunas",
-      p1: "Cada coluna é um objeto <c>DataTableColumn</c> com um <c>name</c> (a chave na linha) e um <c>label</c> (o texto do cabeçalho). Campos como <c>type</c> controlam a formatação — por exemplo, <c>CURRENCY</c> renderiza valores monetários — e <c>valueGetter</c> transforma o conteúdo da célula antes de renderizar.",
-      p2: "A propriedade <c>columns</c> também aceita uma função <c>() => DataTableColumn[]</c>, útil quando as colunas dependem de permissões ou de estado da aplicação."
+      p1: "Cada coluna é um objeto <c>DataTableColumn</c> com um <c>name</c> (a chave na linha) e um <c>label</c> (o texto do cabeçalho). Campos como <c>type</c> controlam a formatação — por exemplo, <c>CURRENCY</c> renderiza valores monetários — e <c>valueGetter</c> transforma o conteúdo da célula antes de renderizar. O conteúdo string é renderizado como texto seguro e escapado por padrão; defina <c>html: true</c> na coluna para interpretá-lo como HTML, ou retorne um nó nativo para conteúdo rico.",
+      p2: "A propriedade <c>columns</c> também aceita uma função <c>() => DataTableColumn[]</c>, útil quando as colunas dependem de permissões ou de estado da aplicação. As colunas podem ser redimensionadas arrastando a borda direita do cabeçalho — ativo por padrão (<c>columnResizeEnabled</c>); desative em uma coluna específica com <c>resizable: false</c>."
+    },
+    columnManagement: {
+      title: "Reordenar e fixar colunas",
+      p1: "Arraste o corpo de um cabeçalho para o lado para reordenar as colunas — uma linha indicadora mostra exatamente onde a coluna vai parar. Um clique curto continua abrindo o menu de ordenação e a alça de redimensionar da borda direita mantém a prioridade, então arrastar nunca atrapalha. Ativo por padrão (<c>columnReorderEnabled</c>); mantenha uma coluna fixa no lugar com <c>reorderable: false</c>.",
+      p2: "O menu do cabeçalho (o mesmo que traz as opções de ordenação) ganha <i>Fixar à esquerda</i>, <i>Fixar à direita</i> e <i>Desafixar</i>. Uma coluna fixada congela na sua borda e permanece visível durante a rolagem horizontal — colunas fixadas à esquerda grudam no início, à direita no fim, com um divisor/sombra sutil. Defina de antemão com <c>pinned: 'left'</c> ou <c>pinned: 'right'</c> na coluna, ou altere em tempo de execução pelo menu; as colunas de sistema (checkbox/expansor) congelam à esquerda e a coluna de ações à direita. Reordenar e fixar são desativados por <c>columnPinEnabled</c> e ignorados no modo responsivo <c>VERTICAL_RECORD</c>."
     },
     pagination: {
       title: "Paginação",
@@ -128,8 +133,8 @@ export const pt: Messages = {
     },
     sorting: {
       title: "Ordenação",
-      p1: "A ordenação por coluna vem habilitada por padrão (<c>orderByEnabled: true</c>): clicar no cabeçalho abre um menu com <i>Crescente</i>, <i>Decrescente</i> e — quando a coluna já está ordenada — <i>Remover ordem</i>, que devolve o grid ao estado neutro. No modo <c>remote</c>, a ordenação atual segue junto nos <c>params</c>; no modo <c>dataset</c>, é resolvida em memória.",
-      p2: "Desative-a por coluna com <c>orderByEnabled: false</c> na definição da coluna, e use <c>filterName</c> como alias do campo enviado ao servidor. Para aplicar uma ordenação por código, use <c>controller.applyOrderBy(orderBy)</c>."
+      p1: "A ordenação por coluna vem habilitada por padrão (<c>orderByEnabled: true</c>): clicar no cabeçalho abre um menu com <i>Crescente</i>, <i>Decrescente</i> e — quando a coluna já está ordenada — <i>Remover ordem</i>, que devolve o grid ao estado neutro. <b>Shift+clique</b> em um cabeçalho para adicionar essa coluna a uma ordenação de <i>múltiplas colunas</i>, alternando-a entre <i>crescente → decrescente → removida</i> enquanto mantém as demais colunas ordenadas; um pequeno número de prioridade (<c>1</c>, <c>2</c>, <c>3</c>…) indica a ordem, e os cabeçalhos expõem <c>aria-sort</c>. No modo <c>remote</c>, a ordenação atual segue junto nos <c>params</c>; no modo <c>dataset</c>, é resolvida em memória.",
+      p2: "Desative-a por coluna com <c>orderByEnabled: false</c> na definição da coluna, e use <c>filterName</c> como alias do campo enviado ao servidor. Para aplicar uma ordenação por código, use <c>controller.applyOrderBy(orderBy)</c> — que agora também aceita um <c>OrderBy[]</c> para uma ordenação completa de múltiplas colunas (o índice 0 ordena primeiro) — ou <c>controller.toggleOrderBy(name, { additive })</c> para alternar uma única coluna."
     },
     checkbox: {
       title: "Seleção múltipla",
@@ -190,6 +195,7 @@ export const pt: Messages = {
         messages: "Substituições pontuais das strings internas, aplicadas por cima do pack do locale resolvido.",
         dataset: "Coleção completa para operações locais; infere mode dataset.",
         columns: "Colunas visíveis e seus renderizadores.",
+        html: "Quando true, o conteúdo string da coluna (valor cru ou retorno de valueGetter/headerContentGetter) é interpretado como HTML; caso contrário é renderizado como texto seguro e escapado. Para conteúdo rico, retorne um nó nativo.",
         datasource: "Provider consultado no modo remote.",
         url: "Endpoint usado no modo remote sem datasource.",
         rowsPerPage: "Quantidade inicial por página.",
@@ -205,6 +211,11 @@ export const pt: Messages = {
         onRowExpandedCollapsed: "Notificam a expansão e o recolhimento de cada linha.",
         responsiveMode: "Define a apresentação mobile.",
         stickyHeaderEnabled: "Mantém o cabeçalho durante a rolagem.",
+        columnResizeEnabled: "Habilita as alças de arrastar para redimensionar nos cabeçalhos das colunas.",
+        resizable: "Permite que esta coluna seja redimensionada arrastando a borda do cabeçalho.",
+        columnReorderEnabled: "Habilita reordenar arrastando o corpo do cabeçalho (ignorado em VERTICAL_RECORD).",
+        reorderable: "Permite arrastar esta coluna para uma nova posição; use false para mantê-la fixa.",
+        pinned: "Congela esta coluna em uma borda (fixa durante a rolagem horizontal); alterável pelo menu do cabeçalho.",
         sendRequestOnMounted: "Controla a primeira consulta remota.",
         initialFilters: "Filtros iniciais remotos ou locais.",
         onRequestError: "Notifica falhas de carregamento."
@@ -344,6 +355,9 @@ export const pt: Messages = {
       renderer: "Conteúdo imediato ou resolvido via Promise.",
       customLoading: "Loading personalizado no modo assíncrono.",
       stickyHeaderEnabled: "Cabeçalho fixo durante o scroll.",
+      columnResizeEnabled: "Arraste as bordas do cabeçalho para redimensionar as colunas.",
+      columnReorderEnabled: "Arraste um cabeçalho para reordenar as colunas.",
+      pinColumns: "Fixa a primeira coluna à esquerda e a última à direita.",
       overflowEnabled: "O corpo rola em vez de crescer.",
       responsiveMode: "Comportamento em telas estreitas.",
       footerVisible: "Exibe o rodapé com a paginação.",

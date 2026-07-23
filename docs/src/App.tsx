@@ -7,7 +7,7 @@ import {
   SearchTypesPreview, SortingPreview, SummaryPreview, ThemePreview
 } from "./components/demos";
 import {
-  actionsCode, checkboxCode, columnsCode, controllerCode, expandableCode, filtersCode, firstUseCode,
+  actionsCode, checkboxCode, columnManagementCode, columnsCode, controllerCode, expandableCode, filtersCode, firstUseCode,
   fullConfigCode, hooksCode, installCode, layoutCode, localizationCode, modeCode, paginationCode, radioCode,
   searchTypesCode, sortingCode, stylesCode, summaryCode, themeCode, type SnippetPair
 } from "./components/snippets";
@@ -60,6 +60,7 @@ const PROPERTY_META: Array<{ key: PropertyKey; name: string; type: string; def: 
   { key: "messages", name: "messages", type: "Partial<ArcanaMessages>", def: undefined },
   { key: "dataset", name: "dataset", type: "DataTableRow[]", def: undefined },
   { key: "columns", name: "columns", type: "DataTableColumn[] | () => DataTableColumn[]", def: undefined },
+  { key: "html", name: "html (column)", type: "boolean", def: "false" },
   { key: "datasource", name: "datasource", type: "(params) => rows | response", def: undefined },
   { key: "url", name: "url", type: "string | () => string", def: undefined },
   { key: "rowsPerPage", name: "rowsPerPage", type: "number", def: "10" },
@@ -75,6 +76,11 @@ const PROPERTY_META: Array<{ key: PropertyKey; name: string; type: string; def: 
   { key: "onRowExpandedCollapsed", name: "onRowExpanded / onRowCollapsed", type: "(row, grid) => void", def: undefined },
   { key: "responsiveMode", name: "responsiveMode", type: "HORIZONTAL_OVERFLOW | VERTICAL_RECORD", def: "HORIZONTAL_OVERFLOW" },
   { key: "stickyHeaderEnabled", name: "stickyHeaderEnabled", type: "boolean", def: "false" },
+  { key: "columnResizeEnabled", name: "columnResizeEnabled", type: "boolean", def: "true" },
+  { key: "resizable", name: "resizable (column)", type: "boolean", def: "true" },
+  { key: "columnReorderEnabled", name: "columnReorderEnabled", type: "boolean", def: "true" },
+  { key: "reorderable", name: "reorderable (column)", type: "boolean", def: "true" },
+  { key: "pinned", name: "pinned (column)", type: "\"left\" | \"right\"", def: undefined },
   { key: "sendRequestOnMounted", name: "sendRequestOnMounted", type: "boolean", def: "true" },
   { key: "initialFilters", name: "initialFilters", type: "Record<string, unknown>", def: "{}" },
   { key: "onRequestError", name: "onRequestError", type: "(error, grid) => void", def: undefined }
@@ -262,7 +268,7 @@ function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
           body: <>
             <P>{s.columns.p1}</P>
             <P>{s.columns.p2}</P>
-            {chips(["columns", "cellMinWidth", "calculateCellWidth", "textAlignment", "width", "valueGetter", "headerContentGetter", "isVisible", "onBeforeColumnStyleMounted", "useFlexbox (deprecated)"])}
+            {chips(["columns", "cellMinWidth", "calculateCellWidth", "textAlignment", "width", "resizable", "valueGetter", "headerContentGetter", "html", "isVisible", "onBeforeColumnStyleMounted", "useFlexbox (deprecated)"])}
           </>
         },
         {
@@ -321,6 +327,16 @@ function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
           </>
         },
         {
+          id: "gerenciar-colunas",
+          title: s.columnManagement.title,
+          code: pairToCode(columnManagementCode, "ColumnManagement.tsx", "ColumnManagement.vue", "ColumnManagement.component.ts", "ColumnManagement.svelte"),
+          body: <>
+            <P>{s.columnManagement.p1}</P>
+            <P>{s.columnManagement.p2}</P>
+            {chips(["columnReorderEnabled", "reorderable", "columnPinEnabled", "pinned"])}
+          </>
+        },
+        {
           id: "selecao-multipla",
           title: s.checkbox.title,
           code: pairToCode(checkboxCode, "MultiSelection.tsx", "MultiSelection.vue", "MultiSelection.component.ts", "MultiSelection.svelte"),
@@ -365,7 +381,7 @@ function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
               <li>{rich(s.layout.liVertical)}</li>
             </ul>
             <P>{s.layout.p2}</P>
-            {chips(["height", "overflowEnabled", "stickyHeaderEnabled", "responsiveMode", "cellMinWidth"])}
+            {chips(["height", "overflowEnabled", "stickyHeaderEnabled", "columnResizeEnabled", "responsiveMode", "cellMinWidth"])}
           </>
         },
         {

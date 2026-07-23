@@ -103,6 +103,9 @@ interface KnobState {
   expandMode: "sync" | "async";
   customExpandLoading: boolean;
   stickyHeaderEnabled: boolean;
+  columnResizeEnabled: boolean;
+  columnReorderEnabled: boolean;
+  pinColumns: boolean;
   height: "off" | "240" | "320" | "480";
   overflowEnabled: boolean;
   responsiveMode: "HORIZONTAL_OVERFLOW" | "VERTICAL_RECORD";
@@ -128,6 +131,8 @@ const LIB_DEFAULTS = {
   cellFocusEnabled: true,
   expandRowOnClick: false,
   stickyHeaderEnabled: false,
+  columnResizeEnabled: true,
+  columnReorderEnabled: true,
   overflowEnabled: false,
   responsiveMode: "HORIZONTAL_OVERFLOW",
   footerVisible: true,
@@ -155,6 +160,9 @@ const DEFAULT_STATE: KnobState = {
   expandMode: "sync",
   customExpandLoading: false,
   stickyHeaderEnabled: false,
+  columnResizeEnabled: true,
+  columnReorderEnabled: true,
+  pinColumns: false,
   height: "off",
   overflowEnabled: false,
   responsiveMode: "HORIZONTAL_OVERFLOW",
@@ -300,12 +308,15 @@ function configLines(state: KnobState, variant: SnippetVariant, effectiveLocale:
     lines.push(...rendererLines(state, variant));
   }
   if (state.stickyHeaderEnabled) lines.push("stickyHeaderEnabled: true,");
+  if (!state.columnResizeEnabled) lines.push("columnResizeEnabled: false,");
+  if (!state.columnReorderEnabled) lines.push("columnReorderEnabled: false,");
   if (state.height !== "off") lines.push(`height: ${state.height},`);
   if (state.overflowEnabled) lines.push("overflowEnabled: true,");
   if (state.responsiveMode !== LIB_DEFAULTS.responsiveMode) lines.push("responsiveMode: 'VERTICAL_RECORD',");
   if (!state.footerVisible) lines.push("footerVisible: false,");
   if (!state.isRowsPerPageVisible) lines.push("isRowsPerPageVisible: false,");
   if (state.calculateCellWidth) lines.push("calculateCellWidth: true,");
+  if (state.pinColumns) lines.push("// pinned: 'left' on the first column, pinned: 'right' on the last");
   lines.push("columns");
   return lines;
 }
@@ -392,6 +403,14 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
   const effectiveLocale: ArcanaLocale = state.locale === "auto" ? (lang as ArcanaLocale) : (state.locale as ArcanaLocale);
 
   const config = useMemo<DataTableConfig<DemoRow>>(() => {
+    const columns = state.pinColumns
+      ? playgroundColumns.map((col, index) =>
+        index === 0
+          ? { ...col, pinned: "left" as const }
+          : index === playgroundColumns.length - 1
+            ? { ...col, pinned: "right" as const }
+            : col)
+      : playgroundColumns;
     const cfg: DataTableConfig<DemoRow> = {
       mode: "dataset",
       dataset: state.emptyDataset ? [] : rows,
@@ -408,12 +427,14 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
       rowFocusEnabled: state.rowFocusEnabled,
       cellFocusEnabled: state.cellFocusEnabled,
       stickyHeaderEnabled: state.stickyHeaderEnabled,
+      columnResizeEnabled: state.columnResizeEnabled,
+      columnReorderEnabled: state.columnReorderEnabled,
       overflowEnabled: state.overflowEnabled,
       responsiveMode: state.responsiveMode,
       footerVisible: state.footerVisible,
       isRowsPerPageVisible: state.isRowsPerPageVisible,
       calculateCellWidth: state.calculateCellWidth,
-      columns: playgroundColumns
+      columns
     };
     const overrideKeys = activeOverrideKeys(state.messagesOverrides);
     if (overrideKeys.length > 0) {
@@ -529,6 +550,15 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
         <Section title={msg.playground.groupLayout} />
         <Row k="stickyHeaderEnabled" label="stickyHeaderEnabled" desc={hints.stickyHeaderEnabled} modified={changed("stickyHeaderEnabled")} infoAria={infoAria}>
           <MiniSwitch label="stickyHeaderEnabled" checked={state.stickyHeaderEnabled} onChange={(value) => update({ stickyHeaderEnabled: value })} />
+        </Row>
+        <Row k="columnResizeEnabled" label="columnResizeEnabled" desc={hints.columnResizeEnabled} modified={changed("columnResizeEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="columnResizeEnabled" checked={state.columnResizeEnabled} onChange={(value) => update({ columnResizeEnabled: value })} />
+        </Row>
+        <Row k="columnReorderEnabled" label="columnReorderEnabled" desc={hints.columnReorderEnabled} modified={changed("columnReorderEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="columnReorderEnabled" checked={state.columnReorderEnabled} onChange={(value) => update({ columnReorderEnabled: value })} />
+        </Row>
+        <Row k="pinColumns" label="pinned" desc={hints.pinColumns} modified={changed("pinColumns")} infoAria={infoAria}>
+          <MiniSwitch label="pinned" checked={state.pinColumns} onChange={(value) => update({ pinColumns: value })} />
         </Row>
         <Row k="height" label="height" desc={msg.playground.heightHint} modified={changed("height")} infoAria={infoAria}>
           <select className="pg-select" aria-label="height" value={state.height} onChange={(event) => update({ height: event.target.value as KnobState["height"] })}>

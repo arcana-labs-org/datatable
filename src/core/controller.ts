@@ -30,7 +30,9 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   uuid = id();
   rows: Row[] = [];
   filters: Record<string, unknown> = {};
-  orderBy?: OrderBy;
+  orderByList: OrderBy[] = [];
+  columnOrder: string[] = [];
+  columnPins: Record<string, "left" | "right" | null> = {};
   loading = false;
   error: unknown = null;
   currentPage = 1;
@@ -44,10 +46,19 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   private listeners = new Set<() => void>();
   private snapshot!: DataTableSnapshot<Row>;
 
+  /** The primary sort column (the highest priority one), for compatibility. */
+  get orderBy(): OrderBy | undefined {
+    return this.orderByList[0];
+  }
+
   constructor(config: DataTableConfig<Row>) {
     this.config = config;
     this.mode = config.mode ?? (Array.isArray(config.dataset) ? "dataset" : "remote");
     this.rowsPerPage = Math.max(1, config.rowsPerPage ?? 10);
+    // Seed the runtime pin state from each column's declared `pinned`.
+    this.baseColumns().forEach((column) => {
+      if (column.pinned) this.columnPins[column.name] = column.pinned;
+    });
     this.updateSnapshot();
 
     if (this.mode === "dataset") {
@@ -72,6 +83,9 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
       rows: this.rows,
       filters: this.filters,
       orderBy: this.orderBy,
+      orderByList: this.orderByList,
+      columnOrder: [...this.columnOrder],
+      columnPins: { ...this.columnPins },
       loading: this.loading,
       error: this.error,
       currentPage: this.currentPage,
@@ -158,9 +172,17 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
     });
     params.page = this.currentPage;
     params.limit = this.rowsPerPage;
-    if (this.orderBy) {
-      params["order_by[field]"] = this.orderBy.name;
-      params["order_by[direction]"] = this.orderBy.direction;
+    // A single sort keeps the classic `order_by[field]` / `order_by[direction]`
+    // pair; multiple sorts use an indexed form preserving priority order:
+    // `order_by[0][field]`, `order_by[0][direction]`, `order_by[1][field]`, …
+    if (this.orderByList.length === 1) {
+      params["order_by[field]"] = this.orderByList[0].name;
+      params["order_by[direction]"] = this.orderByList[0].direction;
+    } else if (this.orderByList.length > 1) {
+      this.orderByList.forEach((order, index) => {
+        params[`order_by[${index}][field]`] = order.name;
+        params[`order_by[${index}][direction]`] = order.direction;
+      });
     }
     return params;
   }
@@ -237,9 +259,67 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   isEmpty(): boolean { return this.rows.length === 0; }
   isNotEmpty(): boolean { return this.rows.length > 0; }
 
-  getColumns(): DataTableColumn<Row>[] {
+  /** Visible columns in natural (config) order, before reorder/pin grouping. */
+  private baseColumns(): DataTableColumn<Row>[] {
     const columns = typeof this.config.columns === "function" ? this.config.columns() : this.config.columns;
     return columns.filter((column) => column.isVisible?.() ?? true);
+  }
+
+  getColumns(): DataTableColumn<Row>[] {
+    const columns = this.baseColumns();
+    // 1) Apply the effective reorder: known names sort by their index; columns
+    //    not present in `columnOrder` (e.g. dynamic ones) keep their relative
+    //    order and stay at the end.
+    const ordered = this.columnOrder.length
+      ? [...columns].sort((left, right) => {
+        const li = this.columnOrder.indexOf(left.name);
+        const ri = this.columnOrder.indexOf(right.name);
+        if (li === -1 && ri === -1) return 0;
+        if (li === -1) return 1;
+        if (ri === -1) return -1;
+        return li - ri;
+      })
+      : columns;
+    // 2) Group by pin (stable): left-pinned first, then unpinned, then right.
+    const rank = (column: DataTableColumn<Row>): number => {
+      const pin = this.getColumnPin(column.name);
+      return pin === "left" ? 0 : pin === "right" ? 2 : 1;
+    };
+    return [...ordered].sort((left, right) => rank(left) - rank(right));
+  }
+
+  setColumnOrder(order: string[]): void {
+    this.columnOrder = [...order];
+    this.notify();
+  }
+
+  moveColumn(name: string, targetName: string | null, position: "before" | "after" = "before"): void {
+    const current = this.getColumns().map((column) => column.name);
+    const from = current.indexOf(name);
+    if (from === -1) return;
+    current.splice(from, 1);
+    if (targetName == null || targetName === name) {
+      current.push(name);
+    } else {
+      let index = current.indexOf(targetName);
+      if (index === -1) current.push(name);
+      else {
+        if (position === "after") index += 1;
+        current.splice(index, 0, name);
+      }
+    }
+    this.columnOrder = current;
+    this.notify();
+  }
+
+  getColumnPin(name: string): "left" | "right" | null {
+    if (name in this.columnPins) return this.columnPins[name];
+    return this.baseColumns().find((column) => column.name === name)?.pinned ?? null;
+  }
+
+  setColumnPinned(name: string, pinned: "left" | "right" | null): void {
+    this.columnPins = { ...this.columnPins, [name]: pinned };
+    this.notify();
   }
 
   async setFilter(name: string, value: unknown): Promise<void> {
@@ -275,8 +355,31 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
     await this.setFilter(column.filterName ?? column.name, value);
   }
 
-  async applyOrderBy(orderBy: OrderBy | null): Promise<void> {
-    this.orderBy = orderBy ?? undefined;
+  async applyOrderBy(orderBy: OrderBy | OrderBy[] | null): Promise<void> {
+    this.orderByList = orderBy == null ? [] : Array.isArray(orderBy) ? [...orderBy] : [orderBy];
+    await this.commitOrderChange();
+  }
+
+  async toggleOrderBy(name: string, options: { additive?: boolean } = {}): Promise<void> {
+    const list = [...this.orderByList];
+    const index = list.findIndex((order) => order.name === name);
+    if (options.additive) {
+      // Keep the other sorted columns; cycle this one asc → desc → removed.
+      if (index === -1) list.push({ name, direction: "asc" });
+      else if (list[index].direction === "asc") list[index] = { name, direction: "desc" };
+      else list.splice(index, 1);
+      this.orderByList = list;
+    } else {
+      // This column becomes the sole sort; cycle asc → desc → cleared.
+      const sole = list.length === 1 && index === 0;
+      if (sole && list[0].direction === "asc") this.orderByList = [{ name, direction: "desc" }];
+      else if (sole && list[0].direction === "desc") this.orderByList = [];
+      else this.orderByList = [{ name, direction: "asc" }];
+    }
+    await this.commitOrderChange();
+  }
+
+  private async commitOrderChange(): Promise<void> {
     this.currentPage = 1;
     if (this.mode === "dataset") {
       this.recomputeDataset();
@@ -419,13 +522,22 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   }
 
   private applyLocalSort(rows: Row[]): Row[] {
-    if (!this.orderBy) return [...rows];
-    const column = this.getColumns().find((item) => (item.filterName ?? item.name) === this.orderBy?.name || item.name === this.orderBy?.name);
-    const path = column?.name ?? this.orderBy.name;
-    const direction = this.orderBy.direction === "desc" ? -1 : 1;
+    if (!this.orderByList.length) return [...rows];
+    const columns = this.getColumns();
+    // Resolve each sort key once (field path + direction multiplier).
+    const keys = this.orderByList.map((order) => {
+      const column = columns.find((item) => (item.filterName ?? item.name) === order.name || item.name === order.name);
+      return { path: column?.name ?? order.name, direction: order.direction === "desc" ? -1 : 1 };
+    });
     return rows
       .map((row, index) => ({ row, index }))
-      .sort((left, right) => compareValues(getValue(left.row, path), getValue(right.row, path)) * direction || left.index - right.index)
+      .sort((left, right) => {
+        for (const key of keys) {
+          const result = compareValues(getValue(left.row, key.path), getValue(right.row, key.path)) * key.direction;
+          if (result) return result;
+        }
+        return left.index - right.index; // stable
+      })
       .map(({ row }) => row);
   }
 

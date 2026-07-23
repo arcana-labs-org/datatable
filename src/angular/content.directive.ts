@@ -5,7 +5,8 @@ import type { Renderable } from "../core/types";
  * Renders a `Renderable` into the host element, exactly like the React/Vue
  * `Content` helpers:
  * - function → invoked (lazily) and the result rendered;
- * - string → rendered as HTML;
+ * - string → rendered as escaped TEXT by default; rendered as HTML only when
+ *   `arcanaContentHtml` is true (opt-in per column via `column.html`);
  * - number/boolean → rendered as text;
  * - DOM `Node` → appended as-is (the Angular-friendly escape hatch for
  *   "component" content: build the node imperatively and return it);
@@ -17,6 +18,7 @@ import type { Renderable } from "../core/types";
 @Directive({ selector: "[arcanaContent]", standalone: true })
 export class ArcanaContentDirective implements OnChanges {
   @Input("arcanaContent") value: Renderable;
+  @Input("arcanaContentHtml") html = false;
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -26,7 +28,8 @@ export class ArcanaContentDirective implements OnChanges {
     element.textContent = "";
     if (resolved == null) return;
     if (typeof resolved === "string") {
-      element.innerHTML = resolved;
+      if (this.html) element.innerHTML = resolved;
+      else element.textContent = resolved;
       return;
     }
     if (typeof resolved === "number" || typeof resolved === "boolean") {

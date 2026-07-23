@@ -98,8 +98,13 @@ export const it: Messages = {
     },
     columns: {
       title: "Colonne",
-      p1: "Ogni colonna è un oggetto <c>DataTableColumn</c> con un <c>name</c> (la chiave sulla riga) e un <c>label</c> (il testo dell'intestazione). Campi come <c>type</c> controllano la formattazione — per esempio, <c>CURRENCY</c> renderizza valori monetari — e <c>valueGetter</c> trasforma il contenuto della cella prima del rendering.",
-      p2: "La proprietà <c>columns</c> accetta anche una funzione <c>() => DataTableColumn[]</c>, utile quando le colonne dipendono dai permessi o dallo stato dell'applicazione."
+      p1: "Ogni colonna è un oggetto <c>DataTableColumn</c> con un <c>name</c> (la chiave sulla riga) e un <c>label</c> (il testo dell'intestazione). Campi come <c>type</c> controllano la formattazione — per esempio, <c>CURRENCY</c> renderizza valori monetari — e <c>valueGetter</c> trasforma il contenuto della cella prima del rendering. Il contenuto stringa viene reso come testo sicuro ed escapato per impostazione predefinita; imposta <c>html: true</c> sulla colonna per interpretarlo come HTML, oppure restituisci un nodo nativo per contenuti ricchi.",
+      p2: "La proprietà <c>columns</c> accetta anche una funzione <c>() => DataTableColumn[]</c>, utile quando le colonne dipendono dai permessi o dallo stato dell'applicazione. Le colonne possono essere ridimensionate trascinando il bordo destro dell'intestazione — attivo per impostazione predefinita (<c>columnResizeEnabled</c>); escludi una singola colonna con <c>resizable: false</c>."
+    },
+    columnManagement: {
+      title: "Riordina e blocca le colonne",
+      p1: "Trascina lateralmente il corpo di un'intestazione per riordinare le colonne — una linea indicatrice mostra esattamente dove andrà la colonna. Un clic breve apre comunque il menu di ordinamento e la maniglia di ridimensionamento sul bordo destro mantiene la priorità, quindi il trascinamento non intralcia mai. Attivo per impostazione predefinita (<c>columnReorderEnabled</c>); mantieni una singola colonna fissa al suo posto con <c>reorderable: false</c>.",
+      p2: "Il menu dell'intestazione (lo stesso che contiene le opzioni di ordinamento) acquisisce <i>Blocca a sinistra</i>, <i>Blocca a destra</i> e <i>Sblocca</i>. Una colonna bloccata si congela sul suo bordo e resta visibile durante lo scorrimento orizzontale — le colonne bloccate a sinistra si attaccano all'inizio, a destra alla fine, con un divisore/ombra discreto. Impostalo in anticipo con <c>pinned: 'left'</c> o <c>pinned: 'right'</c> sulla colonna, oppure cambialo a runtime dal menu; le colonne di sistema (checkbox/espansore) si congelano a sinistra e la colonna delle azioni a destra. Riordino e blocco sono disabilitati da <c>columnPinEnabled</c> e ignorati nella modalità responsive <c>VERTICAL_RECORD</c>."
     },
     pagination: {
       title: "Paginazione",
@@ -128,8 +133,8 @@ export const it: Messages = {
     },
     sorting: {
       title: "Ordinamento",
-      p1: "L'ordinamento per colonna è abilitato per impostazione predefinita (<c>orderByEnabled: true</c>): un clic sull'intestazione apre un menu con <i>Crescente</i>, <i>Decrescente</i> e — quando la colonna è già ordinata — <i>Rimuovi ordinamento</i>, che riporta la griglia allo stato neutro. In modalità <c>remote</c>, l'ordinamento corrente viaggia nei <c>params</c>; in modalità <c>dataset</c>, viene risolto in memoria.",
-      p2: "Disattivalo per colonna con <c>orderByEnabled: false</c> nella definizione della colonna, e usa <c>filterName</c> come alias del campo inviato al server. Per applicare un ordinamento da codice, usa <c>controller.applyOrderBy(orderBy)</c>."
+      p1: "L'ordinamento per colonna è abilitato per impostazione predefinita (<c>orderByEnabled: true</c>): un clic sull'intestazione apre un menu con <i>Crescente</i>, <i>Decrescente</i> e — quando la colonna è già ordinata — <i>Rimuovi ordinamento</i>, che riporta la griglia allo stato neutro. <b>Shift+clic</b> su un'intestazione per aggiungere quella colonna a un ordinamento su <i>più colonne</i>, alternandola tra <i>crescente → decrescente → rimossa</i> mantenendo le altre colonne ordinate; un piccolo numero di priorità (<c>1</c>, <c>2</c>, <c>3</c>…) indica l'ordine, e le intestazioni espongono <c>aria-sort</c>. In modalità <c>remote</c>, l'ordinamento corrente viaggia nei <c>params</c>; in modalità <c>dataset</c>, viene risolto in memoria.",
+      p2: "Disattivalo per colonna con <c>orderByEnabled: false</c> nella definizione della colonna, e usa <c>filterName</c> come alias del campo inviato al server. Per applicare un ordinamento da codice, usa <c>controller.applyOrderBy(orderBy)</c> — che ora accetta anche un <c>OrderBy[]</c> per un ordinamento completo su più colonne (l'indice 0 ordina per primo) — oppure <c>controller.toggleOrderBy(name, { additive })</c> per alternare una singola colonna."
     },
     checkbox: {
       title: "Selezione multipla",
@@ -190,6 +195,7 @@ export const it: Messages = {
         messages: "Sostituzioni puntuali delle stringhe interne, applicate sopra il pack del locale risolto.",
         dataset: "Collezione completa per le operazioni locali; inferisce la modalità dataset.",
         columns: "Colonne visibili e i loro renderer.",
+        html: "Quando è true, il contenuto stringa della colonna (valore grezzo o risultato di valueGetter/headerContentGetter) viene interpretato come HTML; altrimenti viene reso come testo sicuro ed escapato. Per contenuti ricchi, restituisci un nodo nativo.",
         datasource: "Provider interrogato in modalità remote.",
         url: "Endpoint usato in modalità remote senza datasource.",
         rowsPerPage: "Quantità iniziale per pagina.",
@@ -205,6 +211,11 @@ export const it: Messages = {
         onRowExpandedCollapsed: "Notificano l'espansione e la chiusura di ogni riga.",
         responsiveMode: "Definisce la presentazione mobile.",
         stickyHeaderEnabled: "Mantiene l'intestazione durante lo scorrimento.",
+        columnResizeEnabled: "Abilita le maniglie di trascinamento per ridimensionare le intestazioni delle colonne.",
+        resizable: "Consente di ridimensionare questa colonna trascinando il bordo dell'intestazione.",
+        columnReorderEnabled: "Abilita il riordino trascinando il corpo dell'intestazione (ignorato in VERTICAL_RECORD).",
+        reorderable: "Consente di trascinare questa colonna in una nuova posizione; imposta false per tenerla fissa.",
+        pinned: "Congela questa colonna su un bordo (fissa durante lo scorrimento orizzontale); modificabile dal menu dell'intestazione.",
         sendRequestOnMounted: "Controlla la prima query remota.",
         initialFilters: "Filtri iniziali remoti o locali.",
         onRequestError: "Notifica i fallimenti di caricamento."
@@ -344,6 +355,9 @@ export const it: Messages = {
       renderer: "Contenuto immediato o risolto via Promise.",
       customLoading: "Stato di caricamento personalizzato in modalità asincrona.",
       stickyHeaderEnabled: "L'intestazione resta visibile durante lo scroll.",
+      columnResizeEnabled: "Trascina i bordi dell'intestazione per ridimensionare le colonne.",
+      columnReorderEnabled: "Trascina un'intestazione per riordinare le colonne.",
+      pinColumns: "Blocca la prima colonna a sinistra e l'ultima a destra.",
       overflowEnabled: "Il corpo scorre invece di crescere.",
       responsiveMode: "Comportamento su schermi stretti.",
       footerVisible: "Mostra il footer con la paginazione.",

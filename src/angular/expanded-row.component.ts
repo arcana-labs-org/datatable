@@ -20,13 +20,13 @@ import { ArcanaContentDirective } from "./content.directive";
   template: `
     @switch (status) {
       @case ("loading") {
-        <span [arcanaContent]="loadingContent()"></span>
+        <span [arcanaContent]="loadingContent()" [arcanaContentHtml]="true"></span>
       }
       @case ("error") {
         <div class="grid-detail-error">{{ msg().expandedError }}</div>
       }
       @default {
-        <span [arcanaContent]="content"></span>
+        <span [arcanaContent]="content" [arcanaContentHtml]="true"></span>
       }
     }
   `

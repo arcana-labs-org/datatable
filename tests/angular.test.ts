@@ -146,6 +146,36 @@ describe("Angular adapter", () => {
     expect(element.querySelector(".grid-detail-loading")).toBeNull();
   });
 
+  it("escapes raw cell values as text (no HTML injection without column.html)", async () => {
+    const { element } = await renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, name: "<img src=x onerror=\"window.__xssNg=1\">" }],
+      columns: [{ name: "name", label: "Name" }]
+    });
+    expect(element.querySelector(".grid-body img")).toBeNull();
+    expect(element.querySelector(".grid-body .grid-cell")?.textContent).toContain("<img src=x onerror=");
+    expect((window as unknown as { __xssNg?: number }).__xssNg).toBeUndefined();
+  });
+
+  it("renders HTML from a valueGetter only when the column opts in with html: true", async () => {
+    const { element } = await renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, status: "ok" }],
+      columns: [{ name: "status", label: "Status", html: true, valueGetter: (value) => `<span class="pill">${String(value)}</span>` }]
+    });
+    expect(element.querySelector(".grid-body .pill")?.textContent).toBe("ok");
+  });
+
+  it("renders a valueGetter string as text by default (no html flag)", async () => {
+    const { element } = await renderTable({
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, status: "ok" }],
+      columns: [{ name: "status", label: "Status", valueGetter: (value) => `<span class="pill">${String(value)}</span>` }]
+    });
+    expect(element.querySelector(".grid-body .pill")).toBeNull();
+    expect(element.querySelector(".grid-body .grid-cell")?.textContent).toBe('<span class="pill">ok</span>');
+  });
+
   it("localizes the built-in strings with locale: 'en' and honors messages overrides", async () => {
     const rows = Array.from({ length: 7 }, (_, index) => ({ id: index + 1, name: `Person ${index + 1}` }));
     const { fixture, element } = await renderTable({

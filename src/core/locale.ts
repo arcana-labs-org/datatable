@@ -59,6 +59,12 @@ export interface ArcanaMessages {
   sortDescending: string;
   /** Sort menu: clear sorting option. */
   sortClear: string;
+  /** Header menu: pin the column to the left edge. */
+  pinLeft: string;
+  /** Header menu: pin the column to the right edge. */
+  pinRight: string;
+  /** Header menu: remove the column's pin. */
+  unpin: string;
   /** aria-label of a column filter control; placeholder: {label}. */
   filterLabel: string;
   /** BOOLEAN filter: "all" option (also the list filters' placeholder). */
@@ -119,6 +125,9 @@ const ptBR: ArcanaMessages = {
   sortAscending: "Crescente",
   sortDescending: "Decrescente",
   sortClear: "Remover ordem",
+  pinLeft: "Fixar à esquerda",
+  pinRight: "Fixar à direita",
+  unpin: "Desafixar",
   filterLabel: "Filtrar {label}",
   booleanAll: "Todos",
   booleanYes: "Sim",
@@ -161,6 +170,9 @@ const en: ArcanaMessages = {
   sortAscending: "Ascending",
   sortDescending: "Descending",
   sortClear: "Clear sorting",
+  pinLeft: "Pin to left",
+  pinRight: "Pin to right",
+  unpin: "Unpin",
   filterLabel: "Filter {label}",
   booleanAll: "All",
   booleanYes: "Yes",
@@ -203,6 +215,9 @@ const es: ArcanaMessages = {
   sortAscending: "Ascendente",
   sortDescending: "Descendente",
   sortClear: "Quitar orden",
+  pinLeft: "Fijar a la izquierda",
+  pinRight: "Fijar a la derecha",
+  unpin: "Quitar fijación",
   filterLabel: "Filtrar {label}",
   booleanAll: "Todos",
   booleanYes: "Sí",
@@ -245,6 +260,9 @@ const it: ArcanaMessages = {
   sortAscending: "Crescente",
   sortDescending: "Decrescente",
   sortClear: "Rimuovi ordinamento",
+  pinLeft: "Blocca a sinistra",
+  pinRight: "Blocca a destra",
+  unpin: "Sblocca",
   filterLabel: "Filtra {label}",
   booleanAll: "Tutti",
   booleanYes: "Sì",
@@ -287,6 +305,9 @@ const zh: ArcanaMessages = {
   sortAscending: "升序",
   sortDescending: "降序",
   sortClear: "清除排序",
+  pinLeft: "固定到左侧",
+  pinRight: "固定到右侧",
+  unpin: "取消固定",
   filterLabel: "筛选{label}",
   booleanAll: "全部",
   booleanYes: "是",
@@ -329,6 +350,9 @@ const ja: ArcanaMessages = {
   sortAscending: "昇順",
   sortDescending: "降順",
   sortClear: "並べ替えを解除",
+  pinLeft: "左に固定",
+  pinRight: "右に固定",
+  unpin: "固定を解除",
   filterLabel: "{label}で絞り込む",
   booleanAll: "すべて",
   booleanYes: "はい",
@@ -371,6 +395,9 @@ const de: ArcanaMessages = {
   sortAscending: "Aufsteigend",
   sortDescending: "Absteigend",
   sortClear: "Sortierung entfernen",
+  pinLeft: "Links anheften",
+  pinRight: "Rechts anheften",
+  unpin: "Loslösen",
   filterLabel: "{label} filtern",
   booleanAll: "Alle",
   booleanYes: "Ja",
@@ -413,6 +440,9 @@ const ru: ArcanaMessages = {
   sortAscending: "По возрастанию",
   sortDescending: "По убыванию",
   sortClear: "Сбросить сортировку",
+  pinLeft: "Закрепить слева",
+  pinRight: "Закрепить справа",
+  unpin: "Открепить",
   filterLabel: "Фильтр: {label}",
   booleanAll: "Все",
   booleanYes: "Да",

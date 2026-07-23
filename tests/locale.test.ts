@@ -32,6 +32,9 @@ describe("locale packs", () => {
     expect(en.sortAscending).toBe("Ascending");
     expect(en.sortDescending).toBe("Descending");
     expect(en.sortClear).toBe("Clear sorting");
+    expect(en.pinLeft).toBe("Pin to left");
+    expect(en.pinRight).toBe("Pin to right");
+    expect(en.unpin).toBe("Unpin");
     expect(formatMessage(en.showingRange, { from: 1, to: 5, total: 160 })).toBe("Showing 1 to 5 of 160");
   });
 

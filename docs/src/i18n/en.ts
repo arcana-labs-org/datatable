@@ -98,8 +98,13 @@ export const en: Messages = {
     },
     columns: {
       title: "Columns",
-      p1: "Each column is a <c>DataTableColumn</c> object with a <c>name</c> (the key on the row) and a <c>label</c> (the header text). Fields like <c>type</c> control formatting — for example, <c>CURRENCY</c> renders monetary values — and <c>valueGetter</c> transforms the cell content before rendering.",
-      p2: "The <c>columns</c> property also accepts a <c>() => DataTableColumn[]</c> function, handy when the columns depend on permissions or on application state."
+      p1: "Each column is a <c>DataTableColumn</c> object with a <c>name</c> (the key on the row) and a <c>label</c> (the header text). Fields like <c>type</c> control formatting — for example, <c>CURRENCY</c> renders monetary values — and <c>valueGetter</c> transforms the cell content before rendering. String content renders as safe, escaped text by default; set <c>html: true</c> on the column to interpret it as HTML, or return a native node for rich content.",
+      p2: "The <c>columns</c> property also accepts a <c>() => DataTableColumn[]</c> function, handy when the columns depend on permissions or on application state. Columns can be resized by dragging the right edge of their header — on by default (<c>columnResizeEnabled</c>); opt a single column out with <c>resizable: false</c>."
+    },
+    columnManagement: {
+      title: "Reorder and pin columns",
+      p1: "Drag a header cell sideways to reorder the columns — a drop indicator line shows exactly where the column will land. A short click still opens the sort menu and the right-edge resize handle keeps priority, so dragging never gets in the way. It is on by default (<c>columnReorderEnabled</c>); keep a single column locked in place with <c>reorderable: false</c>.",
+      p2: "The header menu (the same one that carries the sort options) gains <i>Pin to left</i>, <i>Pin to right</i> and <i>Unpin</i>. A pinned column freezes to its edge and stays visible during horizontal scroll — pinned-left columns stick to the start, pinned-right to the end, with a subtle divider/shadow. Set it up front with <c>pinned: 'left'</c> or <c>pinned: 'right'</c> on the column, or change it at runtime from the menu; the system columns (checkbox/expander) freeze on the left and the actions column on the right. Both reorder and pin are disabled by <c>columnPinEnabled</c> and ignored in <c>VERTICAL_RECORD</c> responsive mode."
     },
     pagination: {
       title: "Pagination",
@@ -128,8 +133,8 @@ export const en: Messages = {
     },
     sorting: {
       title: "Sorting",
-      p1: "Per-column sorting is enabled by default (<c>orderByEnabled: true</c>): clicking the header opens a menu with <i>Ascending</i>, <i>Descending</i> and — when the column is already sorted — <i>Remove sorting</i>, which returns the grid to its neutral state. In <c>remote</c> mode, the current sorting travels along in the <c>params</c>; in <c>dataset</c> mode, it is resolved in memory.",
-      p2: "Disable it per column with <c>orderByEnabled: false</c> on the column definition, and use <c>filterName</c> as an alias for the field sent to the server. To apply a sort from code, use <c>controller.applyOrderBy(orderBy)</c>."
+      p1: "Per-column sorting is enabled by default (<c>orderByEnabled: true</c>): clicking the header opens a menu with <i>Ascending</i>, <i>Descending</i> and — when the column is already sorted — <i>Remove sorting</i>, which returns the grid to its neutral state. <b>Shift+click</b> a header instead to add that column to a <i>multi-column</i> sort, cycling it <i>ascending → descending → removed</i> while keeping the other sorted columns; a small priority badge (<c>1</c>, <c>2</c>, <c>3</c>…) shows the sort order, and headers expose <c>aria-sort</c>. In <c>remote</c> mode, the current sorting travels along in the <c>params</c>; in <c>dataset</c> mode, it is resolved in memory.",
+      p2: "Disable it per column with <c>orderByEnabled: false</c> on the column definition, and use <c>filterName</c> as an alias for the field sent to the server. To apply a sort from code, use <c>controller.applyOrderBy(orderBy)</c> — which now also accepts an <c>OrderBy[]</c> for a full multi-column order (index 0 sorts first) — or <c>controller.toggleOrderBy(name, { additive })</c> to flip a single column."
     },
     checkbox: {
       title: "Multiple selection",
@@ -190,6 +195,7 @@ export const en: Messages = {
         messages: "Per-key overrides of the built-in strings, applied on top of the resolved locale pack.",
         dataset: "Full collection for local operations; infers dataset mode.",
         columns: "Visible columns and their renderers.",
+        html: "When true, the column's string content (raw value or valueGetter/headerContentGetter return) is interpreted as HTML; otherwise it renders as safe, escaped text. Return a native node for rich content.",
         datasource: "Provider queried in remote mode.",
         url: "Endpoint used in remote mode without a datasource.",
         rowsPerPage: "Initial amount per page.",
@@ -205,6 +211,11 @@ export const en: Messages = {
         onRowExpandedCollapsed: "Notify the expansion and the collapse of each row.",
         responsiveMode: "Defines the mobile presentation.",
         stickyHeaderEnabled: "Keeps the header while scrolling.",
+        columnResizeEnabled: "Enables drag-to-resize handles on the column headers.",
+        resizable: "Lets this column be resized by dragging its header edge.",
+        columnReorderEnabled: "Enables drag-to-reorder by dragging the header body (ignored in VERTICAL_RECORD).",
+        reorderable: "Lets this column be dragged to a new position; set false to keep it fixed.",
+        pinned: "Freezes this column to an edge (sticky during horizontal scroll); changeable from the header menu.",
         sendRequestOnMounted: "Controls the first remote query.",
         initialFilters: "Initial remote or local filters.",
         onRequestError: "Notifies loading failures."
@@ -344,6 +355,9 @@ export const en: Messages = {
       renderer: "Immediate content or resolved via Promise.",
       customLoading: "Custom loading state in async mode.",
       stickyHeaderEnabled: "Header stays visible while scrolling.",
+      columnResizeEnabled: "Drag the header edges to resize columns.",
+      columnReorderEnabled: "Drag a header to reorder the columns.",
+      pinColumns: "Pins the first column to the left and the last to the right.",
       overflowEnabled: "The body scrolls instead of growing.",
       responsiveMode: "Behavior on narrow screens.",
       footerVisible: "Shows the footer with pagination.",

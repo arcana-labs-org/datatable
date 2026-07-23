@@ -5,10 +5,10 @@ import {
 import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
-import { actionStyle, alignmentClass, columnStyle, expanderStyle, inlineStyle, pagination, selectionStyle } from "../core/view";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, dropSide, expanderStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, type PinPlan, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type {
   ContextMenuItem, DataTableAction, DataTableApi, DataTableColumn, DataTableConfig,
-  DataTableRow, DataTableSnapshot, OrderBy, Renderable
+  DataTableRow, DataTableSnapshot, OrderBy, Renderable, SortDirection
 } from "../core/types";
 import { ArcanaContentDirective } from "./content.directive";
 import { ArcanaExpandedRowComponent } from "./expanded-row.component";
@@ -41,33 +41,33 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
       }
       <div class="spark-grid-body" [style]="bodyStyle()">
         <div class="grid-header" [class.grid-header-sticky]="config.stickyHeaderEnabled" role="row">
-          @if (expandable()) { <div class="grid-header-cell grid-expand-cell" [style]="expanderCellStyle"></div> }
+          @if (expandable()) { <div class="grid-header-cell grid-expand-cell {{ pinClsExpander() }}" [style]="expanderPinStyle()"></div> }
           @if (config.checkboxEnabled) {
-            <div class="grid-header-cell" [style]="selectionHeaderStyle">
+            <div class="grid-header-cell {{ pinClsCheckbox() }}" [style]="checkboxPinStyle()">
               <input type="checkbox" [checked]="hasCheckedRows()" [disabled]="isHeaderCheckboxDisabled()" [attr.aria-label]="msg.selectAll" (change)="toggleAll($event)" />
             </div>
           }
-          @if (config.radioButtonSelectionEnabled) { <div class="grid-header-cell" [style]="selectionHeaderStyle"></div> }
+          @if (config.radioButtonSelectionEnabled) { <div class="grid-header-cell {{ pinClsRadio() }}" [style]="radioPinStyle()"></div> }
           @for (column of columns; track column.name) {
-            <div class="grid-header-cell {{ alignment(column) }}" [class.grid-header-order]="orderable(column)" [style]="headerCellStyle(column)" role="columnheader" (click)="openSortMenu($event, column)"><span [arcanaContent]="headerValue(column)"></span><span class="arcana-sort" aria-hidden="true">{{ sortMark(column) }}</span></div>
+            <div class="grid-header-cell {{ alignment(column) }} {{ pinClsColumn(column) }}" [class.grid-header-order]="orderable(column)" [style]="headerCellStyle(column)" role="columnheader" [attr.data-col-name]="column.name" [attr.tabindex]="isReorderable(column) ? 0 : null" [attr.aria-sort]="orderable(column) ? ariaSort(column) : null" (click)="onHeaderClick($event, column)" (pointerdown)="startReorder($event, column)" (keydown)="onHeaderKeyDown($event, column)"><span [arcanaContent]="headerValue(column)" [arcanaContentHtml]="column.html === true"></span><span class="arcana-sort" aria-hidden="true">{{ sortMark(column) }}@if (sortPriority(column)) {<span class="arcana-sort-priority">{{ sortPriority(column) }}</span>}</span>@if (isResizable(column)) {<span class="arcana-col-resizer" role="separator" aria-hidden="true" (pointerdown)="startResize($event, column)" (click)="$event.stopPropagation()"></span>}</div>
           }
-          @if (config.actions) { <div class="grid-header-cell" [style]="actionsCellStyle()">{{ msg.actions }}</div> }
+          @if (config.actions) { <div class="grid-header-cell {{ pinClsActions() }}" [style]="actionsCellStyle()">{{ msg.actions }}</div> }
         </div>
         @if (config.searchEnabled !== false) {
           <div class="grid-search-row" role="row">
-            @if (expandable()) { <div class="grid-search-row-cell grid-expand-cell" [style]="expanderCellStyle"></div> }
-            @if (config.checkboxEnabled) { <div class="grid-search-row-cell" [style]="selectionHeaderStyle"></div> }
-            @if (config.radioButtonSelectionEnabled) { <div class="grid-search-row-cell" [style]="selectionHeaderStyle"></div> }
+            @if (expandable()) { <div class="grid-search-row-cell grid-expand-cell {{ pinClsExpander() }}" [style]="expanderPinStyle()"></div> }
+            @if (config.checkboxEnabled) { <div class="grid-search-row-cell {{ pinClsCheckbox() }}" [style]="checkboxPinStyle()"></div> }
+            @if (config.radioButtonSelectionEnabled) { <div class="grid-search-row-cell {{ pinClsRadio() }}" [style]="radioPinStyle()"></div> }
             @for (column of columns; track column.name) {
               @if (column.searchType === "COMPONENT") {
-                <div class="grid-search-row-cell" [style]="headerCellStyle(column)"><span [arcanaContent]="searchRenderer(column)"></span></div>
+                <div class="grid-search-row-cell {{ pinColClass(column) }}" [style]="headerCellStyle(column)"><span [arcanaContent]="searchRenderer(column)" [arcanaContentHtml]="true"></span></div>
               } @else if (column.searchEnabled ?? true) {
-                <div class="grid-search-row-cell" arcanaFilterField [column]="column" [value]="filterValue(column)" [disabled]="disabledFilter(column)" [messages]="msg" [locale]="gridLocale" [style]="headerCellStyle(column)" (valueChange)="applyFilter(column, $event)"></div>
+                <div class="grid-search-row-cell {{ pinColClass(column) }}" arcanaFilterField [column]="column" [value]="filterValue(column)" [disabled]="disabledFilter(column)" [messages]="msg" [locale]="gridLocale" [style]="headerCellStyle(column)" (valueChange)="applyFilter(column, $event)"></div>
               } @else {
-                <div class="grid-search-row-cell" [style]="headerCellStyle(column)"></div>
+                <div class="grid-search-row-cell {{ pinColClass(column) }}" [style]="headerCellStyle(column)"></div>
               }
             }
-            @if (config.actions) { <div class="grid-search-row-cell" [style]="actionsCellStyle()"></div> }
+            @if (config.actions) { <div class="grid-search-row-cell {{ pinClsActions() }}" [style]="actionsCellStyle()"></div> }
           </div>
         }
         <div class="grid-body" role="rowgroup">
@@ -79,27 +79,27 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
           @for (row of snap.rows; track row._uuid) {
             <div class="grid-row flex" [class.grid-row-focused]="row._hasFocus || focusedRow === row._uuid" [class.grid-row-checked]="row._isChecked || row._isRadioChecked" role="row" (click)="selectRow(row)" (dblclick)="onDoubleClickRow(row)">
               @if (expandable()) {
-                <div class="grid-cell grid-expand-cell spark-grid-selection-cell" data-label="" [style]="expanderCellStyle">
+                <div class="grid-cell grid-expand-cell spark-grid-selection-cell {{ pinClsExpander() }}" data-label="" [style]="expanderPinStyle()">
                   <button type="button" class="grid-expand-toggle" [class.is-open]="isExpanded(row)" [attr.aria-expanded]="isExpanded(row)" [attr.aria-label]="isExpanded(row) ? msg.collapseRow : msg.expandRow" (click)="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
                 </div>
               }
               @if (config.checkboxEnabled) {
-                <div class="grid-cell spark-grid-selection-cell" [style]="selectionCellStyle(row)">
+                <div class="grid-cell spark-grid-selection-cell {{ pinClsCheckbox() }}" [style]="checkboxCellStyle(row)">
                   <input type="checkbox" [checked]="!!row._isChecked" [disabled]="!!row._isCheckboxDisabled" [attr.aria-label]="msg.selectRow" (click)="$event.stopPropagation()" (change)="toggleRow(row, $event)" />
                 </div>
               }
               @if (config.radioButtonSelectionEnabled) {
-                <div class="grid-cell spark-grid-selection-cell" [style]="selectionCellStyle(row)">
+                <div class="grid-cell spark-grid-selection-cell {{ pinClsRadio() }}" [style]="radioCellStyle(row)">
                   <input type="radio" [name]="snap.uuid" [checked]="!!row._isRadioChecked" [attr.aria-label]="msg.selectRow" (click)="$event.stopPropagation()" (change)="selectRadio(row)" />
                 </div>
               }
               @for (column of columns; track column.name) {
-                <div class="grid-cell {{ alignment(column) }}" [class.grid-cell-focused]="focusedCell === row._uuid + ':' + column.name" [attr.data-label]="column.label" [style]="cellStyle(column, row)" role="cell" (click)="selectCell(column, row)" (dblclick)="onDoubleClickCell(column, row)" (contextmenu)="openMenu($event, column, row)"><span [arcanaContent]="cellValue(column, row)"></span></div>
+                <div class="grid-cell {{ alignment(column) }} {{ pinColClass(column) }}" [class.grid-cell-focused]="focusedCell === row._uuid + ':' + column.name" [attr.data-label]="column.label" [style]="cellStyle(column, row)" role="cell" (click)="selectCell(column, row)" (dblclick)="onDoubleClickCell(column, row)" (contextmenu)="openMenu($event, column, row)"><span [arcanaContent]="cellValue(column, row)" [arcanaContentHtml]="column.html === true"></span></div>
               }
               @if (config.actions) {
-                <div class="grid-cell" [attr.data-label]="msg.actions" [style]="actionsCellStyle()">
+                <div class="grid-cell {{ pinClsActions() }}" [attr.data-label]="msg.actions" [style]="actionsCellStyle()">
                   @for (action of config.actions; track $index) {
-                    @if (action.isVisible ? action.isVisible(row) : true) { <span [arcanaContent]="actionContent(action, row)"></span> }
+                    @if (action.isVisible ? action.isVisible(row) : true) { <span [arcanaContent]="actionContent(action, row)" [arcanaContentHtml]="true"></span> }
                   }
                 </div>
               }
@@ -111,13 +111,13 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
         </div>
         @if (config.footerSummarizerEnabled) {
           <div class="grid-summarizer" [class.grid-summarizer-sticky]="config.stickyHeaderEnabled">
-            @if (expandable()) { <div class="grid-summarizer-cell grid-expand-cell" [style]="expanderCellStyle"></div> }
-            @if (config.checkboxEnabled) { <div class="grid-summarizer-cell" [style]="selectionHeaderStyle"></div> }
-            @if (config.radioButtonSelectionEnabled) { <div class="grid-summarizer-cell" [style]="selectionHeaderStyle"></div> }
+            @if (expandable()) { <div class="grid-summarizer-cell grid-expand-cell {{ pinClsExpander() }}" [style]="expanderPinStyle()"></div> }
+            @if (config.checkboxEnabled) { <div class="grid-summarizer-cell {{ pinClsCheckbox() }}" [style]="checkboxPinStyle()"></div> }
+            @if (config.radioButtonSelectionEnabled) { <div class="grid-summarizer-cell {{ pinClsRadio() }}" [style]="radioPinStyle()"></div> }
             @for (column of columns; track column.name) {
-              <div class="grid-summarizer-cell {{ alignment(column) }}" [style]="summarizerCellStyle(column)"><span [arcanaContent]="summarizedValue(column)"></span></div>
+              <div class="grid-summarizer-cell {{ alignment(column) }} {{ pinColClass(column) }}" [style]="summarizerCellStyle(column)"><span [arcanaContent]="summarizedValue(column)" [arcanaContentHtml]="true"></span></div>
             }
-            @if (config.actions) { <div class="grid-summarizer-cell" [style]="actionsCellStyle()"></div> }
+            @if (config.actions) { <div class="grid-summarizer-cell {{ pinClsActions() }}" [style]="actionsCellStyle()"></div> }
           </div>
         }
       </div>
@@ -142,11 +142,24 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
         </div>
       }
       @if (sortMenu; as sortMenuState) {
-        <div class="arcana-context-menu arcana-sort-menu {{ themeClass() }}" [style]="menuStyle(sortMenuState.x, sortMenuState.y)" role="menu" [attr.aria-label]="msg.sortMenu" (click)="$event.stopPropagation()">
-          <button type="button" role="menuitem" [class.is-active]="isSortActive(sortMenuState.name, 'asc')" (click)="applySortOption('asc')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5 3.5 8h3v4.5h3V8h3L8 3.5Z" /></svg>{{ msg.sortAscending }}</button>
-          <button type="button" role="menuitem" [class.is-active]="isSortActive(sortMenuState.name, 'desc')" (click)="applySortOption('desc')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 12.5 12.5 8h-3V3.5h-3V8h-3L8 12.5Z" /></svg>{{ msg.sortDescending }}</button>
-          @if (snap.orderBy?.name === sortMenuState.name) {
-            <button type="button" role="menuitem" class="arcana-sort-menu__clear" (click)="applySortOption(null)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>{{ msg.sortClear }}</button>
+        <div class="arcana-context-menu arcana-header-menu {{ themeClass() }}" [style]="menuStyle(sortMenuState.x, sortMenuState.y)" role="menu" (click)="$event.stopPropagation()">
+          @if (menuColumnOrderable) {
+            <div class="arcana-sort-menu" role="group" [attr.aria-label]="msg.sortMenu">
+              <button type="button" role="menuitem" [class.is-active]="menuDirection(sortMenuState.name) === 'asc'" (click)="applySortOption('asc')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5 3.5 8h3v4.5h3V8h3L8 3.5Z" /></svg>{{ msg.sortAscending }}</button>
+              <button type="button" role="menuitem" [class.is-active]="menuDirection(sortMenuState.name) === 'desc'" (click)="applySortOption('desc')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 12.5 12.5 8h-3V3.5h-3V8h-3L8 12.5Z" /></svg>{{ msg.sortDescending }}</button>
+              @if (menuDirection(sortMenuState.name)) {
+                <button type="button" role="menuitem" class="arcana-sort-menu__clear" (click)="applySortOption(null)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>{{ msg.sortClear }}</button>
+              }
+            </div>
+          }
+          @if (pinnable) {
+            <div class="arcana-pin-menu" role="group">
+              <button type="button" role="menuitem" [class.is-active]="columnPin(sortMenuState.col) === 'left'" (click)="applyPin('left')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3v12H3zM7 4h6v8H7z" /></svg>{{ msg.pinLeft }}</button>
+              <button type="button" role="menuitem" [class.is-active]="columnPin(sortMenuState.col) === 'right'" (click)="applyPin('right')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2h3v12h-3zM3 4h6v8H3z" /></svg>{{ msg.pinRight }}</button>
+              @if (columnPin(sortMenuState.col)) {
+                <button type="button" role="menuitem" (click)="applyPin(null)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>{{ msg.unpin }}</button>
+              }
+            </div>
           }
         </div>
       }
@@ -165,9 +178,13 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   msg: ArcanaMessages = resolveArcanaMessages();
   gridLocale: ArcanaLocale = resolveArcanaLocale();
   menu: { x: number; y: number; items: ContextMenuItem[] } | null = null;
-  sortMenu: { x: number; y: number; name: string } | null = null;
+  sortMenu: { x: number; y: number; name: string; col: string } | null = null;
   focusedRow: string | null = null;
   focusedCell: string | null = null;
+  columnWidths: Record<string, number> = {};
+  drag: { name: string; over: string | null; side: "before" | "after" } | null = null;
+  private didDrag = false;
+  private pinPlan: PinPlan = { active: false, cellStyle: () => ({}), className: () => "" };
 
   readonly pageSizes = [10, 25, 50, 100, 250, 500];
   readonly expanderCellStyle = inlineStyle(expanderStyle);
@@ -220,11 +237,17 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
     this.grid = createDataTable(config);
     this.snap = this.grid.getSnapshot();
     this.columns = this.grid.getColumns();
+    this.recomputePins();
     this.unsubscribe = this.grid.subscribe(() => {
       this.snap = this.grid.getSnapshot();
       this.columns = this.grid.getColumns();
+      this.recomputePins();
       this.cdr.markForCheck();
     });
+  }
+
+  private recomputePins(): void {
+    this.pinPlan = computePinPlan(this.grid, this.columns, this.columnWidths);
   }
 
   themeClass(): string {
@@ -248,28 +271,109 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   headerCellStyle(column: DataTableColumn<DataTableRow>): string {
-    return inlineStyle(columnStyle(column, this.grid));
+    return inlineStyle(columnStyle(column, this.grid, this.columnWidths[column.name]), this.pinPlan.cellStyle(column.name));
   }
 
   actionsCellStyle(): string {
-    return inlineStyle(actionStyle(this.grid));
+    return inlineStyle(actionStyle(this.grid), this.pinPlan.cellStyle(PIN_SLOT_ACTIONS));
   }
 
   summarizerCellStyle(column: DataTableColumn<DataTableRow>): string {
-    return inlineStyle(columnStyle(column, this.grid), { padding: "8px 10px" });
+    return inlineStyle(columnStyle(column, this.grid, this.columnWidths[column.name]), { padding: "8px 10px" }, this.pinPlan.cellStyle(column.name));
   }
 
   cellStyle(column: DataTableColumn<DataTableRow>, row: DataTableRow): string {
     return inlineStyle(
-      columnStyle(column, this.grid),
+      columnStyle(column, this.grid, this.columnWidths[column.name]),
       { padding: "8px 10px" },
       this.config.onBeforeCellStyleMounted?.(this.grid.getCellValue(column, row), column, row, this.grid),
-      column.onBeforeColumnStyleMounted?.(this.grid.getCellValue(column, row), row, this.grid)
+      column.onBeforeColumnStyleMounted?.(this.grid.getCellValue(column, row), row, this.grid),
+      this.pinPlan.cellStyle(column.name)
     );
   }
 
-  selectionCellStyle(row: DataTableRow): string {
-    return inlineStyle(selectionStyle, this.config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, this.grid));
+  checkboxCellStyle(row: DataTableRow): string {
+    return inlineStyle(selectionStyle, this.config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, this.grid), this.pinPlan.cellStyle(PIN_SLOT_CHECKBOX));
+  }
+
+  radioCellStyle(row: DataTableRow): string {
+    return inlineStyle(selectionStyle, this.config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, this.grid), this.pinPlan.cellStyle(PIN_SLOT_RADIO));
+  }
+
+  /* ---- Pin (freeze) helpers ---- */
+  expanderPinStyle(): string { return inlineStyle(expanderStyle, this.pinPlan.cellStyle(PIN_SLOT_EXPANDER)); }
+  checkboxPinStyle(): string { return inlineStyle(selectionStyle, this.pinPlan.cellStyle(PIN_SLOT_CHECKBOX)); }
+  radioPinStyle(): string { return inlineStyle(selectionStyle, this.pinPlan.cellStyle(PIN_SLOT_RADIO)); }
+  pinClsExpander(): string { return this.pinPlan.className(PIN_SLOT_EXPANDER); }
+  pinClsCheckbox(): string { return this.pinPlan.className(PIN_SLOT_CHECKBOX); }
+  pinClsRadio(): string { return this.pinPlan.className(PIN_SLOT_RADIO); }
+  pinClsActions(): string { return this.pinPlan.className(PIN_SLOT_ACTIONS); }
+  pinClsColumn(column: DataTableColumn<DataTableRow>): string {
+    return `${this.pinPlan.className(column.name)}${this.dragClass(column)}`;
+  }
+  pinColClass(column: DataTableColumn<DataTableRow>): string {
+    return this.pinPlan.className(column.name);
+  }
+  dragClass(column: DataTableColumn<DataTableRow>): string {
+    if (!this.drag) return "";
+    const dragging = this.drag.name === column.name ? " arcana-col-dragging" : "";
+    const over = this.drag.over === column.name && this.drag.name !== column.name ? (this.drag.side === "before" ? " arcana-drop-before" : " arcana-drop-after") : "";
+    return `${dragging}${over}`;
+  }
+  isReorderable(column: DataTableColumn<DataTableRow>): boolean { return isColumnReorderable(column, this.grid); }
+  get pinnable(): boolean { return isColumnPinnable(this.grid); }
+  columnPin(name: string): "left" | "right" | null { return this.grid.getColumnPin(name); }
+  get menuColumnOrderable(): boolean {
+    const column = this.sortMenu ? this.columns.find((item) => item.name === this.sortMenu!.col) : undefined;
+    return column ? this.orderable(column) : false;
+  }
+
+  applyPin(pin: "left" | "right" | null): void {
+    if (!this.sortMenu) return;
+    this.grid.setColumnPinned(this.sortMenu.col, pin);
+    this.sortMenu = null;
+  }
+
+  startReorder(event: PointerEvent, column: DataTableColumn<DataTableRow>): void {
+    if (!isColumnReorderable(column, this.grid) || event.button !== 0) return;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    let dragging = false;
+    const overEl = (x: number, y: number) => (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>(".grid-header-cell") ?? null;
+    const onMove = (move: PointerEvent): void => {
+      if (!dragging) {
+        if (Math.abs(move.clientX - startX) < 5 && Math.abs(move.clientY - startY) < 5) return;
+        dragging = true;
+      }
+      const el = overEl(move.clientX, move.clientY);
+      this.drag = { name: column.name, over: el?.getAttribute("data-col-name") ?? null, side: el ? dropSide(move.clientX, el.getBoundingClientRect()) : "after" };
+      this.cdr.markForCheck();
+    };
+    const onUp = (up: PointerEvent): void => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      if (!dragging) return;
+      this.didDrag = true;
+      const el = overEl(up.clientX, up.clientY);
+      const over = el?.getAttribute("data-col-name") ?? null;
+      if (over && over !== column.name && el) this.grid.moveColumn(column.name, over, dropSide(up.clientX, el.getBoundingClientRect()));
+      this.drag = null;
+      window.setTimeout(() => { this.didDrag = false; }, 0);
+      this.cdr.markForCheck();
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  onHeaderKeyDown(event: KeyboardEvent, column: DataTableColumn<DataTableRow>): void {
+    if (!isColumnReorderable(column, this.grid) || !(event.ctrlKey || event.metaKey)) return;
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const names = this.grid.getColumns().map((item) => item.name);
+    const index = names.indexOf(column.name);
+    const target = event.key === "ArrowLeft" ? index - 1 : index + 1;
+    if (target < 0 || target >= names.length) return;
+    this.grid.moveColumn(column.name, names[target], event.key === "ArrowLeft" ? "before" : "after");
   }
 
   menuStyle(x: number, y: number): string {
@@ -329,12 +433,15 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
     void this.grid.applyFilter(column, value);
   }
 
-  openSortMenu(event: MouseEvent, column: DataTableColumn<DataTableRow>): void {
-    if (!this.orderable(column)) return;
+  onHeaderClick(event: MouseEvent, column: DataTableColumn<DataTableRow>): void {
+    if (this.didDrag) return;
+    const isOrderable = this.orderable(column);
+    if (!isOrderable && !this.pinnable) return;
     const name = column.filterName ?? column.name;
     event.stopPropagation();
+    if (event.shiftKey) { if (isOrderable) { this.sortMenu = null; void this.grid.toggleOrderBy(name, { additive: true }); } return; }
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    this.sortMenu = this.sortMenu?.name === name ? null : { x: rect.left, y: rect.bottom + 2, name };
+    this.sortMenu = this.sortMenu?.col === column.name ? null : { x: rect.left, y: rect.bottom + 2, name, col: column.name };
   }
 
   applySortOption(direction: OrderBy["direction"] | null): void {
@@ -343,13 +450,46 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
     this.sortMenu = null;
   }
 
-  isSortActive(name: string, direction: OrderBy["direction"]): boolean {
-    return this.snap.orderBy?.name === name && this.snap.orderBy.direction === direction;
+  menuDirection(name: string): SortDirection | null {
+    return this.snap.orderByList.find((order) => order.name === name)?.direction ?? null;
   }
 
   sortMark(column: DataTableColumn<DataTableRow>): string {
-    if (this.snap.orderBy?.name !== (column.filterName ?? column.name)) return "↕";
-    return this.snap.orderBy.direction === "asc" ? "↑" : "↓";
+    return sortGlyph(columnSortState(this.snap.orderByList, column).direction);
+  }
+
+  sortPriority(column: DataTableColumn<DataTableRow>): number | null {
+    const state = columnSortState(this.snap.orderByList, column);
+    return state.multi && state.direction ? state.priority : null;
+  }
+
+  ariaSort(column: DataTableColumn<DataTableRow>): string {
+    return ariaSortValue(columnSortState(this.snap.orderByList, column).direction);
+  }
+
+  isResizable(column: DataTableColumn<DataTableRow>): boolean {
+    return isColumnResizable(column, this.grid);
+  }
+
+  startResize(event: PointerEvent, column: DataTableColumn<DataTableRow>): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const header = (event.currentTarget as HTMLElement).parentElement;
+    const startX = event.clientX;
+    const startWidth = this.columnWidths[column.name] ?? header?.getBoundingClientRect().width ?? resizeMinWidth(this.grid);
+    const min = resizeMinWidth(this.grid);
+    const onMove = (move: PointerEvent): void => {
+      const next = Math.max(min, Math.round(startWidth + (move.clientX - startX)));
+      this.columnWidths = { ...this.columnWidths, [column.name]: next };
+      this.recomputePins();
+      this.cdr.markForCheck();
+    };
+    const onUp = (): void => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
   }
 
   openMenu(event: MouseEvent, column: DataTableColumn<DataTableRow>, row: DataTableRow): void {

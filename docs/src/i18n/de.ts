@@ -98,8 +98,13 @@ export const de: Messages = {
     },
     columns: {
       title: "Spalten",
-      p1: "Jede Spalte ist ein <c>DataTableColumn</c>-Objekt mit einem <c>name</c> (dem Schlüssel in der Zeile) und einem <c>label</c> (dem Text der Kopfzeile). Felder wie <c>type</c> steuern die Formatierung — zum Beispiel rendert <c>CURRENCY</c> Geldbeträge — und <c>valueGetter</c> transformiert den Zellinhalt vor dem Rendern.",
-      p2: "Die <c>columns</c>-Eigenschaft akzeptiert auch eine Funktion <c>() => DataTableColumn[]</c>, praktisch, wenn die Spalten von Berechtigungen oder vom Anwendungszustand abhängen."
+      p1: "Jede Spalte ist ein <c>DataTableColumn</c>-Objekt mit einem <c>name</c> (dem Schlüssel in der Zeile) und einem <c>label</c> (dem Text der Kopfzeile). Felder wie <c>type</c> steuern die Formatierung — zum Beispiel rendert <c>CURRENCY</c> Geldbeträge — und <c>valueGetter</c> transformiert den Zellinhalt vor dem Rendern. String-Inhalt wird standardmäßig als sicherer, escapeter Text gerendert; setze <c>html: true</c> auf der Spalte, um ihn als HTML zu interpretieren, oder gib für reichhaltige Inhalte einen nativen Knoten zurück.",
+      p2: "Die <c>columns</c>-Eigenschaft akzeptiert auch eine Funktion <c>() => DataTableColumn[]</c>, praktisch, wenn die Spalten von Berechtigungen oder vom Anwendungszustand abhängen. Spalten lassen sich durch Ziehen der rechten Kopfzeilenkante skalieren — standardmäßig aktiv (<c>columnResizeEnabled</c>); eine einzelne Spalte nimmst du mit <c>resizable: false</c> davon aus."
+    },
+    columnManagement: {
+      title: "Spalten umordnen und anheften",
+      p1: "Ziehe den Körper eines Spaltenkopfs seitwärts, um die Spalten umzuordnen — eine Einfüge-Indikatorlinie zeigt genau, wo die Spalte landet. Ein kurzer Klick öffnet weiterhin das Sortiermenü und der Ziehgriff an der rechten Kante behält Vorrang, sodass das Ziehen nie im Weg ist. Standardmäßig aktiv (<c>columnReorderEnabled</c>); halte eine einzelne Spalte mit <c>reorderable: false</c> an ihrem Platz fest.",
+      p2: "Das Kopfzeilenmenü (dasselbe mit den Sortieroptionen) erhält <i>Links anheften</i>, <i>Rechts anheften</i> und <i>Lösen</i>. Eine angeheftete Spalte friert an ihrer Kante ein und bleibt beim horizontalen Scrollen sichtbar — links angeheftete Spalten kleben am Anfang, rechts angeheftete am Ende, mit einem dezenten Trenner/Schatten. Lege es vorab mit <c>pinned: 'left'</c> oder <c>pinned: 'right'</c> an der Spalte fest oder ändere es zur Laufzeit über das Menü; die Systemspalten (Checkbox/Aufklapper) frieren links ein und die Aktionsspalte rechts. Umordnen und Anheften werden durch <c>columnPinEnabled</c> deaktiviert und im responsiven Modus <c>VERTICAL_RECORD</c> ignoriert."
     },
     pagination: {
       title: "Paginierung",
@@ -128,8 +133,8 @@ export const de: Messages = {
     },
     sorting: {
       title: "Sortierung",
-      p1: "Die Sortierung pro Spalte ist standardmäßig aktiviert (<c>orderByEnabled: true</c>): Ein Klick auf die Kopfzeile öffnet ein Menü mit <i>Aufsteigend</i>, <i>Absteigend</i> und — wenn die Spalte bereits sortiert ist — <i>Sortierung entfernen</i>, was das Grid in den neutralen Zustand zurückversetzt. Im <c>remote</c>-Modus reist die aktuelle Sortierung in den <c>params</c> mit; im <c>dataset</c>-Modus wird sie im Speicher aufgelöst.",
-      p2: "Deaktiviere sie pro Spalte mit <c>orderByEnabled: false</c> in der Spaltendefinition und verwende <c>filterName</c> als Alias für das an den Server gesendete Feld. Um eine Sortierung per Code anzuwenden, nutze <c>controller.applyOrderBy(orderBy)</c>."
+      p1: "Die Sortierung pro Spalte ist standardmäßig aktiviert (<c>orderByEnabled: true</c>): Ein Klick auf die Kopfzeile öffnet ein Menü mit <i>Aufsteigend</i>, <i>Absteigend</i> und — wenn die Spalte bereits sortiert ist — <i>Sortierung entfernen</i>, was das Grid in den neutralen Zustand zurückversetzt. Mit <b>Umschalt+Klick</b> auf eine Kopfzeile fügst du diese Spalte einer <i>mehrspaltigen</i> Sortierung hinzu, die sie zwischen <i>aufsteigend → absteigend → entfernt</i> durchschaltet, während die übrigen sortierten Spalten erhalten bleiben; eine kleine Prioritätsnummer (<c>1</c>, <c>2</c>, <c>3</c>…) zeigt die Reihenfolge, und die Kopfzeilen stellen <c>aria-sort</c> bereit. Im <c>remote</c>-Modus reist die aktuelle Sortierung in den <c>params</c> mit; im <c>dataset</c>-Modus wird sie im Speicher aufgelöst.",
+      p2: "Deaktiviere sie pro Spalte mit <c>orderByEnabled: false</c> in der Spaltendefinition und verwende <c>filterName</c> als Alias für das an den Server gesendete Feld. Um eine Sortierung per Code anzuwenden, nutze <c>controller.applyOrderBy(orderBy)</c> — was nun auch ein <c>OrderBy[]</c> für eine vollständige mehrspaltige Sortierung akzeptiert (Index 0 sortiert zuerst) — oder <c>controller.toggleOrderBy(name, { additive })</c>, um eine einzelne Spalte umzuschalten."
     },
     checkbox: {
       title: "Mehrfachauswahl",
@@ -190,6 +195,7 @@ export const de: Messages = {
         messages: "Punktuelle Überschreibungen der eingebauten Texte, angewendet über dem aufgelösten Locale-Paket.",
         dataset: "Vollständige Sammlung für lokale Operationen; impliziert den dataset-Modus.",
         columns: "Sichtbare Spalten und ihre Renderer.",
+        html: "Wenn true, wird der String-Inhalt der Spalte (Rohwert oder Rückgabe von valueGetter/headerContentGetter) als HTML interpretiert; andernfalls als sicherer, escapeter Text gerendert. Für reichhaltige Inhalte einen nativen Knoten zurückgeben.",
         datasource: "Provider, der im remote-Modus abgefragt wird.",
         url: "Endpoint, der im remote-Modus ohne datasource verwendet wird.",
         rowsPerPage: "Anfängliche Anzahl pro Seite.",
@@ -205,6 +211,11 @@ export const de: Messages = {
         onRowExpandedCollapsed: "Melden das Auf- und Zuklappen jeder Zeile.",
         responsiveMode: "Bestimmt die mobile Darstellung.",
         stickyHeaderEnabled: "Hält die Kopfzeile beim Scrollen fest.",
+        columnResizeEnabled: "Aktiviert Ziehgriffe zum Ändern der Breite an den Spaltenköpfen.",
+        resizable: "Erlaubt, diese Spalte durch Ziehen der Kopfzeilenkante zu skalieren.",
+        columnReorderEnabled: "Aktiviert das Umordnen per Ziehen des Kopfzeilenkörpers (in VERTICAL_RECORD ignoriert).",
+        reorderable: "Erlaubt, diese Spalte an eine neue Position zu ziehen; false hält sie fest.",
+        pinned: "Friert diese Spalte an einer Kante ein (fix beim horizontalen Scrollen); über das Kopfzeilenmenü änderbar.",
         sendRequestOnMounted: "Steuert die erste Remote-Abfrage.",
         initialFilters: "Initiale Remote- oder lokale Filter.",
         onRequestError: "Meldet Ladefehler."
@@ -344,6 +355,9 @@ export const de: Messages = {
       renderer: "Sofortiger Inhalt oder per Promise aufgelöst.",
       customLoading: "Eigener Ladezustand im Async-Modus.",
       stickyHeaderEnabled: "Kopfzeile bleibt beim Scrollen sichtbar.",
+      columnResizeEnabled: "Ziehe die Kopfzeilenkanten, um Spalten zu skalieren.",
+      columnReorderEnabled: "Ziehe einen Spaltenkopf, um die Spalten umzuordnen.",
+      pinColumns: "Heftet die erste Spalte links und die letzte rechts an.",
       overflowEnabled: "Der Rumpf scrollt, statt zu wachsen.",
       responsiveMode: "Verhalten auf schmalen Bildschirmen.",
       footerVisible: "Zeigt die Fußzeile mit Paginierung.",

@@ -98,8 +98,13 @@ export const es: Messages = {
     },
     columns: {
       title: "Columnas",
-      p1: "Cada columna es un objeto <c>DataTableColumn</c> con un <c>name</c> (la clave en la fila) y un <c>label</c> (el texto del encabezado). Campos como <c>type</c> controlan el formato — por ejemplo, <c>CURRENCY</c> renderiza valores monetarios — y <c>valueGetter</c> transforma el contenido de la celda antes de renderizar.",
-      p2: "La propiedad <c>columns</c> también acepta una función <c>() => DataTableColumn[]</c>, útil cuando las columnas dependen de permisos o del estado de la aplicación."
+      p1: "Cada columna es un objeto <c>DataTableColumn</c> con un <c>name</c> (la clave en la fila) y un <c>label</c> (el texto del encabezado). Campos como <c>type</c> controlan el formato — por ejemplo, <c>CURRENCY</c> renderiza valores monetarios — y <c>valueGetter</c> transforma el contenido de la celda antes de renderizar. El contenido de texto se renderiza como texto seguro y escapado por defecto; define <c>html: true</c> en la columna para interpretarlo como HTML, o devuelve un nodo nativo para contenido enriquecido.",
+      p2: "La propiedad <c>columns</c> también acepta una función <c>() => DataTableColumn[]</c>, útil cuando las columnas dependen de permisos o del estado de la aplicación. Las columnas se pueden redimensionar arrastrando el borde derecho de su encabezado — activo por defecto (<c>columnResizeEnabled</c>); exime a una columna concreta con <c>resizable: false</c>."
+    },
+    columnManagement: {
+      title: "Reordenar y fijar columnas",
+      p1: "Arrastra lateralmente el cuerpo de un encabezado para reordenar las columnas — una línea indicadora muestra exactamente dónde caerá la columna. Un clic corto sigue abriendo el menú de ordenación y el tirador de redimensionar del borde derecho mantiene la prioridad, así que arrastrar nunca estorba. Activo por defecto (<c>columnReorderEnabled</c>); mantén una columna fija en su lugar con <c>reorderable: false</c>.",
+      p2: "El menú del encabezado (el mismo que lleva las opciones de ordenación) gana <i>Fijar a la izquierda</i>, <i>Fijar a la derecha</i> y <i>Desfijar</i>. Una columna fijada se congela en su borde y permanece visible durante el desplazamiento horizontal — las columnas fijadas a la izquierda se pegan al inicio, a la derecha al final, con un divisor/sombra sutil. Configúralo de antemano con <c>pinned: 'left'</c> o <c>pinned: 'right'</c> en la columna, o cámbialo en tiempo de ejecución desde el menú; las columnas de sistema (checkbox/expansor) se congelan a la izquierda y la columna de acciones a la derecha. Reordenar y fijar se desactivan con <c>columnPinEnabled</c> y se ignoran en el modo responsivo <c>VERTICAL_RECORD</c>."
     },
     pagination: {
       title: "Paginación",
@@ -128,8 +133,8 @@ export const es: Messages = {
     },
     sorting: {
       title: "Ordenación",
-      p1: "La ordenación por columna viene habilitada por defecto (<c>orderByEnabled: true</c>): hacer clic en el encabezado abre un menú con <i>Ascendente</i>, <i>Descendente</i> y — cuando la columna ya está ordenada — <i>Quitar ordenación</i>, que devuelve el grid a su estado neutro. En modo <c>remote</c>, la ordenación actual viaja en los <c>params</c>; en modo <c>dataset</c>, se resuelve en memoria.",
-      p2: "Desactívala por columna con <c>orderByEnabled: false</c> en la definición de la columna, y usa <c>filterName</c> como alias del campo enviado al servidor. Para aplicar una ordenación desde código, usa <c>controller.applyOrderBy(orderBy)</c>."
+      p1: "La ordenación por columna viene habilitada por defecto (<c>orderByEnabled: true</c>): hacer clic en el encabezado abre un menú con <i>Ascendente</i>, <i>Descendente</i> y — cuando la columna ya está ordenada — <i>Quitar ordenación</i>, que devuelve el grid a su estado neutro. <b>Mayús+clic</b> en un encabezado para añadir esa columna a una ordenación de <i>varias columnas</i>, alternándola entre <i>ascendente → descendente → quitada</i> mientras conserva las demás columnas ordenadas; un pequeño número de prioridad (<c>1</c>, <c>2</c>, <c>3</c>…) indica el orden, y los encabezados exponen <c>aria-sort</c>. En modo <c>remote</c>, la ordenación actual viaja en los <c>params</c>; en modo <c>dataset</c>, se resuelve en memoria.",
+      p2: "Desactívala por columna con <c>orderByEnabled: false</c> en la definición de la columna, y usa <c>filterName</c> como alias del campo enviado al servidor. Para aplicar una ordenación desde código, usa <c>controller.applyOrderBy(orderBy)</c> — que ahora también acepta un <c>OrderBy[]</c> para una ordenación completa de varias columnas (el índice 0 ordena primero) — o <c>controller.toggleOrderBy(name, { additive })</c> para alternar una sola columna."
     },
     checkbox: {
       title: "Selección múltiple",
@@ -190,6 +195,7 @@ export const es: Messages = {
         messages: "Reemplazos puntuales de las cadenas internas, aplicados sobre el pack del locale resuelto.",
         dataset: "Colección completa para operaciones locales; infiere el modo dataset.",
         columns: "Columnas visibles y sus renderizadores.",
+        html: "Cuando es true, el contenido de texto de la columna (valor crudo o retorno de valueGetter/headerContentGetter) se interpreta como HTML; de lo contrario se renderiza como texto seguro y escapado. Para contenido enriquecido, devuelve un nodo nativo.",
         datasource: "Proveedor consultado en modo remote.",
         url: "Endpoint usado en modo remote sin datasource.",
         rowsPerPage: "Cantidad inicial por página.",
@@ -205,6 +211,11 @@ export const es: Messages = {
         onRowExpandedCollapsed: "Notifican la expansión y el colapso de cada fila.",
         responsiveMode: "Define la presentación en móviles.",
         stickyHeaderEnabled: "Mantiene el encabezado durante el desplazamiento.",
+        columnResizeEnabled: "Habilita los tiradores de arrastre para redimensionar en los encabezados de columna.",
+        resizable: "Permite redimensionar esta columna arrastrando el borde de su encabezado.",
+        columnReorderEnabled: "Habilita reordenar arrastrando el cuerpo del encabezado (ignorado en VERTICAL_RECORD).",
+        reorderable: "Permite arrastrar esta columna a una nueva posición; ponlo en false para dejarla fija.",
+        pinned: "Congela esta columna en un borde (fija durante el desplazamiento horizontal); modificable desde el menú del encabezado.",
         sendRequestOnMounted: "Controla la primera consulta remota.",
         initialFilters: "Filtros iniciales remotos o locales.",
         onRequestError: "Notifica los fallos de carga."
@@ -344,6 +355,9 @@ export const es: Messages = {
       renderer: "Contenido inmediato o resuelto vía Promise.",
       customLoading: "Estado de carga personalizado en modo asíncrono.",
       stickyHeaderEnabled: "El encabezado permanece visible al hacer scroll.",
+      columnResizeEnabled: "Arrastra los bordes del encabezado para redimensionar las columnas.",
+      columnReorderEnabled: "Arrastra un encabezado para reordenar las columnas.",
+      pinColumns: "Fija la primera columna a la izquierda y la última a la derecha.",
       overflowEnabled: "El cuerpo hace scroll en lugar de crecer.",
       responsiveMode: "Comportamiento en pantallas estrechas.",
       footerVisible: "Muestra el pie con la paginación.",

@@ -62,6 +62,63 @@ describe("Vue adapter", () => {
     expect(wrapper.find(".grid-detail-loading").exists()).toBe(false);
   });
 
+  it("builds a multi-column sort with shift-click and resizes a column by drag", async () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", searchEnabled: false, footerVisible: false, cellMinWidth: 80,
+      dataset: [{ id: 1, name: "B", amount: 2 }, { id: 2, name: "A", amount: 1 }, { id: 3, name: "B", amount: 1 }],
+      columns: [{ name: "name", label: "Name" }, { name: "amount", label: "Amount", type: "NUMBER" }]
+    } } });
+    await wrapper.vm.$nextTick();
+    const headers = wrapper.findAll(".grid-header-cell.grid-header-order");
+    await headers[0].trigger("click", { shiftKey: true }); // name asc
+    await headers[1].trigger("click", { shiftKey: true }); // + amount asc
+    const badges = wrapper.findAll(".arcana-sort-priority");
+    expect(badges.map((badge) => badge.text())).toEqual(["1", "2"]);
+    expect(headers[0].attributes("aria-sort")).toBe("ascending");
+    expect(wrapper.find(".grid-body .grid-row .grid-cell").text()).toBe("A");
+
+    // Drag the first column's resize handle: 0 (rect) + 150 delta = 150px.
+    await headers[0].find(".arcana-col-resizer").trigger("pointerdown", { clientX: 100 });
+    const move = new Event("pointermove"); (move as unknown as { clientX: number }).clientX = 250; window.dispatchEvent(move);
+    window.dispatchEvent(new Event("pointerup"));
+    await wrapper.vm.$nextTick();
+    expect((wrapper.findAll(".grid-header-cell.grid-header-order")[0].element as HTMLElement).style.width).toBe("150px");
+  });
+
+  it("escapes raw cell values as text (no HTML injection without column.html)", async () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, name: "<img src=x onerror=\"window.__xssVue=1\">" }],
+      columns: [{ name: "name", label: "Name" }]
+    } } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".grid-body img").exists()).toBe(false);
+    expect(wrapper.find(".grid-body .grid-cell").text()).toContain("<img src=x onerror=");
+    expect((window as unknown as { __xssVue?: number }).__xssVue).toBeUndefined();
+  });
+
+  it("renders HTML from a valueGetter only when the column opts in with html: true", async () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, status: "ok" }],
+      columns: [{ name: "status", label: "Status", html: true, valueGetter: (value: unknown) => `<span class="pill">${String(value)}</span>` }]
+    } } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".grid-body .pill").exists()).toBe(true);
+    expect(wrapper.find(".grid-body .pill").text()).toBe("ok");
+  });
+
+  it("renders a valueGetter string as text by default (no html flag)", async () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", searchEnabled: false, footerVisible: false,
+      dataset: [{ id: 1, status: "ok" }],
+      columns: [{ name: "status", label: "Status", valueGetter: (value: unknown) => `<span class="pill">${String(value)}</span>` }]
+    } } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".grid-body .pill").exists()).toBe(false);
+    expect(wrapper.find(".grid-body .grid-cell").text()).toBe('<span class="pill">ok</span>');
+  });
+
   it("localizes the built-in strings with locale: 'en' and honors messages overrides", async () => {
     const rows = Array.from({ length: 7 }, (_, index) => ({ id: index + 1, name: `Person ${index + 1}` }));
     const wrapper = mount(ArcanaDataTable, { props: { config: {

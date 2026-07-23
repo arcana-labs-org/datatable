@@ -19,6 +19,7 @@ export type PropertyKey =
   | "messages"
   | "dataset"
   | "columns"
+  | "html"
   | "datasource"
   | "url"
   | "rowsPerPage"
@@ -34,6 +35,11 @@ export type PropertyKey =
   | "onRowExpandedCollapsed"
   | "responsiveMode"
   | "stickyHeaderEnabled"
+  | "columnResizeEnabled"
+  | "resizable"
+  | "columnReorderEnabled"
+  | "reorderable"
+  | "pinned"
   | "sendRequestOnMounted"
   | "initialFilters"
   | "onRequestError";
@@ -169,6 +175,7 @@ export interface Messages {
       keysKeyCol: string;
     };
     columns: SectionProse;
+    columnManagement: SectionProse;
     pagination: SectionProse;
     filters: SectionProse;
     searchTypes: {
@@ -279,6 +286,9 @@ export interface Messages {
       renderer: string;
       customLoading: string;
       stickyHeaderEnabled: string;
+      columnResizeEnabled: string;
+      columnReorderEnabled: string;
+      pinColumns: string;
       overflowEnabled: string;
       responsiveMode: string;
       footerVisible: string;

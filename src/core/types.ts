@@ -53,6 +53,36 @@ export interface DataTableColumn<Row extends DataTableRow = DataTableRow> {
   label: string;
   type?: ColumnType;
   width?: number | string;
+  /**
+   * When `true`, the column's string content — the raw cell value OR a string
+   * returned by `valueGetter`/`headerContentGetter` — is interpreted as HTML.
+   * Otherwise (the default) string content is rendered as safe, escaped text,
+   * so untrusted data can never inject markup. Framework nodes returned by
+   * `valueGetter` (React elements, Vue vnodes, DOM nodes, Svelte snippets…)
+   * are always rendered natively regardless of this flag and remain the
+   * recommended way to render rich content.
+   */
+  html?: boolean;
+  /**
+   * When the grid allows column resizing (`config.columnResizeEnabled`, default
+   * true), this column exposes a drag handle on the right edge of its header
+   * cell. Set to `false` to pin this column's width. Defaults to `true`.
+   */
+  resizable?: boolean;
+  /**
+   * Column reorder opt-out. When the grid allows reordering
+   * (`config.columnReorderEnabled`, default true), this column's header can be
+   * dragged to move it. Set to `false` to keep the column fixed in place.
+   * Defaults to `true`.
+   */
+  reorderable?: boolean;
+  /**
+   * Freezes the column to one edge so it stays visible during horizontal
+   * scrolling: left-pinned columns stick to the start, right-pinned ones to the
+   * end (accumulating widths). The header context menu changes this at runtime.
+   * Ignored in `VERTICAL_RECORD` mode. Defaults to `undefined` (not pinned).
+   */
+  pinned?: "left" | "right";
   textAlignment?: "center" | "left" | "right";
   filterName?: string;
   searchType?: SearchType;
@@ -119,6 +149,27 @@ export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
   cellMinWidth?: number | string;
   calculateCellWidth?: boolean;
   stickyHeaderEnabled?: boolean;
+  /**
+   * Enables drag-to-resize on the header cells (a thin handle on each column's
+   * right edge). Individual columns opt out with `column.resizable: false`.
+   * Ignored in `VERTICAL_RECORD` mode (there is no shared column width there).
+   * Defaults to `true`.
+   */
+  columnResizeEnabled?: boolean;
+  /**
+   * Enables drag-to-reorder of columns by dragging the body of a header cell
+   * (a short click still sorts; the right-edge resize handle keeps priority).
+   * Individual columns opt out with `column.reorderable: false`. Ignored in
+   * `VERTICAL_RECORD` mode. Defaults to `true`.
+   */
+  columnReorderEnabled?: boolean;
+  /**
+   * Enables the header context-menu pin actions (freeze left / freeze right /
+   * unfreeze) and honors each `column.pinned`. Pinned columns stay visible
+   * during horizontal scroll. Ignored in `VERTICAL_RECORD` mode. Defaults to
+   * `true`.
+   */
+  columnPinEnabled?: boolean;
   textAlignment?: "center" | "left" | "right";
   columns: DataTableColumn<Row>[] | (() => DataTableColumn<Row>[]);
   actions?: DataTableAction<Row>[];
@@ -185,7 +236,27 @@ export interface DataTableSnapshot<Row extends DataTableRow = DataTableRow> {
   datasetSize: number;
   rows: Row[];
   filters: Record<string, unknown>;
+  /**
+   * The primary (highest-priority) sort column, or `undefined` when nothing is
+   * sorted. Kept for backward compatibility — it is always `orderByList[0]`.
+   * Read `orderByList` for the full multi-column order.
+   */
   orderBy?: OrderBy;
+  /**
+   * The complete multi-column sort, in priority order (index 0 sorts first).
+   * Empty when nothing is sorted.
+   */
+  orderByList: OrderBy[];
+  /**
+   * Effective column order by `name`, reflecting drag-reorder and
+   * `setColumnOrder`/`moveColumn`. Empty means the natural config order.
+   */
+  columnOrder: string[];
+  /**
+   * Runtime pin overrides per column `name` (`left` / `right` / `null` to
+   * unpin). A column absent here falls back to its `column.pinned`.
+   */
+  columnPins: Record<string, "left" | "right" | null>;
   loading: boolean;
   error: unknown;
   currentPage: number;
@@ -222,9 +293,31 @@ export interface DataTableApi<Row extends DataTableRow = DataTableRow> extends D
   isEmpty(): boolean;
   isNotEmpty(): boolean;
   getColumns(): DataTableColumn<Row>[];
+  /** Replaces the whole effective column order (a list of column `name`s). */
+  setColumnOrder(order: string[]): void;
+  /**
+   * Moves a column next to another one. `position` decides whether it lands
+   * before (default) or after `targetName`; a `null` target sends it to the end.
+   */
+  moveColumn(name: string, targetName: string | null, position?: "before" | "after"): void;
+  /** The current pin of a column (its runtime override, else `column.pinned`). */
+  getColumnPin(name: string): "left" | "right" | null;
+  /** Pins a column to an edge, or unpins it with `null`. */
+  setColumnPinned(name: string, pinned: "left" | "right" | null): void;
   getFilters(): Record<string, unknown>;
   applyFilter(column: DataTableColumn<Row>, value: unknown): Promise<void>;
-  applyOrderBy(orderBy: OrderBy | null): Promise<void>;
+  /**
+   * Replaces the whole sort. A single `OrderBy` (or `null`) keeps the classic
+   * single-column behavior; an `OrderBy[]` applies a full multi-column order
+   * (index 0 sorts first).
+   */
+  applyOrderBy(orderBy: OrderBy | OrderBy[] | null): Promise<void>;
+  /**
+   * Cycles one column's sort on a header click. `additive` (Shift-click) keeps
+   * the other sorted columns and cycles this one asc → desc → removed; without
+   * it, the column becomes the sole sort (cycling asc → desc → cleared).
+   */
+  toggleOrderBy(name: string, options?: { additive?: boolean }): Promise<void>;
   setFilter(name: string, value: unknown): Promise<void>;
   setFilters(filters: Record<string, unknown>): Promise<void>;
   paginate(page: number, rowsPerPage: number): Promise<void>;
@@ -291,7 +384,7 @@ export type OnVisibleActionCheck = (row: Row) => boolean;
 export type State = DataTableSnapshot;
 export type Methods = Pick<DataTableApi,
   "refresh" | "fetch" | "setRows" | "setDataset" | "getDataset" | "clearRows" | "removeRow" | "addRow" | "upsert" | "updateRow" |
-  "getRows" | "getCheckedRows" | "isEmpty" | "isNotEmpty" | "getColumns" | "applyFilter" | "applyOrderBy" |
+  "getRows" | "getCheckedRows" | "isEmpty" | "isNotEmpty" | "getColumns" | "setColumnOrder" | "moveColumn" | "getColumnPin" | "setColumnPinned" | "applyFilter" | "applyOrderBy" | "toggleOrderBy" |
   "setFilter" | "setFilters" | "paginate" | "getSummarizedValue" | "getSelectedRadioRow" |
   "clearRadioRowSelection" | "clearCheckedRows" | "setSelectedRadioRow" |
   "expandRow" | "collapseRow" | "getExpandedRows">;

@@ -98,8 +98,13 @@ export const ja: Messages = {
     },
     columns: {
       title: "カラム",
-      p1: "各カラムは <c>name</c>（行のキー）と <c>label</c>（ヘッダーのテキスト）を持つ <c>DataTableColumn</c> オブジェクトです。<c>type</c> などのフィールドがフォーマットを制御し（たとえば <c>CURRENCY</c> は金額としてレンダリングします）、<c>valueGetter</c> はレンダリング前にセルの内容を変換します。",
-      p2: "<c>columns</c> プロパティは <c>() => DataTableColumn[]</c> 形式の関数も受け付けます。カラムが権限やアプリケーションの状態に依存する場合に便利です。",
+      p1: "各カラムは <c>name</c>（行のキー）と <c>label</c>（ヘッダーのテキスト）を持つ <c>DataTableColumn</c> オブジェクトです。<c>type</c> などのフィールドがフォーマットを制御し（たとえば <c>CURRENCY</c> は金額としてレンダリングします）、<c>valueGetter</c> はレンダリング前にセルの内容を変換します。文字列コンテンツはデフォルトで安全にエスケープされたテキストとして描画されます。カラムに <c>html: true</c> を設定すると HTML として解釈され、リッチなコンテンツにはネイティブノードを返せます。",
+      p2: "<c>columns</c> プロパティは <c>() => DataTableColumn[]</c> 形式の関数も受け付けます。カラムが権限やアプリケーションの状態に依存する場合に便利です。カラムはヘッダーの右端をドラッグして幅を変更できます — デフォルトで有効（<c>columnResizeEnabled</c>）で、特定のカラムを対象外にするには <c>resizable: false</c> を指定します。",
+    },
+    columnManagement: {
+      title: "列の並べ替えと固定",
+      p1: "ヘッダーの本体を横にドラッグするとカラムを並べ替えられます — ドロップ位置を示すインジケーター線で、カラムがどこに収まるかが正確にわかります。短いクリックは従来どおり並べ替えメニューを開き、右端の幅変更ハンドルが優先されるため、ドラッグが邪魔になることはありません。デフォルトで有効（<c>columnReorderEnabled</c>）で、特定のカラムを固定したままにするには <c>reorderable: false</c> を指定します。",
+      p2: "ヘッダーメニュー（並べ替えオプションと同じメニュー）に<i>左に固定</i>、<i>右に固定</i>、<i>固定を解除</i>が追加されます。固定されたカラムはその端に凍結され、横スクロール中も表示され続けます — 左に固定したカラムは先頭に、右に固定したカラムは末尾に、控えめな区切り線／影とともに貼り付きます。カラムに <c>pinned: 'left'</c> または <c>pinned: 'right'</c> をあらかじめ設定するか、メニューから実行時に変更できます。システム列（チェックボックス／展開ボタン）は左に、アクション列は右に凍結されます。並べ替えと固定はどちらも <c>columnPinEnabled</c> で無効化でき、<c>VERTICAL_RECORD</c> レスポンシブモードでは無視されます。"
     },
     pagination: {
       title: "ページネーション",
@@ -128,8 +133,8 @@ export const ja: Messages = {
     },
     sorting: {
       title: "ソート",
-      p1: "カラムごとのソートはデフォルトで有効です（<c>orderByEnabled: true</c>）。ヘッダーをクリックすると、<i>昇順</i>、<i>降順</i>、そしてすでにソート済みのカラムでは<i>並び替えを解除</i>（グリッドをニュートラルな状態に戻します）を含むメニューが開きます。<c>remote</c> モードでは現在のソートが <c>params</c> に含めて送信され、<c>dataset</c> モードではメモリ上で解決されます。",
-      p2: "カラム単位で無効にするには、カラム定義で <c>orderByEnabled: false</c> を指定します。サーバーに送るフィールドのエイリアスには <c>filterName</c> を使用してください。コードからソートを適用するには <c>controller.applyOrderBy(orderBy)</c> を使用します。",
+      p1: "カラムごとのソートはデフォルトで有効です（<c>orderByEnabled: true</c>）。ヘッダーをクリックすると、<i>昇順</i>、<i>降順</i>、そしてすでにソート済みのカラムでは<i>並び替えを解除</i>（グリッドをニュートラルな状態に戻します）を含むメニューが開きます。ヘッダーを <b>Shift+クリック</b> すると、そのカラムを<i>複数カラム</i>のソートに追加でき、他のソート済みカラムを保ったまま <i>昇順 → 降順 → 解除</i> と切り替わります。小さな優先順位の番号（<c>1</c>、<c>2</c>、<c>3</c>…）がソート順を示し、ヘッダーは <c>aria-sort</c> を公開します。<c>remote</c> モードでは現在のソートが <c>params</c> に含めて送信され、<c>dataset</c> モードではメモリ上で解決されます。",
+      p2: "カラム単位で無効にするには、カラム定義で <c>orderByEnabled: false</c> を指定します。サーバーに送るフィールドのエイリアスには <c>filterName</c> を使用してください。コードからソートを適用するには <c>controller.applyOrderBy(orderBy)</c> を使用します。これは複数カラムの完全な並び順を表す <c>OrderBy[]</c> も受け付けるようになりました（インデックス 0 が最優先）。単一カラムの切り替えには <c>controller.toggleOrderBy(name, { additive })</c> を使用します。",
     },
     checkbox: {
       title: "複数選択",
@@ -190,6 +195,7 @@ export const ja: Messages = {
         messages: "内蔵文言のキー単位の上書きです。解決されたロケールパックの上に適用されます。",
         dataset: "ローカル操作用の全コレクションです。dataset モードが推論されます。",
         columns: "表示するカラムとそのレンダラーです。",
+        html: "true のとき、そのカラムの文字列コンテンツ（生の値、または valueGetter/headerContentGetter の戻り値）は HTML として解釈されます。それ以外の場合は安全にエスケープされたテキストとして描画されます。リッチなコンテンツにはネイティブノードを返してください。",
         datasource: "remote モードで照会されるプロバイダーです。",
         url: "datasource なしの remote モードで使用されるエンドポイントです。",
         rowsPerPage: "1 ページあたりの初期件数です。",
@@ -205,6 +211,11 @@ export const ja: Messages = {
         onRowExpandedCollapsed: "各行の展開と折りたたみを通知します。",
         responsiveMode: "モバイルでの表示方法を定義します。",
         stickyHeaderEnabled: "スクロール中もヘッダーを維持します。",
+        columnResizeEnabled: "カラムヘッダーにドラッグで幅を変えるハンドルを表示します。",
+        resizable: "ヘッダーの端をドラッグしてこのカラムの幅を変更できるようにします。",
+        columnReorderEnabled: "ヘッダー本体をドラッグして並べ替えを有効にします（VERTICAL_RECORD では無視）。",
+        reorderable: "このカラムを新しい位置へドラッグできるようにします。false にすると固定されます。",
+        pinned: "このカラムを端に固定します（横スクロール中も固定）。ヘッダーメニューから変更可能です。",
         sendRequestOnMounted: "最初のリモートクエリを制御します。",
         initialFilters: "リモートまたはローカルの初期フィルターです。",
         onRequestError: "読み込みの失敗を通知します。",
@@ -344,6 +355,9 @@ export const ja: Messages = {
       renderer: "即時レンダリング、または Promise で解決します。",
       customLoading: "非同期モードでのカスタムローディング。",
       stickyHeaderEnabled: "スクロール中もヘッダーを固定表示します。",
+      columnResizeEnabled: "ヘッダーの端をドラッグしてカラム幅を変更します。",
+      columnReorderEnabled: "ヘッダーをドラッグしてカラムを並べ替えます。",
+      pinColumns: "最初のカラムを左に、最後のカラムを右に固定します。",
       overflowEnabled: "本体が伸びる代わりに内部でスクロールします。",
       responsiveMode: "狭い画面での挙動。",
       footerVisible: "ページネーション付きのフッターを表示します。",

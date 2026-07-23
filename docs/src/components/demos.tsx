@@ -160,8 +160,8 @@ export function ColumnsPreview() {
     mode: "dataset", locale: gridLocale, dataset: rows.slice(0, 4), searchEnabled: false, footerVisible: false,
     calculateCellWidth: true, cellMinWidth: 130, textAlignment: "left",
     columns: () => [
-      { name: "id", label: msg.demos.cols.code, width: 90, textAlignment: "center", headerContentGetter: () => `<strong># ${msg.demos.cols.id}</strong>` },
-      { name: "name", label: msg.demos.cols.name, valueGetter: (value) => `<strong>${String(value).toUpperCase()}</strong>` },
+      { name: "id", label: msg.demos.cols.code, width: 90, textAlignment: "center", headerContentGetter: () => <strong># {msg.demos.cols.id}</strong> },
+      { name: "name", label: msg.demos.cols.name, html: true, valueGetter: (value) => `<strong>${String(value).toUpperCase()}</strong>` },
       { name: "score", label: msg.demos.cols.score, type: "PERCENTAGE", textAlignment: "right", valueGetter: (value) => `${value}%`, isVisible: () => true },
       { name: "email", label: msg.demos.cols.email, orderByEnabled: false, onBeforeColumnStyleMounted: () => ({ color: "#4f46e5" }) }
     ]
@@ -330,7 +330,7 @@ export function HooksPreview() {
     mode: "dataset", locale: gridLocale, dataset: rows.slice(0, 4), searchEnabled: false, checkboxEnabled: true, ariaLabel: msg.demos.aria.hooks,
     columns: [{ name: "name", label: msg.demos.cols.person }, { name: "status", label: msg.demos.cols.situation }, { name: "score", label: msg.demos.cols.score, textAlignment: "right" }],
     onBeforeRowMounted: (row) => ({ ...row, status: row.active ? msg.demos.available : msg.demos.unavailable }),
-    onBeforeHeaderCellMounted: (column) => `<span class=\"hook-header\">${column.label}</span>`,
+    onBeforeHeaderCellMounted: (column) => <span className="hook-header">{column.label}</span>,
     onBeforeCellMounted: (value, column) => column.name === "score" ? `${value} ${msg.demos.card.pts}` : value,
     onBeforeCellStyleMounted: (_value, column, row) => column.name === "status" ? { color: row.active ? "#047857" : "#9f1239", fontWeight: 600 } : {},
     onBeforeCheckboxAndRadioButtonStyleMounted: (row) => ({ background: row.active ? "#eef2ff" : "#fff1f2" })

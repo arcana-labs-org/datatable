@@ -19,6 +19,9 @@
     --arcana-surface-muted: #e9edf1;
     --arcana-summarizer-bg: #ededed;
     --arcana-status-bg: #fdfdfd;
+    --arcana-pin-shadow: rgba(15, 23, 42, 0.20);
+    --arcana-pin-border: #c4ccd3;
+    --arcana-drop-indicator: #1467b8;
     /* borders */
     --arcana-border: #dddddd;
     --arcana-border-strong: #bbbbbb;
@@ -1256,6 +1259,110 @@
     padding-left: 8px;
     color: var(--arcana-sort-hint);
     font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Multi-column sort: the 1-based priority number next to the arrow. */
+.spark-grid .arcana-sort-priority {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: var(--arcana-sort-menu-active, #1467b8);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Drag-to-resize handle on the right edge of each header cell. */
+.spark-grid .grid-header .grid-header-cell .arcana-col-resizer {
+    position: absolute;
+    top: 0;
+    right: -3px;
+    width: 7px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 2;
+    touch-action: none;
+    user-select: none;
+}
+
+.spark-grid .grid-header .grid-header-cell .arcana-col-resizer::before {
+    content: "";
+    position: absolute;
+    top: 20%;
+    right: 3px;
+    width: 2px;
+    height: 60%;
+    border-radius: 2px;
+    background: transparent;
+    transition: background 0.12s ease;
+}
+
+.spark-grid .grid-header .grid-header-cell .arcana-col-resizer:hover::before,
+.spark-grid .grid-header .grid-header-cell .arcana-col-resizer:active::before {
+    background: var(--arcana-sort-menu-active, #1467b8);
+}
+
+/* -----------------------------------------------------------------
+   Column reorder (drag header) + pin/freeze (left/right)
+   ----------------------------------------------------------------- */
+
+/* Dragged header cell + drop indicator (vertical line between columns). */
+.spark-grid .grid-header .grid-header-cell.arcana-col-dragging {
+    opacity: 0.55;
+    cursor: grabbing;
+}
+
+.spark-grid .grid-header .grid-header-cell.arcana-drop-before::after,
+.spark-grid .grid-header .grid-header-cell.arcana-drop-after::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--arcana-drop-indicator, #1467b8);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.spark-grid .grid-header .grid-header-cell.arcana-drop-before::after { left: -1px; }
+.spark-grid .grid-header .grid-header-cell.arcana-drop-after::after { right: -1px; }
+
+/* Pinned (frozen) cells stay opaque so scrolled content passes behind them. */
+.spark-grid .grid-cell.arcana-pin {
+    background: var(--arcana-surface);
+    z-index: 1;
+}
+
+.spark-grid .grid-header-cell.arcana-pin {
+    z-index: 6;
+}
+
+.spark-grid .grid-summarizer-cell.arcana-pin {
+    z-index: 6;
+}
+
+.spark-grid .grid-search-row-cell.arcana-pin {
+    background: var(--arcana-surface);
+    z-index: 5;
+}
+
+/* Subtle divider/shadow separating the frozen region from the scrollable one. */
+.spark-grid .arcana-pin-left-edge {
+    box-shadow: 6px 0 8px -6px var(--arcana-pin-shadow);
+    border-right: 1px solid var(--arcana-pin-border) !important;
+}
+
+.spark-grid .arcana-pin-right-edge {
+    box-shadow: -6px 0 8px -6px var(--arcana-pin-shadow);
+    border-left: 1px solid var(--arcana-pin-border) !important;
 }
 
 .spark-grid .spark-grid-datatable-input {
@@ -1337,18 +1444,34 @@
 }
 
 
+.arcana-header-menu {
+    min-width: 178px;
+}
+
+.arcana-sort-menu,
+.arcana-pin-menu {
+    display: grid;
+}
+
+/* The pin group sits below the sort group, separated by a divider. */
+.arcana-header-menu .arcana-sort-menu + .arcana-pin-menu {
+    border-top: 1px solid var(--arcana-menu-divider, #eceff1);
+}
+
 .arcana-sort-menu {
     min-width: 168px;
 }
 
-.arcana-sort-menu button {
+.arcana-sort-menu button,
+.arcana-pin-menu button {
     display: flex;
     align-items: center;
     gap: 9px;
     font-size: 13px;
 }
 
-.arcana-sort-menu button svg {
+.arcana-sort-menu button svg,
+.arcana-pin-menu button svg {
     width: 15px;
     height: 15px;
     flex: 0 0 auto;
@@ -1356,12 +1479,14 @@
     color: var(--arcana-menu-icon, #78909c);
 }
 
-.arcana-sort-menu button.is-active {
+.arcana-sort-menu button.is-active,
+.arcana-pin-menu button.is-active {
     color: var(--arcana-sort-menu-active, #1467b8);
     font-weight: 600;
 }
 
-.arcana-sort-menu button.is-active svg { color: var(--arcana-sort-menu-active, #1467b8); }
+.arcana-sort-menu button.is-active svg,
+.arcana-pin-menu button.is-active svg { color: var(--arcana-sort-menu-active, #1467b8); }
 
 .arcana-sort-menu .arcana-sort-menu__clear {
     border-top: 1px solid var(--arcana-menu-divider, #eceff1);
@@ -2054,6 +2179,9 @@
     --arcana-surface-muted: #1e293b;
     --arcana-summarizer-bg: #1e293b;
     --arcana-status-bg: #0f172a;
+    --arcana-pin-shadow: rgba(0, 0, 0, 0.55);
+    --arcana-pin-border: #3b4d68;
+    --arcana-drop-indicator: #7dd3fc;
     --arcana-border: #2b3a52;
     --arcana-border-strong: #3b4d68;
     --arcana-text: #e2e8f0;

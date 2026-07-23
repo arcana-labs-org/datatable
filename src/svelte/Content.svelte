@@ -2,7 +2,8 @@
   /**
    * Renders a `Renderable` exactly like the React/Vue `Content` helpers:
    * - function → invoked (lazily) and the result rendered;
-   * - string → rendered as HTML inside a `<span>`;
+   * - string → rendered as escaped TEXT by default; rendered as HTML only when
+   *   `html` is true (opt-in per column via `column.html`);
    * - number/boolean → rendered as text inside a `<span>`;
    * - DOM `Node` → appended as-is (the Svelte-friendly escape hatch for
    *   "component" content: build the node imperatively and return it);
@@ -10,7 +11,7 @@
    */
   import type { Renderable } from "../core/types";
 
-  let { value }: { value: Renderable } = $props();
+  let { value, html = false }: { value: Renderable; html?: boolean } = $props();
 
   const resolved = $derived(typeof value === "function" ? (value as () => Renderable)() : value);
 
@@ -27,4 +28,4 @@
   }
 </script>
 
-{#if resolved == null}{:else if typeof resolved === "string"}<span>{@html resolved}</span>{:else if typeof resolved === "number" || typeof resolved === "boolean"}<span>{String(resolved)}</span>{:else if typeof Node !== "undefined" && resolved instanceof Node}<span use:mountNode={resolved}></span>{:else}<span>{String(resolved)}</span>{/if}
+{#if resolved == null}{:else if typeof resolved === "string"}{#if html}<span>{@html resolved}</span>{:else}<span>{resolved}</span>{/if}{:else if typeof resolved === "number" || typeof resolved === "boolean"}<span>{String(resolved)}</span>{:else if typeof Node !== "undefined" && resolved instanceof Node}<span use:mountNode={resolved}></span>{:else}<span>{String(resolved)}</span>{/if}

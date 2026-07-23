@@ -98,8 +98,13 @@ export const zh: Messages = {
     },
     columns: {
       title: "列",
-      p1: "每一列都是一个 <c>DataTableColumn</c> 对象，包含 <c>name</c>（行数据上的键）和 <c>label</c>（表头文本）。像 <c>type</c> 这样的字段控制格式化——例如 <c>CURRENCY</c> 会渲染货币值——而 <c>valueGetter</c> 在渲染前转换单元格内容。",
-      p2: "<c>columns</c> 属性也接受一个 <c>() => DataTableColumn[]</c> 函数，当列依赖于权限或应用状态时非常方便。"
+      p1: "每一列都是一个 <c>DataTableColumn</c> 对象，包含 <c>name</c>（行数据上的键）和 <c>label</c>（表头文本）。像 <c>type</c> 这样的字段控制格式化——例如 <c>CURRENCY</c> 会渲染货币值——而 <c>valueGetter</c> 在渲染前转换单元格内容。字符串内容默认作为安全的转义文本渲染；在列上设置 <c>html: true</c> 可将其解析为 HTML，或返回原生节点以呈现富内容。",
+      p2: "<c>columns</c> 属性也接受一个 <c>() => DataTableColumn[]</c> 函数，当列依赖于权限或应用状态时非常方便。可以通过拖动表头右边缘来调整列宽——默认启用（<c>columnResizeEnabled</c>）；用 <c>resizable: false</c> 可让某一列不参与调整。"
+    },
+    columnManagement: {
+      title: "重新排序和固定列",
+      p1: "横向拖动表头主体即可重新排序列——一条放置指示线会显示列最终落在何处。短按仍会打开排序菜单，右边缘的调整宽度手柄依然优先，因此拖动绝不会碍事。默认启用（<c>columnReorderEnabled</c>）；用 <c>reorderable: false</c> 可让某一列固定不动。",
+      p2: "表头菜单（与排序选项相同的那个菜单）新增了<i>固定到左侧</i>、<i>固定到右侧</i>和<i>取消固定</i>。被固定的列会冻结在其边缘，并在横向滚动时保持可见——固定到左侧的列贴在开头，固定到右侧的列贴在末尾，并带有淡淡的分隔线／阴影。可以在列上预先设置 <c>pinned: 'left'</c> 或 <c>pinned: 'right'</c>，也可以通过菜单在运行时更改；系统列（复选框／展开器）冻结在左侧，操作列冻结在右侧。重新排序和固定都由 <c>columnPinEnabled</c> 关闭，并在 <c>VERTICAL_RECORD</c> 响应式模式下被忽略。"
     },
     pagination: {
       title: "分页",
@@ -128,8 +133,8 @@ export const zh: Messages = {
     },
     sorting: {
       title: "排序",
-      p1: "按列排序默认启用（<c>orderByEnabled: true</c>）：点击表头会打开一个菜单，包含<i>升序</i>、<i>降序</i>，以及——当该列已排序时——<i>取消排序</i>，后者将表格恢复到中性状态。在 <c>remote</c> 模式下，当前排序会随 <c>params</c> 一起发送；在 <c>dataset</c> 模式下，则在内存中完成。",
-      p2: "在列定义上用 <c>orderByEnabled: false</c> 可按列禁用排序，并可用 <c>filterName</c> 作为发送到服务端的字段别名。如需通过代码应用排序，使用 <c>controller.applyOrderBy(orderBy)</c>。"
+      p1: "按列排序默认启用（<c>orderByEnabled: true</c>）：点击表头会打开一个菜单，包含<i>升序</i>、<i>降序</i>，以及——当该列已排序时——<i>取消排序</i>，后者将表格恢复到中性状态。<b>Shift+点击</b>表头可将该列加入<i>多列排序</i>，在保留其他已排序列的同时，让该列在<i>升序 → 降序 → 移除</i>之间循环；一个小的优先级序号（<c>1</c>、<c>2</c>、<c>3</c>…）指示排序顺序，表头还会暴露 <c>aria-sort</c>。在 <c>remote</c> 模式下，当前排序会随 <c>params</c> 一起发送；在 <c>dataset</c> 模式下，则在内存中完成。",
+      p2: "在列定义上用 <c>orderByEnabled: false</c> 可按列禁用排序，并可用 <c>filterName</c> 作为发送到服务端的字段别名。如需通过代码应用排序，使用 <c>controller.applyOrderBy(orderBy)</c>——它现在也接受 <c>OrderBy[]</c> 以表示完整的多列排序（索引 0 最先排序）——或使用 <c>controller.toggleOrderBy(name, { additive })</c> 来切换单个列。"
     },
     checkbox: {
       title: "多选",
@@ -190,6 +195,7 @@ export const zh: Messages = {
         messages: "对内置文案的逐条覆盖，叠加在解析出的语言包之上。",
         dataset: "供本地操作使用的完整集合；会自动推断为 dataset 模式。",
         columns: "可见的列及其渲染器。",
+        html: "为 true 时，该列的字符串内容（原始值或 valueGetter/headerContentGetter 的返回值）会被解析为 HTML；否则会作为安全的转义文本渲染。若需富内容，请返回原生节点。",
         datasource: "remote 模式下查询的数据提供方。",
         url: "remote 模式下未提供 datasource 时使用的接口地址。",
         rowsPerPage: "每页的初始条数。",
@@ -205,6 +211,11 @@ export const zh: Messages = {
         onRowExpandedCollapsed: "在每行展开和折叠时发出通知。",
         responsiveMode: "定义移动端的展示方式。",
         stickyHeaderEnabled: "滚动时保持表头可见。",
+        columnResizeEnabled: "在列表头上启用拖动调整宽度的手柄。",
+        resizable: "允许通过拖动表头边缘来调整该列的宽度。",
+        columnReorderEnabled: "通过拖动表头主体启用重新排序（在 VERTICAL_RECORD 中忽略）。",
+        reorderable: "允许将该列拖到新位置；设为 false 可保持其固定。",
+        pinned: "将该列冻结到某个边缘（横向滚动时保持固定）；可通过表头菜单更改。",
         sendRequestOnMounted: "控制首次远程查询。",
         initialFilters: "初始的远程或本地筛选条件。",
         onRequestError: "通知加载失败。"
@@ -344,6 +355,9 @@ export const zh: Messages = {
       renderer: "内容立即渲染或通过 Promise 异步解析。",
       customLoading: "异步模式下的自定义加载状态。",
       stickyHeaderEnabled: "滚动时表头保持可见。",
+      columnResizeEnabled: "拖动表头边缘即可调整列宽。",
+      columnReorderEnabled: "拖动表头即可重新排序列。",
+      pinColumns: "将第一列固定到左侧，最后一列固定到右侧。",
       overflowEnabled: "表体内部滚动而不是撑高。",
       responsiveMode: "窄屏下的响应行为。",
       footerVisible: "显示带分页的页脚。",
