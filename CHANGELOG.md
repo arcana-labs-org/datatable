@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 — 2026-07-23
+
+### Alterações que exigem atenção
+- **Renomeação das classes CSS internas** de `.spark-grid*` para `.arcana-grid*`, e do arquivo de estilos `SparkGrid.css` para `ArcanaGrid.css`. O import público `@arcanalabs/datatable/styles.css` continua igual. Aplicações que estilizavam diretamente os seletores `.spark-grid*` precisam atualizá-los. Os aliases de migração `SparkGrid` (componente) e `SparkGridConfig` (tipo) foram mantidos.
+
+### Novos recursos
+- **Animação de arraste ao reordenar colunas**: chip fantasma acompanhando o cursor, reordenação ao vivo durante o arrasto e transição suave (FLIP) dos cabeçalhos; `Esc` cancela e restaura a ordem. Respeita `prefers-reduced-motion`.
+
+### Correções
+- Indicador de destino do arraste de colunas agora é claramente visível (linha na cor de destaque com brilho e marcador), com variação por tema.
+
 ## 1.1.0 — 2026-07-22
 
 ### Segurança
