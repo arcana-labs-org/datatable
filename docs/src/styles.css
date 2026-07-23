@@ -1,4 +1,4 @@
-@import "../../src/assets/SparkGrid.css";
+@import "../../src/assets/ArcanaGrid.css";
 
 :root {
   --bg: #ffffff;
@@ -655,7 +655,7 @@ table.ref-table td .t-type {
   padding: 18px;
   min-width: 0;
 }
-.section-preview-body .spark-grid { font-family: var(--font-body); }
+.section-preview-body .arcana-grid { font-family: var(--font-body); }
 .section-panel--code { background: var(--code-bg); }
 .section-panel--code .code-block { border-radius: 0; }
 .section-panel--code .code-block pre {
@@ -1134,7 +1134,7 @@ table.ref-table td .t-type {
 }
 .pg-workbench { margin: 0; min-width: 0; }
 .pg-workbench .section-preview-caption { margin-right: auto; }
-.pg-workbench .spark-grid { font-family: var(--font-body); }
+.pg-workbench .arcana-grid { font-family: var(--font-body); }
 .pg-workbench .section-panel {
   border: 0;
   border-radius: 0;

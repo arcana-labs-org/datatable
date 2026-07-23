@@ -7,7 +7,7 @@ import { startColumnDrag } from "../core/drag";
 import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, StyleMap } from "../core/types";
 import FilterField from "./FilterField.vue";
-import "../assets/SparkGrid.css";
+import "../assets/ArcanaGrid.css";
 
 const props = defineProps<{ config: DataTableConfig<DataTableRow> }>();
 const emit = defineEmits<{ mounted: [grid: DataTableApi<DataTableRow>] }>();
@@ -211,9 +211,9 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
 </script>
 
 <template>
-  <div class="spark-grid grid-wrapper" :class="[themeClass, { 'spark-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD' }]" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
+  <div class="arcana-grid grid-wrapper" :class="[themeClass, { 'arcana-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD' }]" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
     <div v-if="state.error" class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
-    <div class="spark-grid-body" :style="config.overflowEnabled ? { maxHeight: `${config.height ?? 560}px`, overflow: 'auto' } : undefined">
+    <div class="arcana-grid-body" :style="config.overflowEnabled ? { maxHeight: `${config.height ?? 560}px`, overflow: 'auto' } : undefined">
       <div class="grid-header" :class="{ 'grid-header-sticky': config.stickyHeaderEnabled }" role="row">
         <div v-if="expandable" class="grid-header-cell grid-expand-cell" :class="pinClass(PIN_SLOT_EXPANDER)" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]" />
         <div v-if="config.checkboxEnabled" class="grid-header-cell" :class="pinClass(PIN_SLOT_CHECKBOX)" :style="[selectionStyle, pinStyle(PIN_SLOT_CHECKBOX)]"><input type="checkbox" :checked="state.rows.some(row => row._isChecked)" :disabled="config.isCheckboxHeaderDisabled?.(grid)" :aria-label="msg.selectAll" @change="grid.toggleAll(($event.target as HTMLInputElement).checked)" /></div>
@@ -238,9 +238,9 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
         <div v-else-if="state.rows.length === 0" class="arcana-grid-status">{{ msg.empty }}</div>
         <template v-for="row in state.rows" :key="row._uuid">
           <div class="grid-row flex" :class="{ 'grid-row-focused': row._hasFocus || focusedRow === row._uuid, 'grid-row-checked': row._isChecked || row._isRadioChecked }" role="row" @click="onRow(row)" @dblclick="config.onDoubleClickRow?.(row, grid)">
-            <div v-if="expandable" class="grid-cell grid-expand-cell spark-grid-selection-cell" :class="pinClass(PIN_SLOT_EXPANDER)" data-label="" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]"><button type="button" class="grid-expand-toggle" :class="{ 'is-open': isExpanded(row) }" :aria-expanded="isExpanded(row)" :aria-label="isExpanded(row) ? msg.collapseRow : msg.expandRow" @click="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button></div>
-            <div v-if="config.checkboxEnabled" class="grid-cell spark-grid-selection-cell" :class="pinClass(PIN_SLOT_CHECKBOX)" :style="[selectionCellStyle(row), pinStyle(PIN_SLOT_CHECKBOX)]"><input type="checkbox" :checked="row._isChecked" :disabled="row._isCheckboxDisabled" :aria-label="msg.selectRow" @click.stop @change="grid.toggleRow(row, ($event.target as HTMLInputElement).checked)" /></div>
-            <div v-if="config.radioButtonSelectionEnabled" class="grid-cell spark-grid-selection-cell" :class="pinClass(PIN_SLOT_RADIO)" :style="[selectionCellStyle(row), pinStyle(PIN_SLOT_RADIO)]"><input type="radio" :name="state.uuid" :checked="row._isRadioChecked" :aria-label="msg.selectRow" @click.stop @change="selectRadio(row)" /></div>
+            <div v-if="expandable" class="grid-cell grid-expand-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_EXPANDER)" data-label="" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]"><button type="button" class="grid-expand-toggle" :class="{ 'is-open': isExpanded(row) }" :aria-expanded="isExpanded(row)" :aria-label="isExpanded(row) ? msg.collapseRow : msg.expandRow" @click="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button></div>
+            <div v-if="config.checkboxEnabled" class="grid-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_CHECKBOX)" :style="[selectionCellStyle(row), pinStyle(PIN_SLOT_CHECKBOX)]"><input type="checkbox" :checked="row._isChecked" :disabled="row._isCheckboxDisabled" :aria-label="msg.selectRow" @click.stop @change="grid.toggleRow(row, ($event.target as HTMLInputElement).checked)" /></div>
+            <div v-if="config.radioButtonSelectionEnabled" class="grid-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_RADIO)" :style="[selectionCellStyle(row), pinStyle(PIN_SLOT_RADIO)]"><input type="radio" :name="state.uuid" :checked="row._isRadioChecked" :aria-label="msg.selectRow" @click.stop @change="selectRadio(row)" /></div>
             <div v-for="column in columns" :key="column.name" class="grid-cell" :class="[alignmentClass(column, grid), { 'grid-cell-focused': focusedCell === `${row._uuid}:${column.name}` }, pinClass(column.name)]" :data-label="column.label" :style="[cellStyle(column, row), pinStyle(column.name)]" role="cell" @click="onCell(column, row)" @dblclick="config.onDoubleClickCell?.(grid.getCellValue(column, row), column, row, grid)" @contextmenu="context($event, column, row)"><RuntimeContent :value="grid.getCellValue(column, row)" :html="column.html === true" /></div>
             <div v-if="config.actions" class="grid-cell" :class="pinClass(PIN_SLOT_ACTIONS)" :data-label="msg.actions" :style="[actionStyle(grid), pinStyle(PIN_SLOT_ACTIONS)]"><template v-for="(action, index) in config.actions" :key="index"><RuntimeContent v-if="action.isVisible?.(row) ?? true" :value="action.element(row)" :html="true" /></template></div>
           </div>
@@ -255,11 +255,11 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
       </div>
     </div>
     <div v-if="config.footerVisible ?? true" class="grid-footer">
-      <div class="spark-grid-pages">
-        <label v-if="config.isRowsPerPageVisible ?? true" class="spark-grid__per-page">{{ msg.perPage }} <select :value="state.rowsPerPage" class="spark-grid-datatable-select" @change="grid.paginate(1, Number(($event.target as HTMLSelectElement).value))"><option v-for="size in [10,25,50,100,250,500]" :key="size" :value="size">{{ size }}</option></select></label>
-        <span v-if="state.totalRows" class="spark-grid__info">{{ formatMessage(msg.showingRange, { from: beginning, to: ending, total: state.totalRows }) }}</span>
-        <div class="spark-grid__pagination-group">
-          <span class="spark-grid-selected-rows">{{ grid.getCheckedRows().length ? formatMessage(msg.selectedCount, { count: grid.getCheckedRows().length }) : '' }}</span>
+      <div class="arcana-grid-pages">
+        <label v-if="config.isRowsPerPageVisible ?? true" class="arcana-grid__per-page">{{ msg.perPage }} <select :value="state.rowsPerPage" class="arcana-grid-datatable-select" @change="grid.paginate(1, Number(($event.target as HTMLSelectElement).value))"><option v-for="size in [10,25,50,100,250,500]" :key="size" :value="size">{{ size }}</option></select></label>
+        <span v-if="state.totalRows" class="arcana-grid__info">{{ formatMessage(msg.showingRange, { from: beginning, to: ending, total: state.totalRows }) }}</span>
+        <div class="arcana-grid__pagination-group">
+          <span class="arcana-grid-selected-rows">{{ grid.getCheckedRows().length ? formatMessage(msg.selectedCount, { count: grid.getCheckedRows().length }) : '' }}</span>
           <ul :aria-label="msg.pagination"><li><button type="button" :disabled="state.currentPage <= 1" :aria-label="msg.previousPage" @click="grid.paginate(state.currentPage - 1, state.rowsPerPage)">‹</button></li><li v-for="page in pages" :key="page" :class="{ current: page === state.currentPage }"><button type="button" :disabled="page === state.currentPage" @click="grid.paginate(page, state.rowsPerPage)">{{ page }}</button></li><li><button type="button" :disabled="state.currentPage >= lastPage" :aria-label="msg.nextPage" @click="grid.paginate(state.currentPage + 1, state.rowsPerPage)">›</button></li></ul>
         </div>
       </div>

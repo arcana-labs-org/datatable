@@ -86,7 +86,7 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
     type="search"
     :value="value as string"
     :disabled="disabled"
-    class="spark-grid-datatable-input"
+    class="arcana-grid-datatable-input"
     :aria-label="filterLabel"
     @input="onInput"
     @change="commitText"

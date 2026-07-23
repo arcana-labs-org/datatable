@@ -39,7 +39,7 @@ describe("Svelte adapter", () => {
     component.setRows([{ id: 1, name: "Ada" }]);
     flushSync();
     expect(target.textContent).toContain("Ada");
-    const cell = target.querySelector(".grid-body .grid-cell:not(.spark-grid-selection-cell)");
+    const cell = target.querySelector(".grid-body .grid-cell:not(.arcana-grid-selection-cell)");
     click(cell);
     expect(target.querySelector(".grid-body .grid-row")?.classList.contains("grid-row-focused")).toBe(true);
     expect(cell?.classList.contains("grid-cell-focused")).toBe(true);
@@ -221,8 +221,8 @@ describe("Svelte adapter", () => {
     });
     await Promise.resolve();
     flushSync();
-    expect(target.querySelector(".spark-grid__info")?.textContent).toBe("Showing 1 to 5 of 7");
-    expect(target.querySelector(".spark-grid__per-page")?.textContent).toContain("Per page:");
+    expect(target.querySelector(".arcana-grid__info")?.textContent).toBe("Showing 1 to 5 of 7");
+    expect(target.querySelector(".arcana-grid__per-page")?.textContent).toContain("Per page:");
     expect(target.querySelector(".grid-header")?.textContent).toContain("Actions");
     expect(target.querySelector('input[aria-label="Select all"]')).toBeTruthy();
     expect(target.querySelector('input[aria-label="Filter Name"]')).toBeTruthy();

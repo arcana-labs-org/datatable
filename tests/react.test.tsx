@@ -65,7 +65,7 @@ describe("React adapter", () => {
       columns: [{ name: "name", label: "Name" }]
     }} />);
     expect(screen.getByText("Showing 1 to 5 of 12")).toBeTruthy();
-    expect(container.querySelector(".spark-grid__per-page")?.textContent).toContain("Per page:");
+    expect(container.querySelector(".arcana-grid__per-page")?.textContent).toContain("Per page:");
     expect(screen.getByText("Actions")).toBeTruthy();
     expect(screen.getByLabelText("Select all")).toBeTruthy();
     expect(screen.getByLabelText("Pagination")).toBeTruthy();

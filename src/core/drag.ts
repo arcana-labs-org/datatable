@@ -61,7 +61,7 @@ export function startColumnDrag<Row extends DataTableRow>(
 ): void {
   const headerRow = headerEl.closest<HTMLElement>(".grid-header");
   if (!headerRow) return;
-  const scroller = headerEl.closest<HTMLElement>(".spark-grid-body");
+  const scroller = headerEl.closest<HTMLElement>(".arcana-grid-body");
   const initialOrder = grid.getColumns().map((item) => item.name);
   const reducedMotion = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const startX = event.clientX;

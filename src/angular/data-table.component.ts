@@ -36,11 +36,11 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
   imports: [ArcanaContentDirective, ArcanaExpandedRowComponent, ArcanaFilterFieldComponent],
   styles: [":host { display: block; }"],
   template: `
-    <div class="spark-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' spark-grid-responsive-vertical' : '' }}{{ className ? ' ' + className : '' }}" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
+    <div class="arcana-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' arcana-grid-responsive-vertical' : '' }}{{ className ? ' ' + className : '' }}" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
       @if (snap.error) {
         <div class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
       }
-      <div class="spark-grid-body" [style]="bodyStyle()">
+      <div class="arcana-grid-body" [style]="bodyStyle()">
         <div class="grid-header" [class.grid-header-sticky]="config.stickyHeaderEnabled" role="row">
           @if (expandable()) { <div class="grid-header-cell grid-expand-cell {{ pinClsExpander() }}" [style]="expanderPinStyle()"></div> }
           @if (config.checkboxEnabled) {
@@ -80,17 +80,17 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
           @for (row of snap.rows; track row._uuid) {
             <div class="grid-row flex" [class.grid-row-focused]="row._hasFocus || focusedRow === row._uuid" [class.grid-row-checked]="row._isChecked || row._isRadioChecked" role="row" (click)="selectRow(row)" (dblclick)="onDoubleClickRow(row)">
               @if (expandable()) {
-                <div class="grid-cell grid-expand-cell spark-grid-selection-cell {{ pinClsExpander() }}" data-label="" [style]="expanderPinStyle()">
+                <div class="grid-cell grid-expand-cell arcana-grid-selection-cell {{ pinClsExpander() }}" data-label="" [style]="expanderPinStyle()">
                   <button type="button" class="grid-expand-toggle" [class.is-open]="isExpanded(row)" [attr.aria-expanded]="isExpanded(row)" [attr.aria-label]="isExpanded(row) ? msg.collapseRow : msg.expandRow" (click)="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
                 </div>
               }
               @if (config.checkboxEnabled) {
-                <div class="grid-cell spark-grid-selection-cell {{ pinClsCheckbox() }}" [style]="checkboxCellStyle(row)">
+                <div class="grid-cell arcana-grid-selection-cell {{ pinClsCheckbox() }}" [style]="checkboxCellStyle(row)">
                   <input type="checkbox" [checked]="!!row._isChecked" [disabled]="!!row._isCheckboxDisabled" [attr.aria-label]="msg.selectRow" (click)="$event.stopPropagation()" (change)="toggleRow(row, $event)" />
                 </div>
               }
               @if (config.radioButtonSelectionEnabled) {
-                <div class="grid-cell spark-grid-selection-cell {{ pinClsRadio() }}" [style]="radioCellStyle(row)">
+                <div class="grid-cell arcana-grid-selection-cell {{ pinClsRadio() }}" [style]="radioCellStyle(row)">
                   <input type="radio" [name]="snap.uuid" [checked]="!!row._isRadioChecked" [attr.aria-label]="msg.selectRow" (click)="$event.stopPropagation()" (change)="selectRadio(row)" />
                 </div>
               }
@@ -123,14 +123,14 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
         }
       </div>
       @if (config.footerVisible ?? true) {
-        <div class="grid-footer"><div class="spark-grid-pages">
+        <div class="grid-footer"><div class="arcana-grid-pages">
           @if (config.isRowsPerPageVisible ?? true) {
-            <label class="spark-grid__per-page">{{ msg.perPage }} <select [value]="snap.rowsPerPage" class="spark-grid-datatable-select" (change)="onPerPageChange($event)">
+            <label class="arcana-grid__per-page">{{ msg.perPage }} <select [value]="snap.rowsPerPage" class="arcana-grid-datatable-select" (change)="onPerPageChange($event)">
               @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
             </select></label>
           }
-          @if (snap.totalRows) { <span class="spark-grid__info">{{ rangeInfo() }}</span> }
-          <div class="spark-grid__pagination-group"><span class="spark-grid-selected-rows">{{ checkedLabel() }}</span>
+          @if (snap.totalRows) { <span class="arcana-grid__info">{{ rangeInfo() }}</span> }
+          <div class="arcana-grid__pagination-group"><span class="arcana-grid-selected-rows">{{ checkedLabel() }}</span>
             <ul [attr.aria-label]="msg.pagination"><li><button type="button" [disabled]="snap.currentPage <= 1" [attr.aria-label]="msg.previousPage" (click)="paginate(snap.currentPage - 1)">‹</button></li>@for (page of pages(); track page) {<li [class.current]="page === snap.currentPage"><button type="button" [disabled]="page === snap.currentPage" (click)="paginate(page)">{{ page }}</button></li>}<li><button type="button" [disabled]="snap.currentPage >= lastPage()" [attr.aria-label]="msg.nextPage" (click)="paginate(snap.currentPage + 1)">›</button></li></ul>
           </div>
         </div></div>

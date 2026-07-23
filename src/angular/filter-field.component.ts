@@ -38,7 +38,7 @@ import { ArcanaSelectComponent } from "./select.component";
           type="search"
           [value]="stringValue()"
           [disabled]="disabled"
-          class="spark-grid-datatable-input"
+          class="arcana-grid-datatable-input"
           [attr.aria-label]="filterLabel()"
           (input)="onInput($event)"
           (blur)="valueChange.emit(draft)"

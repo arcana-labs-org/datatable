@@ -6,11 +6,11 @@
    only override these variables.
 
    IMPORTANT: the select/calendar panels are portaled to <body>, so they do
-   NOT inherit variables from `.spark-grid` — defaults are declared on the
+   NOT inherit variables from `.arcana-grid` — defaults are declared on the
    panels too, and the components repeat the `arcana-theme-*` class on every
    portaled panel.
    ============================================ */
-.spark-grid,
+.arcana-grid,
 .arcana-select__panel,
 .arcana-cal__panel,
 .arcana-drag-ghost {
@@ -77,49 +77,49 @@
     --arcana-sort-menu-active: #1467b8;
 }
 
-.spark-grid {
+.arcana-grid {
     font-family: "Figtree", sans-serif;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
 }
 
-.spark-grid .context-menu-open {
+.arcana-grid .context-menu-open {
     background-color: var(--arcana-row-context-open) !important;
 }
 
-.spark-grid .spark-grid-datatable-wrapper {
+.arcana-grid .arcana-grid-datatable-wrapper {
     border-right: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
 }
 
-.spark-grid .spark-grid-datatable-body>.spark-grid-datatable-row {
+.arcana-grid .arcana-grid-datatable-body>.arcana-grid-datatable-row {
     display: flex;
 }
 
-.spark-grid .spark-grid-datatable-body {
+.arcana-grid .arcana-grid-datatable-body {
     z-index: 0;
     position: relative;
     background: var(--arcana-bg);
 }
 
-.spark-grid .spark-grid-datatable-body .spark-grid-datatable-row:last-child .spark-grid-datatable-cell {
+.arcana-grid .arcana-grid-datatable-body .arcana-grid-datatable-row:last-child .arcana-grid-datatable-cell {
     border-bottom: 1px solid var(--arcana-border);
 }
 
-.spark-grid .spark-grid-datatable-row-focused .spark-grid-datatable-cell {
+.arcana-grid .arcana-grid-datatable-row-focused .arcana-grid-datatable-cell {
     background: var(--arcana-row-focused) !important;
 }
 
-.spark-grid .spark-grid-datatable-row-checked .spark-grid-datatable-cell {
+.arcana-grid .arcana-grid-datatable-row-checked .arcana-grid-datatable-cell {
     background: var(--arcana-row-checked) !important;
 }
 
-.spark-grid .spark-grid-datatable-cell-focused {
+.arcana-grid .arcana-grid-datatable-cell-focused {
     border: 1px solid var(--arcana-cell-focus) !important;
 }
 
-.spark-grid .spark-grid-datatable-cell {
+.arcana-grid .arcana-grid-datatable-cell {
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
@@ -132,27 +132,27 @@
     font-size: 12px;
 }
 
-.spark-grid .spark-grid-datatable-cell.spark-grid-datatable-cell-center-alignment {
+.arcana-grid .arcana-grid-datatable-cell.arcana-grid-datatable-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .spark-grid-datatable-cell.spark-grid-datatable-cell-left-alignment {
+.arcana-grid .arcana-grid-datatable-cell.arcana-grid-datatable-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .spark-grid-datatable-cell.spark-grid-datatable-cell-right-alignment {
+.arcana-grid .arcana-grid-datatable-cell.arcana-grid-datatable-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .spark-grid-datatable-cell:first-child {
+.arcana-grid .arcana-grid-datatable-cell:first-child {
     border-left: 1px solid transparent;
 }
 
-.spark-grid .spark-grid-datatable-cell:last-child {
+.arcana-grid .arcana-grid-datatable-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .spark-grid-datatable-cell .cell-has-comment {
+.arcana-grid .arcana-grid-datatable-cell .cell-has-comment {
     width: 0;
     height: 0;
     border-left: 10px solid transparent;
@@ -164,7 +164,7 @@
     transform: rotate(225deg);
 }
 
-.spark-grid .spark-grid-datatable-footer {
+.arcana-grid .arcana-grid-datatable-footer {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -175,30 +175,30 @@
     font-size: 12px;
 }
 
-.spark-grid .spark-grid-datatable-footer .spark-grid-pages ul {
+.arcana-grid .arcana-grid-datatable-footer .arcana-grid-pages ul {
     float: right;
 }
 
-.spark-grid .spark-grid-datatable-footer .spark-grid-pages ul li:not(.current):hover button:enabled {
+.arcana-grid .arcana-grid-datatable-footer .arcana-grid-pages ul li:not(.current):hover button:enabled {
     background-color: var(--arcana-pagination-hover) !important;
 }
 
-.spark-grid .spark-grid-datatable-footer>* {
+.arcana-grid .arcana-grid-datatable-footer>* {
     flex: 1;
 }
 
-.spark-grid .spark-grid-datatable-footer ul {
+.arcana-grid .arcana-grid-datatable-footer ul {
     display: inline-block;
     padding: 0px;
     margin: 0px;
     list-style: none;
 }
 
-.spark-grid .spark-grid-datatable-footer ul li {
+.arcana-grid .arcana-grid-datatable-footer ul li {
     display: inline-block;
 }
 
-.spark-grid .spark-grid-datatable-footer ul li>button {
+.arcana-grid .arcana-grid-datatable-footer ul li>button {
     padding: 5px;
     min-width: 30px;
     margin-left: 2px;
@@ -211,27 +211,27 @@
     border-radius: 3px;
 }
 
-.spark-grid .spark-grid-datatable-footer ul li>button[disabled] {
+.arcana-grid .arcana-grid-datatable-footer ul li>button[disabled] {
     color: var(--arcana-text-disabled);
     cursor: default;
 }
 
-.spark-grid .spark-grid-datatable-footer ul li.current>button {
+.arcana-grid .arcana-grid-datatable-footer ul li.current>button {
     color: var(--arcana-accent-contrast);
     background-color: var(--arcana-accent);
     cursor: default;
 }
 
-.spark-grid .spark-grid-datatable-footer ul li:not(.current):hover>button:not([disabled]) {
+.arcana-grid .arcana-grid-datatable-footer ul li:not(.current):hover>button:not([disabled]) {
     background-color: var(--arcana-row-hover);
 }
 
-.spark-grid .spark-grid-datatable-search-row {
+.arcana-grid .arcana-grid-datatable-search-row {
     z-index: 0;
     display: flex;
 }
 
-.spark-grid .spark-grid-datatable-search-row .spark-grid-datatable-search-row-cell {
+.arcana-grid .arcana-grid-datatable-search-row .arcana-grid-datatable-search-row-cell {
     background: var(--arcana-surface);
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
@@ -240,26 +240,26 @@
     padding: 10px;
 }
 
-.spark-grid .spark-grid-datatable-search-row .spark-grid-datatable-search-row-cell input,
-.spark-grid .spark-grid-datatable-search-row .spark-grid-datatable-search-row-cell select {
+.arcana-grid .arcana-grid-datatable-search-row .arcana-grid-datatable-search-row-cell input,
+.arcana-grid .arcana-grid-datatable-search-row .arcana-grid-datatable-search-row-cell select {
     z-index: 0 !important;
 }
 
-.spark-grid .spark-grid-datatable-search-row .spark-grid-datatable-search-row-cell:first-child {
+.arcana-grid .arcana-grid-datatable-search-row .arcana-grid-datatable-search-row-cell:first-child {
     border-left: 1px solid transparent;
 }
 
-.spark-grid .spark-grid-datatable-search-row .spark-grid-datatable-search-row-cell:last-child {
+.arcana-grid .arcana-grid-datatable-search-row .arcana-grid-datatable-search-row-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .spark-grid-datatable-search-row .has-feedback.has-feedback-left select,
-.spark-grid .spark-grid-datatable-search-row .has-feedback.has-feedback-left input {
+.arcana-grid .arcana-grid-datatable-search-row .has-feedback.has-feedback-left select,
+.arcana-grid .arcana-grid-datatable-search-row .has-feedback.has-feedback-left input {
     padding-left: 33px;
     padding-right: 0 !important;
 }
 
-.spark-grid .spark-grid-datatable-select {
+.arcana-grid .arcana-grid-datatable-select {
     width: 100%;
     padding: 6px 8px;
     border: 1px solid var(--arcana-select-border);
@@ -269,23 +269,23 @@
     cursor: pointer;
 }
 
-.spark-grid .spark-grid-datatable-select:hover {
+.arcana-grid .arcana-grid-datatable-select:hover {
     border-color: var(--arcana-select-border-hover);
 }
 
-.spark-grid .spark-grid-datatable-select:focus {
+.arcana-grid .arcana-grid-datatable-select:focus {
     outline: none;
     border-color: var(--arcana-select-focus);
 }
 
-.spark-grid .spark-grid-pages {
+.arcana-grid .arcana-grid-pages {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.spark-grid .spark-grid__per-page {
+.arcana-grid .arcana-grid__per-page {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
@@ -293,14 +293,14 @@
     white-space: nowrap;
 }
 
-.spark-grid .spark-grid__per-page .spark-grid-datatable-select {
+.arcana-grid .arcana-grid__per-page .arcana-grid-datatable-select {
     width: auto;
     min-width: 4rem;
     max-width: max-content;
     flex: 0 0 auto;
 }
 
-.spark-grid .spark-grid__pagination-group {
+.arcana-grid .arcana-grid__pagination-group {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -308,24 +308,24 @@
     margin-left: auto;
 }
 
-.spark-grid .spark-grid__info,
-.spark-grid .spark-grid-selected-rows {
+.arcana-grid .arcana-grid__info,
+.arcana-grid .arcana-grid-selected-rows {
     white-space: nowrap;
 }
 
-.spark-grid .input-wrapper {
+.arcana-grid .input-wrapper {
     position: relative;
 }
 
-.spark-grid .clear-input {
+.arcana-grid .clear-input {
     cursor: pointer;
 }
 
-.spark-grid .spark-grid-datatable-header {
+.arcana-grid .arcana-grid-datatable-header {
     display: flex;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell {
     border-top: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
     border-right: 1px solid transparent;
@@ -340,43 +340,43 @@
     padding: 8px 10px;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell .fa-solid.fa-sort {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell .fa-solid.fa-sort {
     color: var(--arcana-sort-idle);
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-header-order {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-header-order {
     cursor: pointer;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-header-order:hover {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-header-order:hover {
     background: var(--arcana-header-hover);
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-header-order:hover .fa-solid.fa-sort {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-header-order:hover .fa-solid.fa-sort {
     color: var(--arcana-sort-hover) !important;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-cell-center-alignment {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-cell-left-alignment {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-cell-right-alignment {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell:first-child {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell:first-child {
     border-left: 1px solid transparent;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell:last-child {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .spark-grid-datatable-summarizer-cell {
+.arcana-grid .arcana-grid-datatable-summarizer-cell {
     border-top: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
     border-collapse: collapse;
@@ -387,40 +387,40 @@
     border-bottom: 1px solid var(--arcana-border-strong);
 }
 
-.spark-grid .spark-grid-datatable-summarizer-cell.spark-grid-datatable-cell-center-alignment {
+.arcana-grid .arcana-grid-datatable-summarizer-cell.arcana-grid-datatable-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .spark-grid-datatable-summarizer-cell.spark-grid-datatable-cell-left-alignment {
+.arcana-grid .arcana-grid-datatable-summarizer-cell.arcana-grid-datatable-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .spark-grid-datatable-summarizer-cell.spark-grid-datatable-cell-right-alignment {
+.arcana-grid .arcana-grid-datatable-summarizer-cell.arcana-grid-datatable-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .spark-grid-datatable-summarizer-cell:first-child {
+.arcana-grid .arcana-grid-datatable-summarizer-cell:first-child {
     border-left: none;
 }
 
-.spark-grid .spark-grid-datatable-summarizer-cell:last-child {
+.arcana-grid .arcana-grid-datatable-summarizer-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .spark-grid-datatable-header-sticky {
+.arcana-grid .arcana-grid-datatable-header-sticky {
     position: sticky;
     top: 0;
     z-index: 200;
 }
 
-.spark-grid .spark-grid-datatable-summarizer-sticky {
+.arcana-grid .arcana-grid-datatable-summarizer-sticky {
     position: sticky;
     bottom: 0;
     z-index: 200;
 }
 
 /* Mobile filter trigger is hidden by default, shown on small screens */
-.spark-grid .spark-grid-datatable-mobile-filters {
+.arcana-grid .arcana-grid-datatable-mobile-filters {
     display: none;
 }
 
@@ -429,59 +429,59 @@
    ============================================ */
 
 /* Wrapper for horizontal scroll on mobile */
-.spark-grid .spark-grid-datatable-wrapper {
+.arcana-grid .arcana-grid-datatable-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
 /* HORIZONTAL_OVERFLOW mode — force horizontal scroll on mobile (grids without vertical-record class) */
 @media screen and (max-width: 768px) {
-    .spark-grid:not(.spark-grid-responsive-vertical) .spark-grid-body > div {
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .arcana-grid-body > div {
         min-width: max-content;
     }
 
-    .spark-grid:not(.spark-grid-responsive-vertical) .grid-body > div {
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .grid-body > div {
         min-width: max-content;
     }
 
     /* Protect grid rows from external flex overrides (e.g. .flex { flex-direction: column }) */
-    .spark-grid:not(.spark-grid-responsive-vertical) .spark-grid-datatable-body > .spark-grid-datatable-row,
-    .spark-grid:not(.spark-grid-responsive-vertical) .grid-body > .grid-row {
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .arcana-grid-datatable-body > .arcana-grid-datatable-row,
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .grid-body > .grid-row {
         flex-direction: row !important;
     }
 
-    .spark-grid:not(.spark-grid-responsive-vertical) .spark-grid-datatable-header,
-    .spark-grid:not(.spark-grid-responsive-vertical) .grid-header {
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .arcana-grid-datatable-header,
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .grid-header {
         flex-direction: row !important;
     }
 
-    .spark-grid:not(.spark-grid-responsive-vertical) .spark-grid-datatable-search-row,
-    .spark-grid:not(.spark-grid-responsive-vertical) .grid-search-row {
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .arcana-grid-datatable-search-row,
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .grid-search-row {
         flex-direction: row !important;
     }
 
-    .spark-grid:not(.spark-grid-responsive-vertical) .spark-grid-datatable-footer {
+    .arcana-grid:not(.arcana-grid-responsive-vertical) .arcana-grid-datatable-footer {
         flex-direction: row !important;
     }
 }
 
 /* Mobile/Tablet breakpoint (768px and below) — vertical card layout (VERTICAL_RECORD mode only) */
 @media screen and (max-width: 768px) {
-    .spark-grid-responsive-vertical.grid-wrapper {
+    .arcana-grid-responsive-vertical.grid-wrapper {
         border-left: none;
         border-right: none;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-body {
+    .arcana-grid-responsive-vertical .arcana-grid-body {
         background: transparent !important;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filters {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filters {
         display: block;
         padding: 10px 0 6px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-trigger {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-trigger {
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -496,18 +496,18 @@
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-icon {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-icon {
         display: inline-flex;
         width: 18px;
         height: 18px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-icon svg {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-icon svg {
         width: 18px;
         height: 18px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-backdrop {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-backdrop {
         position: fixed;
         inset: 0;
         background: rgba(15, 23, 42, 0.4);
@@ -518,7 +518,7 @@
         padding: 12px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-dialog {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-dialog {
         width: 100%;
         max-width: 520px;
         background: #ffffff;
@@ -530,7 +530,7 @@
         max-height: 85vh;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-header {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -539,13 +539,13 @@
         background: #f8fafc;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-title {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-title {
         font-size: 14px;
         font-weight: 700;
         color: #0f172a;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-close {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-close {
         border: none;
         background: transparent;
         font-size: 18px;
@@ -554,7 +554,7 @@
         padding: 4px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-body {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-body {
         padding: 16px;
         display: flex;
         flex-direction: column;
@@ -562,19 +562,19 @@
         overflow-y: auto;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-field {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-field {
         display: flex;
         flex-direction: column;
         gap: 6px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-field-label {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-field-label {
         font-size: 12px;
         font-weight: 600;
         color: #475569;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-footer {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-footer {
         padding: 12px 16px 16px;
         border-top: 1px solid #e2e8f0;
         background: #f8fafc;
@@ -582,7 +582,7 @@
         justify-content: flex-end;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-mobile-filter-apply {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-mobile-filter-apply {
         border: 1px solid #cbd5f5;
         background: #3b82f6;
         color: #ffffff;
@@ -592,48 +592,48 @@
         cursor: pointer;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-header,
-    .spark-grid-responsive-vertical .grid-header {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-header,
+    .arcana-grid-responsive-vertical .grid-header {
         display: none !important;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-search-row,
-    .spark-grid-responsive-vertical .grid-search-row {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-search-row,
+    .arcana-grid-responsive-vertical .grid-search-row {
         display: none !important;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-footer {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-footer {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-footer .spark-grid-pages,
-    .spark-grid-responsive-vertical .spark-grid-datatable-footer .grid-footer>div {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-footer .arcana-grid-pages,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-footer .grid-footer>div {
         flex-direction: column;
         align-items: center;
         gap: 8px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-footer ul {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-footer ul {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 4px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-footer ul li {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-footer ul li {
         display: inline-flex;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-footer ul li>button {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-footer ul li>button {
         min-width: 40px;
         min-height: 40px;
         padding: 10px;
         font-size: 14px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-select {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-select {
         min-height: 40px;
         font-size: 14px;
     }
@@ -641,20 +641,20 @@
 
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
-    .spark-grid .spark-grid-datatable-footer ul li>button {
+    .arcana-grid .arcana-grid-datatable-footer ul li>button {
         min-width: 44px;
         min-height: 44px;
     }
 
-    .spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.spark-grid-datatable-header-order {
+    .arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.arcana-grid-datatable-header-order {
         padding: 12px 10px;
     }
 
-    .spark-grid .spark-grid-datatable-select {
+    .arcana-grid .arcana-grid-datatable-select {
         min-height: 44px;
     }
 
-    .spark-grid .spark-grid-datatable-cell {
+    .arcana-grid .arcana-grid-datatable-cell {
         padding: 10px 8px;
     }
 }
@@ -663,44 +663,44 @@
    GRID CLASS COMPATIBILITY
    ============================================ */
 
-.spark-grid.grid-wrapper {
+.arcana-grid.grid-wrapper {
     border-right: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-.spark-grid .spark-grid-body,
-.spark-grid .grid-body {
+.arcana-grid .arcana-grid-body,
+.arcana-grid .grid-body {
     z-index: 0;
     position: relative;
     background: var(--arcana-bg);
 }
 
-.spark-grid .grid-body>.grid-row {
+.arcana-grid .grid-body>.grid-row {
     display: flex;
 }
 
-.spark-grid .grid-body .grid-row:last-child .grid-cell,
-.spark-grid .grid-body .grid-row:last-child .spark-grid-datatable-cell {
+.arcana-grid .grid-body .grid-row:last-child .grid-cell,
+.arcana-grid .grid-body .grid-row:last-child .arcana-grid-datatable-cell {
     border-bottom: 1px solid var(--arcana-border);
 }
 
-.spark-grid .grid-row-focused .grid-cell,
-.spark-grid .grid-row-focused .spark-grid-datatable-cell {
+.arcana-grid .grid-row-focused .grid-cell,
+.arcana-grid .grid-row-focused .arcana-grid-datatable-cell {
     background: var(--arcana-row-focused) !important;
 }
 
-.spark-grid .grid-row-checked .grid-cell,
-.spark-grid .grid-row-checked .spark-grid-datatable-cell {
+.arcana-grid .grid-row-checked .grid-cell,
+.arcana-grid .grid-row-checked .arcana-grid-datatable-cell {
     background: var(--arcana-row-checked) !important;
 }
 
-.spark-grid .grid-cell-focused {
+.arcana-grid .grid-cell-focused {
     border: 1px solid var(--arcana-cell-focus) !important;
 }
 
-.spark-grid .grid-cell {
+.arcana-grid .grid-cell {
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
@@ -713,30 +713,30 @@
     font-size: 12px;
 }
 
-.spark-grid .grid-cell.grid-cell-center-alignment,
-.spark-grid .spark-grid-datatable-cell.grid-cell-center-alignment {
+.arcana-grid .grid-cell.grid-cell-center-alignment,
+.arcana-grid .arcana-grid-datatable-cell.grid-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .grid-cell.grid-cell-left-alignment,
-.spark-grid .spark-grid-datatable-cell.grid-cell-left-alignment {
+.arcana-grid .grid-cell.grid-cell-left-alignment,
+.arcana-grid .arcana-grid-datatable-cell.grid-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .grid-cell.grid-cell-right-alignment,
-.spark-grid .spark-grid-datatable-cell.grid-cell-right-alignment {
+.arcana-grid .grid-cell.grid-cell-right-alignment,
+.arcana-grid .arcana-grid-datatable-cell.grid-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .grid-cell:first-child {
+.arcana-grid .grid-cell:first-child {
     border-left: 1px solid transparent;
 }
 
-.spark-grid .grid-cell:last-child {
+.arcana-grid .grid-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .grid-cell .cell-has-comment {
+.arcana-grid .grid-cell .cell-has-comment {
     width: 0;
     height: 0;
     border-left: 10px solid transparent;
@@ -748,7 +748,7 @@
     transform: rotate(225deg);
 }
 
-.spark-grid .grid-footer {
+.arcana-grid .grid-footer {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -759,30 +759,30 @@
     font-size: 12px;
 }
 
-.spark-grid .grid-footer .spark-grid-pages ul {
+.arcana-grid .grid-footer .arcana-grid-pages ul {
     float: right;
 }
 
-.spark-grid .grid-footer .spark-grid-pages ul li:not(.current):hover button:enabled {
+.arcana-grid .grid-footer .arcana-grid-pages ul li:not(.current):hover button:enabled {
     background-color: var(--arcana-pagination-hover) !important;
 }
 
-.spark-grid .grid-footer>* {
+.arcana-grid .grid-footer>* {
     flex: 1;
 }
 
-.spark-grid .grid-footer ul {
+.arcana-grid .grid-footer ul {
     display: inline-block;
     padding: 0px;
     margin: 0px;
     list-style: none;
 }
 
-.spark-grid .grid-footer ul li {
+.arcana-grid .grid-footer ul li {
     display: inline-block;
 }
 
-.spark-grid .grid-footer ul li>button {
+.arcana-grid .grid-footer ul li>button {
     padding: 5px;
     min-width: 30px;
     margin-left: 2px;
@@ -795,28 +795,28 @@
     border-radius: 3px;
 }
 
-.spark-grid .grid-footer ul li>button[disabled] {
+.arcana-grid .grid-footer ul li>button[disabled] {
     color: var(--arcana-text-disabled);
     cursor: default;
 }
 
-.spark-grid .grid-footer ul li.current>button {
+.arcana-grid .grid-footer ul li.current>button {
     color: var(--arcana-accent-contrast);
     background-color: var(--arcana-accent);
     cursor: default;
 }
 
-.spark-grid .grid-footer ul li:not(.current):hover>button:not([disabled]) {
+.arcana-grid .grid-footer ul li:not(.current):hover>button:not([disabled]) {
     background-color: var(--arcana-row-hover);
 }
 
-.spark-grid .grid-search-row {
+.arcana-grid .grid-search-row {
     z-index: 0;
     display: flex;
 }
 
-.spark-grid .grid-search-row .grid-search-row-cell,
-.spark-grid .grid-search-row .spark-grid-datatable-header-cell {
+.arcana-grid .grid-search-row .grid-search-row-cell,
+.arcana-grid .grid-search-row .arcana-grid-datatable-header-cell {
     background: var(--arcana-surface);
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
@@ -825,34 +825,34 @@
     padding: 10px;
 }
 
-.spark-grid .grid-search-row .grid-search-row-cell input,
-.spark-grid .grid-search-row .grid-search-row-cell select,
-.spark-grid .grid-search-row .spark-grid-datatable-header-cell input,
-.spark-grid .grid-search-row .spark-grid-datatable-header-cell select {
+.arcana-grid .grid-search-row .grid-search-row-cell input,
+.arcana-grid .grid-search-row .grid-search-row-cell select,
+.arcana-grid .grid-search-row .arcana-grid-datatable-header-cell input,
+.arcana-grid .grid-search-row .arcana-grid-datatable-header-cell select {
     z-index: 0 !important;
 }
 
-.spark-grid .grid-search-row .grid-search-row-cell:first-child,
-.spark-grid .grid-search-row .spark-grid-datatable-header-cell:first-child {
+.arcana-grid .grid-search-row .grid-search-row-cell:first-child,
+.arcana-grid .grid-search-row .arcana-grid-datatable-header-cell:first-child {
     border-left: 1px solid transparent;
 }
 
-.spark-grid .grid-search-row .grid-search-row-cell:last-child,
-.spark-grid .grid-search-row .spark-grid-datatable-header-cell:last-child {
+.arcana-grid .grid-search-row .grid-search-row-cell:last-child,
+.arcana-grid .grid-search-row .arcana-grid-datatable-header-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .grid-search-row .has-feedback.has-feedback-left select,
-.spark-grid .grid-search-row .has-feedback.has-feedback-left input {
+.arcana-grid .grid-search-row .has-feedback.has-feedback-left select,
+.arcana-grid .grid-search-row .has-feedback.has-feedback-left input {
     padding-left: 33px;
     padding-right: 0 !important;
 }
 
-.spark-grid .grid-header {
+.arcana-grid .grid-header {
     display: flex;
 }
 
-.spark-grid .grid-header .grid-header-cell {
+.arcana-grid .grid-header .grid-header-cell {
     border-top: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
     border-right: 1px solid transparent;
@@ -867,59 +867,59 @@
     padding: 8px 10px;
 }
 
-.spark-grid .grid-header .grid-header-cell .fa-solid.fa-sort {
+.arcana-grid .grid-header .grid-header-cell .fa-solid.fa-sort {
     color: var(--arcana-sort-idle);
 }
 
-.spark-grid .grid-header .grid-header-cell.grid-header-order {
+.arcana-grid .grid-header .grid-header-cell.grid-header-order {
     cursor: pointer;
 }
 
-.spark-grid .grid-header .grid-header-cell.grid-header-order:hover {
+.arcana-grid .grid-header .grid-header-cell.grid-header-order:hover {
     background: var(--arcana-header-hover);
 }
 
-.spark-grid .grid-header .grid-header-cell.grid-header-order:hover .fa-solid.fa-sort {
+.arcana-grid .grid-header .grid-header-cell.grid-header-order:hover .fa-solid.fa-sort {
     color: var(--arcana-sort-hover) !important;
 }
 
-.spark-grid .grid-header .grid-header-cell.grid-cell-center-alignment {
+.arcana-grid .grid-header .grid-header-cell.grid-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .grid-header .grid-header-cell.grid-cell-left-alignment {
+.arcana-grid .grid-header .grid-header-cell.grid-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .grid-header .grid-header-cell.grid-cell-right-alignment {
+.arcana-grid .grid-header .grid-header-cell.grid-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.grid-cell-center-alignment {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.grid-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.grid-cell-left-alignment {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.grid-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .spark-grid-datatable-header .spark-grid-datatable-header-cell.grid-cell-right-alignment {
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell.grid-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .grid-header .grid-header-cell:first-child {
+.arcana-grid .grid-header .grid-header-cell:first-child {
     border-left: 1px solid transparent;
 }
 
-.spark-grid .grid-header .grid-header-cell:last-child {
+.arcana-grid .grid-header .grid-header-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .grid-summarizer {
+.arcana-grid .grid-summarizer {
     display: flex;
 }
 
-.spark-grid .grid-summarizer-cell {
+.arcana-grid .grid-summarizer-cell {
     border-top: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
     border-collapse: collapse;
@@ -931,88 +931,88 @@
     padding: 8px 10px;
 }
 
-.spark-grid .grid-summarizer-cell.grid-cell-center-alignment,
-.spark-grid .spark-grid-datatable-summarizer-cell.grid-cell-center-alignment {
+.arcana-grid .grid-summarizer-cell.grid-cell-center-alignment,
+.arcana-grid .arcana-grid-datatable-summarizer-cell.grid-cell-center-alignment {
     justify-content: center;
 }
 
-.spark-grid .grid-summarizer-cell.grid-cell-left-alignment,
-.spark-grid .spark-grid-datatable-summarizer-cell.grid-cell-left-alignment {
+.arcana-grid .grid-summarizer-cell.grid-cell-left-alignment,
+.arcana-grid .arcana-grid-datatable-summarizer-cell.grid-cell-left-alignment {
     justify-content: start;
 }
 
-.spark-grid .grid-summarizer-cell.grid-cell-right-alignment,
-.spark-grid .spark-grid-datatable-summarizer-cell.grid-cell-right-alignment {
+.arcana-grid .grid-summarizer-cell.grid-cell-right-alignment,
+.arcana-grid .arcana-grid-datatable-summarizer-cell.grid-cell-right-alignment {
     justify-content: end;
 }
 
-.spark-grid .grid-summarizer-cell:first-child {
+.arcana-grid .grid-summarizer-cell:first-child {
     border-left: none;
 }
 
-.spark-grid .grid-summarizer-cell:last-child {
+.arcana-grid .grid-summarizer-cell:last-child {
     border-right: 1px solid var(--arcana-border);
 }
 
-.spark-grid .grid-header-sticky {
+.arcana-grid .grid-header-sticky {
     position: sticky;
     top: 0;
     z-index: 200;
 }
 
-.spark-grid .grid-summarizer-sticky {
+.arcana-grid .grid-summarizer-sticky {
     position: sticky;
     bottom: 0;
     z-index: 200;
 }
 
 @media screen and (max-width: 768px) {
-    .spark-grid-responsive-vertical .spark-grid__pagination-group {
+    .arcana-grid-responsive-vertical .arcana-grid__pagination-group {
         justify-content: center;
         flex-wrap: wrap;
         margin-left: 0;
     }
 
-    .spark-grid-responsive-vertical .grid-footer {
+    .arcana-grid-responsive-vertical .grid-footer {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
 
-    .spark-grid-responsive-vertical .grid-footer .spark-grid-pages,
-    .spark-grid-responsive-vertical .grid-footer>div {
+    .arcana-grid-responsive-vertical .grid-footer .arcana-grid-pages,
+    .arcana-grid-responsive-vertical .grid-footer>div {
         flex-direction: column;
         align-items: center;
         gap: 8px;
     }
 
-    .spark-grid-responsive-vertical .grid-footer ul {
+    .arcana-grid-responsive-vertical .grid-footer ul {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 4px;
     }
 
-    .spark-grid-responsive-vertical .grid-footer ul li {
+    .arcana-grid-responsive-vertical .grid-footer ul li {
         display: inline-flex;
     }
 
-    .spark-grid-responsive-vertical .grid-footer ul li>button {
+    .arcana-grid-responsive-vertical .grid-footer ul li>button {
         min-width: 40px;
         min-height: 40px;
         padding: 10px;
         font-size: 14px;
     }
 
-    .spark-grid-responsive-vertical .grid-body,
-    .spark-grid-responsive-vertical .spark-grid-datatable-body {
+    .arcana-grid-responsive-vertical .grid-body,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-body {
         display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    .spark-grid-responsive-vertical .grid-row,
-    .spark-grid-responsive-vertical .spark-grid-datatable-row {
+    .arcana-grid-responsive-vertical .grid-row,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row {
         flex-wrap: wrap;
         border: 1px solid var(--arcana-border);
         border-radius: 8px;
@@ -1020,7 +1020,7 @@
         background: var(--arcana-surface);
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-row-action-bar {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row-action-bar {
         display: flex !important;
         flex: 1;
         justify-content: flex-end;
@@ -1031,7 +1031,7 @@
         border-bottom: 1px solid #e2e8f0;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-row-action {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row-action {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
@@ -1046,19 +1046,19 @@
         box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-row-action-icon {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row-action-icon {
         display: inline-flex;
         width: 18px;
         height: 18px;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-row-action-icon svg {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row-action-icon svg {
         width: 18px;
         height: 18px;
     }
 
-    .spark-grid-responsive-vertical .grid-cell,
-    .spark-grid-responsive-vertical .spark-grid-datatable-cell {
+    .arcana-grid-responsive-vertical .grid-cell,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-cell {
         min-width: 100% !important;
         max-width: 100% !important;
         width: 100% !important;
@@ -1075,7 +1075,7 @@
     }
 
     /* Selection cell (checkbox/radio) — compact header row */
-    .spark-grid-responsive-vertical .spark-grid-selection-cell {
+    .arcana-grid-responsive-vertical .arcana-grid-selection-cell {
         min-width: auto !important;
         max-width: auto !important;
         width: auto !important;
@@ -1090,41 +1090,41 @@
         background: #f8fafc;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-selection-cell::before {
+    .arcana-grid-responsive-vertical .arcana-grid-selection-cell::before {
         content: none !important;
     }
 
-    .spark-grid-responsive-vertical .grid-cell::before,
-    .spark-grid-responsive-vertical .spark-grid-datatable-cell::before {
+    .arcana-grid-responsive-vertical .grid-cell::before,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-cell::before {
         content: attr(data-label);
         font-weight: 600;
         color: #546e7a;
     }
 
-    .spark-grid-responsive-vertical .grid-cell[data-label=""]::before,
-    .spark-grid-responsive-vertical .spark-grid-datatable-cell[data-label=""]::before {
+    .arcana-grid-responsive-vertical .grid-cell[data-label=""]::before,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-cell[data-label=""]::before {
         content: "";
     }
 
-    .spark-grid-responsive-vertical .grid-row>.grid-cell:first-child,
-    .spark-grid-responsive-vertical .grid-row>.spark-grid-datatable-cell:first-child,
-    .spark-grid-responsive-vertical .spark-grid-datatable-row>.spark-grid-datatable-cell:first-child,
-    .spark-grid-responsive-vertical .spark-grid-datatable-row>.grid-cell:first-child {
+    .arcana-grid-responsive-vertical .grid-row>.grid-cell:first-child,
+    .arcana-grid-responsive-vertical .grid-row>.arcana-grid-datatable-cell:first-child,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row>.arcana-grid-datatable-cell:first-child,
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-row>.grid-cell:first-child {
         border-top: none;
     }
 
-    .spark-grid-responsive-vertical .spark-grid-datatable-select {
+    .arcana-grid-responsive-vertical .arcana-grid-datatable-select {
         min-height: 40px;
         font-size: 14px;
     }
 }
 
-.spark-grid .spark-grid-datatable-row-action,
-.spark-grid .spark-grid-datatable-row-action-bar {
+.arcana-grid .arcana-grid-datatable-row-action,
+.arcana-grid .arcana-grid-datatable-row-action-bar {
     display: none;
 }
 
-.spark-grid-datatable-mobile-filter-open {
+.arcana-grid-datatable-mobile-filter-open {
     overflow: hidden;
 }
 
@@ -1134,11 +1134,11 @@
    (`.grid-detail-row`). Everything runs on `--arcana-*` tokens, so the four
    presets (including midnight) are covered automatically.
    ============================================ */
-.spark-grid .grid-expand-cell {
+.arcana-grid .grid-expand-cell {
     justify-content: center;
 }
 
-.spark-grid .grid-expand-toggle {
+.arcana-grid .grid-expand-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1153,12 +1153,12 @@
     transition: background-color 100ms ease, color 100ms ease;
 }
 
-.spark-grid .grid-expand-toggle:hover {
+.arcana-grid .grid-expand-toggle:hover {
     background: var(--arcana-item-hover);
     color: var(--arcana-ink);
 }
 
-.spark-grid .grid-expand-toggle svg {
+.arcana-grid .grid-expand-toggle svg {
     width: 14px;
     height: 14px;
     fill: none;
@@ -1166,16 +1166,16 @@
     transition: transform 150ms ease;
 }
 
-.spark-grid .grid-expand-toggle.is-open svg {
+.arcana-grid .grid-expand-toggle.is-open svg {
     transform: rotate(90deg);
 }
 
-.spark-grid .grid-detail-row {
+.arcana-grid .grid-detail-row {
     display: flex;
     width: 100%;
 }
 
-.spark-grid .grid-detail-cell {
+.arcana-grid .grid-detail-cell {
     flex: 1;
     min-width: 0;
     padding: 12px 14px;
@@ -1185,11 +1185,11 @@
     font-size: 12px;
 }
 
-.spark-grid .grid-body > .grid-detail-row:last-child .grid-detail-cell {
+.arcana-grid .grid-body > .grid-detail-row:last-child .grid-detail-cell {
     border-bottom: 1px solid var(--arcana-border);
 }
 
-.spark-grid .grid-detail-loading {
+.arcana-grid .grid-detail-loading {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1197,7 +1197,7 @@
     font-size: 12px;
 }
 
-.spark-grid .grid-detail-spinner {
+.arcana-grid .grid-detail-spinner {
     display: inline-block;
     width: 14px;
     height: 14px;
@@ -1212,7 +1212,7 @@
     to { transform: rotate(360deg); }
 }
 
-.spark-grid .grid-detail-error {
+.arcana-grid .grid-detail-error {
     color: var(--arcana-text-muted);
     font-size: 12px;
     font-style: italic;
@@ -1221,24 +1221,24 @@
 /* VERTICAL_RECORD: the detail area becomes a full-width block right below
    the row card, without breaking the card layout. */
 @media screen and (max-width: 768px) {
-    .spark-grid-responsive-vertical .grid-detail-row {
+    .arcana-grid-responsive-vertical .grid-detail-row {
         width: 100%;
         margin-top: -6px;
     }
 
-    .spark-grid-responsive-vertical .grid-detail-cell {
+    .arcana-grid-responsive-vertical .grid-detail-cell {
         border: 1px solid var(--arcana-border);
         border-radius: 8px;
     }
 
-    .spark-grid-responsive-vertical .grid-row .grid-expand-cell.spark-grid-selection-cell {
+    .arcana-grid-responsive-vertical .grid-row .grid-expand-cell.arcana-grid-selection-cell {
         border-bottom: 1px solid var(--arcana-border);
         background: var(--arcana-surface-muted);
     }
 }
 
-.spark-grid .arcana-grid-status,
-.spark-grid .arcana-grid-error {
+.arcana-grid .arcana-grid-status,
+.arcana-grid .arcana-grid-error {
     width: 100%;
     padding: 48px 20px;
     border-top: 1px solid var(--arcana-border);
@@ -1248,7 +1248,7 @@
     text-align: center;
 }
 
-.spark-grid .arcana-grid-error {
+.arcana-grid .arcana-grid-error {
     padding: 10px 14px;
     border: 1px solid #fecaca;
     background: #fff1f2;
@@ -1256,7 +1256,7 @@
     text-align: left;
 }
 
-.spark-grid .arcana-sort {
+.arcana-grid .arcana-sort {
     margin-left: auto;
     padding-left: 8px;
     color: var(--arcana-sort-hint);
@@ -1267,7 +1267,7 @@
 }
 
 /* Multi-column sort: the 1-based priority number next to the arrow. */
-.spark-grid .arcana-sort-priority {
+.arcana-grid .arcana-sort-priority {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1283,7 +1283,7 @@
 }
 
 /* Drag-to-resize handle on the right edge of each header cell. */
-.spark-grid .grid-header .grid-header-cell .arcana-col-resizer {
+.arcana-grid .grid-header .grid-header-cell .arcana-col-resizer {
     position: absolute;
     top: 0;
     right: -3px;
@@ -1295,7 +1295,7 @@
     user-select: none;
 }
 
-.spark-grid .grid-header .grid-header-cell .arcana-col-resizer::before {
+.arcana-grid .grid-header .grid-header-cell .arcana-col-resizer::before {
     content: "";
     position: absolute;
     top: 20%;
@@ -1307,8 +1307,8 @@
     transition: background 0.12s ease;
 }
 
-.spark-grid .grid-header .grid-header-cell .arcana-col-resizer:hover::before,
-.spark-grid .grid-header .grid-header-cell .arcana-col-resizer:active::before {
+.arcana-grid .grid-header .grid-header-cell .arcana-col-resizer:hover::before,
+.arcana-grid .grid-header .grid-header-cell .arcana-col-resizer:active::before {
     background: var(--arcana-sort-menu-active, #1467b8);
 }
 
@@ -1318,7 +1318,7 @@
 
 /* Dragged header cell: translucent + tinted with the indicator color, so it
    is obvious which column is in flight while the pointer moves. */
-.spark-grid .grid-header .grid-header-cell.arcana-col-dragging {
+.arcana-grid .grid-header .grid-header-cell.arcana-col-dragging {
     opacity: 0.5;
     cursor: grabbing;
     background: var(--arcana-header-hover);
@@ -1360,7 +1360,7 @@
    session measures the header positions before/after `moveColumn`, applies
    the inverse transform inline and lets this class transition it to zero.
    The column's own gap is the drop indicator — there is no drop line. */
-.spark-grid .grid-header .grid-header-cell.arcana-header-flip {
+.arcana-grid .grid-header .grid-header-cell.arcana-header-flip {
     transition: transform 150ms ease-out;
     will-change: transform;
 }
@@ -1370,42 +1370,42 @@
         transform: none;
     }
 
-    .spark-grid .grid-header .grid-header-cell.arcana-header-flip {
+    .arcana-grid .grid-header .grid-header-cell.arcana-header-flip {
         transition: none;
     }
 }
 
 /* Pinned (frozen) cells stay opaque so scrolled content passes behind them. */
-.spark-grid .grid-cell.arcana-pin {
+.arcana-grid .grid-cell.arcana-pin {
     background: var(--arcana-surface);
     z-index: 1;
 }
 
-.spark-grid .grid-header-cell.arcana-pin {
+.arcana-grid .grid-header-cell.arcana-pin {
     z-index: 6;
 }
 
-.spark-grid .grid-summarizer-cell.arcana-pin {
+.arcana-grid .grid-summarizer-cell.arcana-pin {
     z-index: 6;
 }
 
-.spark-grid .grid-search-row-cell.arcana-pin {
+.arcana-grid .grid-search-row-cell.arcana-pin {
     background: var(--arcana-surface);
     z-index: 5;
 }
 
 /* Subtle divider/shadow separating the frozen region from the scrollable one. */
-.spark-grid .arcana-pin-left-edge {
+.arcana-grid .arcana-pin-left-edge {
     box-shadow: 6px 0 8px -6px var(--arcana-pin-shadow);
     border-right: 1px solid var(--arcana-pin-border) !important;
 }
 
-.spark-grid .arcana-pin-right-edge {
+.arcana-grid .arcana-pin-right-edge {
     box-shadow: -6px 0 8px -6px var(--arcana-pin-shadow);
     border-left: 1px solid var(--arcana-pin-border) !important;
 }
 
-.spark-grid .spark-grid-datatable-input {
+.arcana-grid .arcana-grid-datatable-input {
     box-sizing: border-box;
     width: 100%;
     min-height: 30px;
@@ -1417,14 +1417,14 @@
     font: inherit;
 }
 
-.spark-grid .spark-grid-datatable-input:focus,
-.spark-grid .spark-grid-datatable-select:focus,
-.spark-grid button:focus-visible {
+.arcana-grid .arcana-grid-datatable-input:focus,
+.arcana-grid .arcana-grid-datatable-select:focus,
+.arcana-grid button:focus-visible {
     outline: 2px solid var(--arcana-focus-ring);
     outline-offset: 2px;
 }
 
-.spark-grid .arcana-context-menu,
+.arcana-grid .arcana-context-menu,
 .arcana-context-menu {
     position: fixed;
     z-index: 10000;
@@ -1449,7 +1449,7 @@
 .arcana-context-menu button:hover { background: var(--arcana-menu-hover, #eef5f6); }
 
 /* Checkboxes internos do grid — estilo shadcn (temável via tokens) */
-.spark-grid input[type="checkbox"] {
+.arcana-grid input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     width: 16px;
@@ -1463,10 +1463,10 @@
     vertical-align: middle;
     transition: background-color .12s, border-color .12s;
 }
-.spark-grid input[type="checkbox"]:hover:not(:disabled) {
+.arcana-grid input[type="checkbox"]:hover:not(:disabled) {
     border-color: var(--arcana-accent);
 }
-.spark-grid input[type="checkbox"]:checked {
+.arcana-grid input[type="checkbox"]:checked {
     border-color: var(--arcana-accent);
     background-color: var(--arcana-accent);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E");
@@ -1474,11 +1474,11 @@
     background-position: center;
     background-size: 12px 12px;
 }
-.spark-grid input[type="checkbox"]:focus-visible {
+.arcana-grid input[type="checkbox"]:focus-visible {
     outline: 2px solid var(--arcana-accent);
     outline-offset: 2px;
 }
-.spark-grid input[type="checkbox"]:disabled {
+.arcana-grid input[type="checkbox"]:disabled {
     opacity: .45;
     cursor: not-allowed;
 }
@@ -1536,16 +1536,16 @@
 .arcana-sort-menu .arcana-sort-menu__clear svg { color: #9f1239; }
 
 @media (hover: none) and (pointer: coarse) {
-    .spark-grid .grid-footer ul li>button {
+    .arcana-grid .grid-footer ul li>button {
         min-width: 44px;
         min-height: 44px;
     }
 
-    .spark-grid .grid-header .grid-header-cell.grid-header-order {
+    .arcana-grid .grid-header .grid-header-cell.grid-header-order {
         padding: 12px 10px;
     }
 
-    .spark-grid .grid-cell {
+    .arcana-grid .grid-cell {
         padding: 10px 8px;
     }
 }
@@ -1553,12 +1553,12 @@
 /* ============================================
    ARCANA FILTER CONTROLS — shadcn-style (zinc)
    Panels are teleported/portaled to <body>, so their rules are NOT
-   nested under .spark-grid. Classes are prefixed `arcana-` to avoid
+   nested under .arcana-grid. Classes are prefixed `arcana-` to avoid
    clashing with host apps that already ship shadcn-like classes.
    ============================================ */
 
 /* ── Free-text filter input: align the native input with the zinc theme ── */
-.spark-grid .grid-search-row .spark-grid-datatable-input {
+.arcana-grid .grid-search-row .arcana-grid-datatable-input {
     border-color: var(--arcana-input-border);
     border-radius: 6px;
     font-size: 12px;
@@ -1566,20 +1566,20 @@
     transition: border-color 150ms ease;
 }
 
-.spark-grid .grid-search-row .spark-grid-datatable-input::placeholder {
+.arcana-grid .grid-search-row .arcana-grid-datatable-input::placeholder {
     color: var(--arcana-text-placeholder);
 }
 
-.spark-grid .grid-search-row .spark-grid-datatable-input:hover:not(:disabled) {
+.arcana-grid .grid-search-row .arcana-grid-datatable-input:hover:not(:disabled) {
     border-color: var(--arcana-input-border-hover);
 }
 
-.spark-grid .grid-search-row .spark-grid-datatable-input:focus {
+.arcana-grid .grid-search-row .arcana-grid-datatable-input:focus {
     outline: none;
     border-color: var(--arcana-input-border-active);
 }
 
-.spark-grid .grid-search-row .spark-grid-datatable-input:disabled {
+.arcana-grid .grid-search-row .arcana-grid-datatable-input:disabled {
     background: var(--arcana-input-bg-disabled);
     color: var(--arcana-text-placeholder);
     cursor: not-allowed;
@@ -2286,6 +2286,6 @@
     color-scheme: dark;
 }
 
-.arcana-theme-midnight .spark-grid-datatable-select {
+.arcana-theme-midnight .arcana-grid-datatable-select {
     color: var(--arcana-input-text);
 }

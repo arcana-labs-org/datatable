@@ -346,7 +346,7 @@ export interface EventProxy {
   off?: (name: string, callback: (...args: unknown[]) => void) => void;
 }
 
-// Backwards-compatible names from spark-grid-vue.
+// Backwards-compatible names from arcana-grid-vue.
 export type Row = DataTableRow;
 export type Column = DataTableColumn;
 export type Action = DataTableAction;

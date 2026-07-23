@@ -6,7 +6,7 @@ export const globalConfig: {
   eventProxy?: EventProxy;
 } = {};
 
-/** Backwards-compatible name used by spark-grid-vue integrations. */
+/** Backwards-compatible name used by arcana-grid-vue integrations. */
 export const GlobalConfig = globalConfig;
 
 export function configureDataTable(options: ArcanaDataTableOptions = {}): void {

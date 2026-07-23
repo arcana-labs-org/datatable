@@ -49,7 +49,7 @@ describe("Angular adapter", () => {
     api.setRows([{ id: 1, name: "Ada" }]);
     fixture.detectChanges();
     expect(element.textContent).toContain("Ada");
-    const cell = element.querySelector(".grid-body .grid-cell:not(.spark-grid-selection-cell)");
+    const cell = element.querySelector(".grid-body .grid-cell:not(.arcana-grid-selection-cell)");
     click(cell);
     fixture.detectChanges();
     expect(element.querySelector(".grid-body .grid-row")?.classList.contains("grid-row-focused")).toBe(true);
@@ -211,8 +211,8 @@ describe("Angular adapter", () => {
     });
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(element.querySelector(".spark-grid__info")?.textContent).toBe("Showing 1 to 5 of 7");
-    expect(element.querySelector(".spark-grid__per-page")?.textContent).toContain("Per page:");
+    expect(element.querySelector(".arcana-grid__info")?.textContent).toBe("Showing 1 to 5 of 7");
+    expect(element.querySelector(".arcana-grid__per-page")?.textContent).toContain("Per page:");
     expect(element.querySelector(".grid-header")?.textContent).toContain("Actions");
     expect(element.querySelector('input[aria-label="Select all"]')).toBeTruthy();
     expect(element.querySelector('input[aria-label="Filter Name"]')).toBeTruthy();

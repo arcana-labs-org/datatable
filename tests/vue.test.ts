@@ -10,9 +10,9 @@ describe("Vue adapter", () => {
     wrapper.vm.setRows([{ id: 1, name: "Ada" }]);
     await wrapper.vm.$nextTick();
     expect(wrapper.text()).toContain("Ada");
-    await wrapper.find('.grid-cell:not(.spark-grid-selection-cell)').trigger("click");
+    await wrapper.find('.grid-cell:not(.arcana-grid-selection-cell)').trigger("click");
     expect(wrapper.find(".grid-body .grid-row").classes()).toContain("grid-row-focused");
-    expect(wrapper.find('.grid-cell:not(.spark-grid-selection-cell)').classes()).toContain("grid-cell-focused");
+    expect(wrapper.find('.grid-cell:not(.arcana-grid-selection-cell)').classes()).toContain("grid-cell-focused");
     expect(selectionStyle).toHaveBeenCalled();
     await wrapper.find('input[aria-label="Selecionar linha"]').setValue(true);
     expect(checked).toHaveBeenCalledOnce();
@@ -151,8 +151,8 @@ describe("Vue adapter", () => {
       columns: [{ name: "name", label: "Name" }]
     } } });
     await wrapper.vm.$nextTick();
-    expect(wrapper.find(".spark-grid__info").text()).toBe("Showing 1 to 5 of 7");
-    expect(wrapper.find(".spark-grid__per-page").text()).toContain("Per page:");
+    expect(wrapper.find(".arcana-grid__info").text()).toBe("Showing 1 to 5 of 7");
+    expect(wrapper.find(".arcana-grid__per-page").text()).toContain("Per page:");
     expect(wrapper.find(".grid-header").text()).toContain("Actions");
     expect(wrapper.find('input[aria-label="Select all"]').exists()).toBe(true);
     expect(wrapper.find('input[aria-label="Filter Name"]').exists()).toBe(true);

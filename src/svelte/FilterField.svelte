@@ -60,7 +60,7 @@
     type="search"
     value={String(draft ?? "")}
     {disabled}
-    class="spark-grid-datatable-input"
+    class="arcana-grid-datatable-input"
     aria-label={filterLabel}
     oninput={(event) => { draft = (event.currentTarget as HTMLInputElement).value; }}
     onblur={() => onChange(draft)}

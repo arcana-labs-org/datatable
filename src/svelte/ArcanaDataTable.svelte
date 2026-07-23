@@ -19,7 +19,7 @@
   import Content from "./Content.svelte";
   import ExpandedRowContent from "./ExpandedRowContent.svelte";
   import FilterField from "./FilterField.svelte";
-  import "../assets/SparkGrid.css";
+  import "../assets/ArcanaGrid.css";
 
   let { config, class: className = "", onMounted }: {
     config: DataTableConfig<DataTableRow>;
@@ -214,9 +214,9 @@
   export function getExpandedRows() { return grid.getExpandedRows(); }
 </script>
 
-<div class={`spark-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "spark-grid-responsive-vertical" : ""} ${className}`.trim()} aria-label={config.ariaLabel ?? msg.gridLabel} aria-busy={snap.loading}>
+<div class={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} aria-label={config.ariaLabel ?? msg.gridLabel} aria-busy={snap.loading}>
   {#if snap.error}<div class="arcana-grid-error" role="alert">{msg.loadError}</div>{/if}
-  <div class="spark-grid-body" style={config.overflowEnabled ? `max-height: ${config.height ?? 560}px; overflow: auto` : undefined}>
+  <div class="arcana-grid-body" style={config.overflowEnabled ? `max-height: ${config.height ?? 560}px; overflow: auto` : undefined}>
     <div class={`grid-header ${config.stickyHeaderEnabled ? "grid-header-sticky" : ""}`} role="row">
       {#if expandable}<div class={`grid-header-cell grid-expand-cell ${pinClass(PIN_SLOT_EXPANDER)}`} style={inlineStyle(expanderStyle, pinStyle(PIN_SLOT_EXPANDER))}></div>{/if}
       {#if config.checkboxEnabled}<div class={`grid-header-cell ${pinClass(PIN_SLOT_CHECKBOX)}`} style={inlineStyle(selectionStyle, pinStyle(PIN_SLOT_CHECKBOX))}><input type="checkbox" checked={snap.rows.some((row) => row._isChecked)} disabled={config.isCheckboxHeaderDisabled?.(grid)} aria-label={msg.selectAll} onchange={(event) => grid.toggleAll((event.currentTarget as HTMLInputElement).checked)} /></div>{/if}
@@ -250,9 +250,9 @@
       {/if}
       {#each snap.rows as row (row._uuid)}
         <div class={`grid-row flex ${row._hasFocus || focusedRow === row._uuid ? "grid-row-focused" : ""} ${row._isChecked || row._isRadioChecked ? "grid-row-checked" : ""}`} role="row" onclick={() => selectRow(row)} ondblclick={() => config.onDoubleClickRow?.(row, grid)}>
-          {#if expandable}<div class={`grid-cell grid-expand-cell spark-grid-selection-cell ${pinClass(PIN_SLOT_EXPANDER)}`} data-label="" style={inlineStyle(expanderStyle, pinStyle(PIN_SLOT_EXPANDER))}><button type="button" class={`grid-expand-toggle${isExpanded(row) ? " is-open" : ""}`} aria-expanded={isExpanded(row)} aria-label={isExpanded(row) ? msg.collapseRow : msg.expandRow} onclick={(event) => onExpandToggle(event, row)}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button></div>{/if}
-          {#if config.checkboxEnabled}<div class={`grid-cell spark-grid-selection-cell ${pinClass(PIN_SLOT_CHECKBOX)}`} style={inlineStyle(selectionStyle, config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, grid), pinStyle(PIN_SLOT_CHECKBOX))}><input type="checkbox" checked={Boolean(row._isChecked)} disabled={row._isCheckboxDisabled} aria-label={msg.selectRow} onclick={(event) => event.stopPropagation()} onchange={(event) => grid.toggleRow(row, (event.currentTarget as HTMLInputElement).checked)} /></div>{/if}
-          {#if config.radioButtonSelectionEnabled}<div class={`grid-cell spark-grid-selection-cell ${pinClass(PIN_SLOT_RADIO)}`} style={inlineStyle(selectionStyle, config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, grid), pinStyle(PIN_SLOT_RADIO))}><input type="radio" name={snap.uuid} checked={Boolean(row._isRadioChecked)} aria-label={msg.selectRow} onclick={(event) => event.stopPropagation()} onchange={() => grid.setSelectedRadioRow(row)} /></div>{/if}
+          {#if expandable}<div class={`grid-cell grid-expand-cell arcana-grid-selection-cell ${pinClass(PIN_SLOT_EXPANDER)}`} data-label="" style={inlineStyle(expanderStyle, pinStyle(PIN_SLOT_EXPANDER))}><button type="button" class={`grid-expand-toggle${isExpanded(row) ? " is-open" : ""}`} aria-expanded={isExpanded(row)} aria-label={isExpanded(row) ? msg.collapseRow : msg.expandRow} onclick={(event) => onExpandToggle(event, row)}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button></div>{/if}
+          {#if config.checkboxEnabled}<div class={`grid-cell arcana-grid-selection-cell ${pinClass(PIN_SLOT_CHECKBOX)}`} style={inlineStyle(selectionStyle, config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, grid), pinStyle(PIN_SLOT_CHECKBOX))}><input type="checkbox" checked={Boolean(row._isChecked)} disabled={row._isCheckboxDisabled} aria-label={msg.selectRow} onclick={(event) => event.stopPropagation()} onchange={(event) => grid.toggleRow(row, (event.currentTarget as HTMLInputElement).checked)} /></div>{/if}
+          {#if config.radioButtonSelectionEnabled}<div class={`grid-cell arcana-grid-selection-cell ${pinClass(PIN_SLOT_RADIO)}`} style={inlineStyle(selectionStyle, config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, grid), pinStyle(PIN_SLOT_RADIO))}><input type="radio" name={snap.uuid} checked={Boolean(row._isRadioChecked)} aria-label={msg.selectRow} onclick={(event) => event.stopPropagation()} onchange={() => grid.setSelectedRadioRow(row)} /></div>{/if}
           {#each columns as column (column.name)}
             <div class={`grid-cell ${alignmentClass(column, grid)} ${focusedCell === `${row._uuid}:${column.name}` ? "grid-cell-focused" : ""} ${pinClass(column.name)}`} data-label={column.label} style={cellStyle(column, row)} role="cell" onclick={() => selectCell(column, row)} ondblclick={() => config.onDoubleClickCell?.(grid.getCellValue(column, row), column, row, grid)} oncontextmenu={(event) => openMenu(event, column, row)}><Content value={grid.getCellValue(column, row)} html={column.html === true} /></div>
           {/each}
@@ -281,12 +281,12 @@
     {/if}
   </div>
   {#if config.footerVisible ?? true}
-    <div class="grid-footer"><div class="spark-grid-pages">
+    <div class="grid-footer"><div class="arcana-grid-pages">
       {#if config.isRowsPerPageVisible ?? true}
-        <label class="spark-grid__per-page">{msg.perPage} <select value={snap.rowsPerPage} class="spark-grid-datatable-select" onchange={(event) => void grid.paginate(1, Number((event.currentTarget as HTMLSelectElement).value))}>{#each [10, 25, 50, 100, 250, 500] as size (size)}<option value={size}>{size}</option>{/each}</select></label>
+        <label class="arcana-grid__per-page">{msg.perPage} <select value={snap.rowsPerPage} class="arcana-grid-datatable-select" onchange={(event) => void grid.paginate(1, Number((event.currentTarget as HTMLSelectElement).value))}>{#each [10, 25, 50, 100, 250, 500] as size (size)}<option value={size}>{size}</option>{/each}</select></label>
       {/if}
-      {#if snap.totalRows}<span class="spark-grid__info">{formatMessage(msg.showingRange, { from: beginning, to: ending, total: snap.totalRows })}</span>{/if}
-      <div class="spark-grid__pagination-group"><span class="spark-grid-selected-rows">{grid.getCheckedRows().length ? formatMessage(msg.selectedCount, { count: grid.getCheckedRows().length }) : ""}</span>
+      {#if snap.totalRows}<span class="arcana-grid__info">{formatMessage(msg.showingRange, { from: beginning, to: ending, total: snap.totalRows })}</span>{/if}
+      <div class="arcana-grid__pagination-group"><span class="arcana-grid-selected-rows">{grid.getCheckedRows().length ? formatMessage(msg.selectedCount, { count: grid.getCheckedRows().length }) : ""}</span>
         <ul aria-label={msg.pagination}><li><button type="button" disabled={snap.currentPage <= 1} aria-label={msg.previousPage} onclick={() => void grid.paginate(snap.currentPage - 1, snap.rowsPerPage)}>‹</button></li>{#each pages as page (page)}<li class={page === snap.currentPage ? "current" : ""}><button type="button" disabled={page === snap.currentPage} onclick={() => void grid.paginate(page, snap.rowsPerPage)}>{page}</button></li>{/each}<li><button type="button" disabled={snap.currentPage >= lastPage} aria-label={msg.nextPage} onclick={() => void grid.paginate(snap.currentPage + 1, snap.rowsPerPage)}>›</button></li></ul>
       </div>
     </div></div>

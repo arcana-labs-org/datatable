@@ -4,7 +4,7 @@ import type { ArcanaTheme, ArcanaThemePreset } from "./types";
  * Global theme registry.
  *
  * Every theme is a CSS class (`arcana-theme-{name}`) that only overrides the
- * `--arcana-*` custom properties declared in `SparkGrid.css`. The grid root
+ * `--arcana-*` custom properties declared in `ArcanaGrid.css`. The grid root
  * receives the class, and — because the select/calendar panels are portaled
  * to `<body>` and therefore do NOT inherit variables from the grid — the same
  * class is propagated to every portaled panel.
