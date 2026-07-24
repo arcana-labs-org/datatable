@@ -2,8 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
-import ArcanaSelect from "./ArcanaSelect.vue";
-import ArcanaDatePicker from "./ArcanaDatePicker.vue";
+import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/vue";
 
 const props = defineProps<{
   column: DataTableColumn<DataTableRow>;
@@ -42,20 +41,18 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
 <template>
   <ArcanaDatePicker
     v-if="column.searchType === 'DATE_RANGE'"
-    mode="range"
-    :value="rangeValue"
+    type="daterange"
+    :model-value="rangeValue"
     :disabled="disabled"
-    :messages="msg"
     :locale="locale"
     :aria-label="filterLabel"
     @change="commit"
   />
   <ArcanaSelect
     v-else-if="column.searchType === 'BOOLEAN'"
-    :value="String(value ?? '')"
+    :model-value="String(value ?? '')"
     :options="booleanOptions"
     :disabled="disabled"
-    :messages="msg"
     :placeholder="msg.booleanAll"
     :aria-label="filterLabel"
     @change="commit"
@@ -63,20 +60,18 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
   <ArcanaSelect
     v-else-if="column.searchType === 'LIST' || column.searchType === 'REMOTE'"
     multiple
-    :value="listValue"
+    :model-value="listValue"
     :options="options"
     :disabled="disabled"
-    :messages="msg"
     :placeholder="msg.booleanAll"
     :aria-label="filterLabel"
     @change="commit"
   />
   <ArcanaDatePicker
     v-else-if="column.searchType === 'DATE' || column.searchType === 'DATE_MONTH'"
-    :mode="column.searchType === 'DATE' ? 'date' : 'month'"
-    :value="String(value ?? '')"
+    :type="column.searchType === 'DATE' ? 'date' : 'month'"
+    :model-value="String(value ?? '')"
     :disabled="disabled"
-    :messages="msg"
     :locale="locale"
     :aria-label="filterLabel"
     @change="commit"

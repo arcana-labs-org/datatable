@@ -5,8 +5,7 @@ import { arcanaThemeClass } from "../core/theme";
 import { startColumnDrag } from "../core/drag";
 import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { ContextMenuItem, DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, SearchOption, StyleMap } from "../core/types";
-import { ArcanaSelect } from "./ArcanaSelect";
-import { ArcanaDatePicker } from "./ArcanaDatePicker";
+import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/react";
 import "../assets/ArcanaGrid.css";
 
 export interface ArcanaDataTableProps<Row extends DataTableRow = DataTableRow> {
@@ -32,17 +31,17 @@ function FilterField<Row extends DataTableRow>({ column, value, disabled, messag
   const commit = (next: unknown) => { setDraft(next); onChange(next); };
   if (column.searchType === "DATE_RANGE") {
     const range: [string, string] = Array.isArray(draft) ? [String(draft[0] ?? ""), String(draft[1] ?? "")] : ["", ""];
-    return <ArcanaDatePicker mode="range" value={range} disabled={disabled} messages={messages} locale={locale} ariaLabel={filterLabel} onChange={commit} />;
+    return <ArcanaDatePicker type="daterange" value={range} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
   }
   if (column.searchType === "BOOLEAN") {
-    return <ArcanaSelect value={String(draft ?? "")} options={booleanOptions} disabled={disabled} messages={messages} placeholder={messages.booleanAll} ariaLabel={filterLabel} onChange={commit} />;
+    return <ArcanaSelect value={String(draft ?? "")} options={booleanOptions.map((option) => ({ label: option.label, value: String(option.value) }))} disabled={disabled} placeholder={messages.booleanAll} onChange={commit} />;
   }
   if (column.searchType === "LIST" || column.searchType === "REMOTE") {
     const selected = Array.isArray(draft) ? draft.map(String) : draft == null || draft === "" ? [] : [String(draft)];
-    return <ArcanaSelect multiple value={selected} options={options} disabled={disabled} messages={messages} placeholder={messages.booleanAll} ariaLabel={filterLabel} onChange={commit} />;
+    return <ArcanaSelect multiple value={selected} options={options.map((option) => ({ label: option.label, value: String(option.value) }))} disabled={disabled} placeholder={messages.booleanAll} onChange={commit} />;
   }
   if (column.searchType === "DATE" || column.searchType === "DATE_MONTH") {
-    return <ArcanaDatePicker mode={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} disabled={disabled} messages={messages} locale={locale} ariaLabel={filterLabel} onChange={commit} />;
+    return <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
   }
   return <input type="search" value={String(draft)} disabled={disabled} className="arcana-grid-datatable-input" aria-label={filterLabel} onChange={(event) => setDraft(event.target.value)} onBlur={() => onChange(draft)} onKeyDown={(event) => { if (event.key === "Enter") onChange(draft); }} />;
 }

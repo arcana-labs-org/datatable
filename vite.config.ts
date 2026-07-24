@@ -40,7 +40,7 @@ export default defineConfig({
       fileName: (format, entry) => `${entry}.${format === "es" ? "js" : "cjs"}`
     },
     rollupOptions: {
-      external: ["vue", "react", "react-dom", "react/jsx-runtime", /^svelte(\/|$)/],
+      external: ["vue", "react", "react-dom", "react/jsx-runtime", /^svelte(\/|$)/, /^@arcanalabs\/ui-components(\/|$)/],
       output: {
         exports: "named",
         assetFileNames: (asset) => asset.name?.endsWith(".css") ? "arcanalabs-datatable.css" : "assets/[name][extname]"

@@ -7,8 +7,7 @@
    */
   import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
   import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
-  import ArcanaSelect from "./ArcanaSelect.svelte";
-  import ArcanaDatePicker from "./ArcanaDatePicker.svelte";
+  import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/svelte";
 
   let { column, value, disabled = false, messages, locale, onChange }: {
     column: DataTableColumn<DataTableRow>;
@@ -48,13 +47,13 @@
 </script>
 
 {#if column.searchType === "DATE_RANGE"}
-  <ArcanaDatePicker mode="range" value={rangeValue} {disabled} messages={msg} {locale} ariaLabel={filterLabel} onChange={commit} />
+  <ArcanaDatePicker type="daterange" value={rangeValue} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
 {:else if column.searchType === "BOOLEAN"}
-  <ArcanaSelect value={String(draft ?? "")} options={booleanOptions} {disabled} messages={msg} placeholder={msg.booleanAll} ariaLabel={filterLabel} onChange={commit} />
+  <ArcanaSelect value={String(draft ?? "")} options={booleanOptions} {disabled} placeholder={msg.booleanAll} onChange={commit} />
 {:else if column.searchType === "LIST" || column.searchType === "REMOTE"}
-  <ArcanaSelect multiple value={listValue} {options} {disabled} messages={msg} placeholder={msg.booleanAll} ariaLabel={filterLabel} onChange={commit} />
+  <ArcanaSelect multiple value={listValue} {options} {disabled} placeholder={msg.booleanAll} onChange={commit} />
 {:else if column.searchType === "DATE" || column.searchType === "DATE_MONTH"}
-  <ArcanaDatePicker mode={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} {disabled} messages={msg} {locale} ariaLabel={filterLabel} onChange={commit} />
+  <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
 {:else}
   <input
     type="search"

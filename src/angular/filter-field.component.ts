@@ -2,10 +2,9 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
   OnChanges, OnDestroy, Output, SimpleChanges, inject
 } from "@angular/core";
-import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
+import { formatMessage, getDefaultArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
-import { ArcanaDatePickerComponent } from "./date-picker.component";
-import { ArcanaSelectComponent } from "./select.component";
+import { ArcanaDatePickerComponent, ArcanaSelectComponent, type SelectOption } from "@arcanalabs/ui-components/angular";
 
 /**
  * Renders the filter control for a column, mirroring the React/Vue
@@ -22,16 +21,16 @@ import { ArcanaSelectComponent } from "./select.component";
   template: `
     @switch (kind()) {
       @case ("range") {
-        <div arcanaDatePicker mode="range" [value]="rangeValue()" [disabled]="disabled" [messages]="msg()" [locale]="locale" [ariaLabel]="filterLabel()" (valueChange)="commit($event)"></div>
+        <div arcanaDatePicker type="daterange" [value]="rangeValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @case ("boolean") {
-        <div arcanaSelect [value]="stringValue()" [options]="booleanOptions()" [disabled]="disabled" [messages]="msg()" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (valueChange)="commit($event)"></div>
+        <div arcanaSelect [value]="stringValue()" [options]="booleanOptions()" [disabled]="disabled" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @case ("list") {
-        <div arcanaSelect [multiple]="true" [value]="listValue()" [options]="options" [disabled]="disabled" [messages]="msg()" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (valueChange)="commit($event)"></div>
+        <div arcanaSelect [multiple]="true" [value]="listValue()" [options]="selectOptions()" [disabled]="disabled" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @case ("date") {
-        <div arcanaDatePicker [mode]="column.searchType === 'DATE' ? 'date' : 'month'" [value]="stringValue()" [disabled]="disabled" [messages]="msg()" [locale]="locale" [ariaLabel]="filterLabel()" (valueChange)="commit($event)"></div>
+        <div arcanaDatePicker [type]="column.searchType === 'DATE' ? 'date' : 'month'" [value]="stringValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @default {
         <input
@@ -69,13 +68,26 @@ export class ArcanaFilterFieldComponent implements OnChanges, OnDestroy {
     return formatMessage(this.msg().filterLabel, { label: this.column.label });
   }
 
-  booleanOptions(): SearchOption[] {
+  booleanOptions(): SelectOption[] {
     const messages = this.msg();
     return [
       { value: "", label: messages.booleanAll },
       { value: "1", label: messages.booleanYes },
       { value: "0", label: messages.booleanNo }
     ];
+  }
+
+  /** Adapts the column's `SearchOption[]` to the ui-components `SelectOption[]` shape. */
+  selectOptions(): SelectOption[] {
+    return this.options.map((opt) => ({
+      label: opt.label,
+      value: opt.value as SelectOption["value"]
+    }));
+  }
+
+  /** DatePicker `locale` input is non-nullable; fall back to the global default. */
+  datePickerLocale(): ArcanaLocale {
+    return this.locale ?? getDefaultArcanaLocale();
   }
 
   private active = true;

@@ -1,9 +1,6 @@
 import type { Component } from "svelte";
-import type { ArcanaLocale, ArcanaMessages } from "./core/locale";
-import type { DataTableApi, DataTableConfig, DataTableRow, SearchOption } from "./core/types";
+import type { DataTableApi, DataTableConfig, DataTableRow } from "./core/types";
 import ArcanaDataTableComponent from "./svelte/ArcanaDataTable.svelte";
-import ArcanaSelectComponent from "./svelte/ArcanaSelect.svelte";
-import ArcanaDatePickerComponent from "./svelte/ArcanaDatePicker.svelte";
 
 export * from "./index";
 
@@ -36,36 +33,6 @@ export interface ArcanaDataTableExports {
   getExpandedRows(): DataTableRow[];
 }
 
-export interface ArcanaSelectProps {
-  value: unknown;
-  options?: SearchOption[];
-  onChange: (value: unknown) => void;
-  multiple?: boolean;
-  disabled?: boolean;
-  clearable?: boolean;
-  searchable?: boolean;
-  placeholder?: string;
-  searchPlaceholder?: string;
-  ariaLabel?: string;
-  /** Resolved message table; defaults to the global default locale pack. */
-  messages?: ArcanaMessages;
-}
-
-export interface ArcanaDatePickerProps {
-  mode: "date" | "month" | "range";
-  value: unknown;
-  onChange: (value: unknown) => void;
-  disabled?: boolean;
-  placeholder?: string;
-  ariaLabel?: string;
-  /** Resolved message table; defaults to the global default locale pack. */
-  messages?: ArcanaMessages;
-  /** Locale of the calendar display names (months/weekdays via Intl). */
-  locale?: ArcanaLocale;
-}
-
 export const ArcanaDataTable: Component<ArcanaDataTableProps, ArcanaDataTableExports> =
   ArcanaDataTableComponent as unknown as Component<ArcanaDataTableProps, ArcanaDataTableExports>;
-export const ArcanaSelect: Component<ArcanaSelectProps> = ArcanaSelectComponent as unknown as Component<ArcanaSelectProps>;
-export const ArcanaDatePicker: Component<ArcanaDatePickerProps> = ArcanaDatePickerComponent as unknown as Component<ArcanaDatePickerProps>;
 export const SparkGrid = ArcanaDataTable;
