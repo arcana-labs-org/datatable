@@ -98,6 +98,7 @@ export interface Messages {
     lead: string;
     navDocs: string;
     navPlayground: string;
+    navThemeBuilder: string;
     topNavAria: string;
     /** aria-label of the GitHub star count; {count} placeholder. */
     githubStars: string;
@@ -315,6 +316,58 @@ export interface Messages {
       theme: string;
       locale: string;
     };
+  };
+
+  /** Theme Builder screen (`#/theme-builder`): tokens, sizing and generated CSS. */
+  themeBuilder: {
+    panelAria: string;
+    settings: string;
+    reset: string;
+    groupPreset: string;
+    groupColors: string;
+    groupSizing: string;
+    /** Label of the preset row. */
+    preset: string;
+    presetHint: string;
+    presetPickerAria: string;
+    /** Tooltip of each exposed `--arcana-*` color token. */
+    colorHints: {
+      accent: string;
+      surface: string;
+      surfaceMuted: string;
+      text: string;
+      textMuted: string;
+      border: string;
+      rowHover: string;
+      rowChecked: string;
+      headerHover: string;
+      selectedBg: string;
+    };
+    /** aria-label of a color's reset (✕) button; {token} placeholder. */
+    clearColor: string;
+    /** Labels of the sizing/typography sliders. */
+    sizing: {
+      cellPaddingY: string;
+      cellPaddingX: string;
+      rowHeight: string;
+      fontSize: string;
+      radius: string;
+    };
+    sizingHints: {
+      cellPaddingY: string;
+      cellPaddingX: string;
+      rowHeight: string;
+      fontSize: string;
+      radius: string;
+    };
+    /** Footnote explaining that the sliders have no `--arcana-*` token yet. */
+    sizingNote: string;
+    stageCaption: string;
+    /** Label of the generated-CSS tab. */
+    cssTab: string;
+    tableAria: string;
+    /** aria-label of a control's ⓘ info button; {label} placeholder. */
+    infoAria: string;
   };
 
   demos: {

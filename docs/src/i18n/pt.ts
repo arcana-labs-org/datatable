@@ -9,6 +9,7 @@ export const pt: Messages = {
     lead: "Uma datatable tipada para Vue 3, React, Angular e Svelte. A mesma configuração, o mesmo comportamento, o mesmo resultado — em qualquer um dos quatro frameworks.",
     navDocs: "Docs",
     navPlayground: "Playground",
+    navThemeBuilder: "Editor de tema",
     topNavAria: "Áreas do site",
     githubStars: "{count} estrelas no GitHub",
     searchPlaceholder: "Buscar na documentação… (⌘K)",
@@ -412,6 +413,50 @@ export const pt: Messages = {
       theme: "Paleta visual da tabela.",
       locale: "Idioma dos textos internos da tabela."
     }
+  },
+
+  themeBuilder: {
+    panelAria: "Ajustes do tema",
+    settings: "Tema",
+    reset: "Restaurar",
+    groupPreset: "Preset",
+    groupColors: "Cores",
+    groupSizing: "Espaçamento e tipografia",
+    preset: "Preset base",
+    presetHint: "Paleta de partida; todas as cores abaixo são medidas a partir dela.",
+    presetPickerAria: "Escolher preset base",
+    colorHints: {
+      accent: "Anel de foco, página atual e destaques de ordenação.",
+      surface: "Fundo do corpo da tabela.",
+      surfaceMuted: "Fundo do cabeçalho, do rodapé e da linha de totais.",
+      text: "Cor do texto principal dentro das células.",
+      textMuted: "Textos secundários: rodapé, placeholders e dicas.",
+      border: "Cor das bordas de células, campos e painéis.",
+      rowHover: "Fundo da linha sob o cursor.",
+      rowChecked: "Fundo das linhas marcadas.",
+      headerHover: "Fundo da célula de cabeçalho no hover.",
+      selectedBg: "Opção selecionada dentro dos painéis de filtro."
+    },
+    clearColor: "Restaurar {token}",
+    sizing: {
+      cellPaddingY: "Padding vertical",
+      cellPaddingX: "Padding horizontal",
+      rowHeight: "Altura da linha",
+      fontSize: "Tamanho da fonte",
+      radius: "Raio da borda"
+    },
+    sizingHints: {
+      cellPaddingY: "Espaço acima e abaixo do conteúdo da célula.",
+      cellPaddingX: "Espaço à esquerda e à direita do conteúdo da célula.",
+      rowHeight: "Altura mínima de cada linha — a densidade da tabela.",
+      fontSize: "Tamanho do texto no cabeçalho, nas células e no rodapé.",
+      radius: "Arredondamento dos cantos da tabela e dos campos de filtro."
+    },
+    sizingNote: "Estes controles ainda não têm token --arcana-*: o CSS gerado emite regras diretas nas partes do grid.",
+    stageCaption: "componente real · reage a cada token",
+    cssTab: "CSS",
+    tableAria: "Prévia de tema do Arcana DataTable",
+    infoAria: "Sobre {label}"
   },
 
   demos: {

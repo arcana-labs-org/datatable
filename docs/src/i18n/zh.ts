@@ -9,6 +9,7 @@ export const zh: Messages = {
     lead: "一个类型化的数据表格组件，支持 Vue 3、React、Angular 和 Svelte。同样的配置、同样的行为、同样的结果——在四个框架中的任意一个都是如此。",
     navDocs: "文档",
     navPlayground: "演练场",
+    navThemeBuilder: "主题编辑器",
     topNavAria: "站点区域",
     githubStars: "GitHub 上 {count} 个星标",
     searchPlaceholder: "搜索文档…（⌘K）",
@@ -412,6 +413,50 @@ export const zh: Messages = {
       theme: "表格的视觉主题。",
       locale: "表格内置文本的语言。"
     }
+  },
+
+  themeBuilder: {
+    panelAria: "主题设置",
+    settings: "主题",
+    reset: "重置",
+    groupPreset: "预设",
+    groupColors: "颜色",
+    groupSizing: "间距与排版",
+    preset: "基础预设",
+    presetHint: "起始配色，下面所有颜色都以它为基准。",
+    presetPickerAria: "选择基础预设",
+    colorHints: {
+      accent: "焦点环、当前页码与排序高亮。",
+      surface: "表格主体的背景。",
+      surfaceMuted: "表头、页脚与汇总行的背景。",
+      text: "单元格正文的文字颜色。",
+      textMuted: "次要文字：页脚、占位符与提示。",
+      border: "单元格、输入框与面板的边框颜色。",
+      rowHover: "鼠标悬停时的行背景。",
+      rowChecked: "已勾选行的背景。",
+      headerHover: "表头单元格悬停时的背景。",
+      selectedBg: "筛选面板中被选中的选项。"
+    },
+    clearColor: "重置 {token}",
+    sizing: {
+      cellPaddingY: "垂直内边距",
+      cellPaddingX: "水平内边距",
+      rowHeight: "行高",
+      fontSize: "字号",
+      radius: "圆角半径"
+    },
+    sizingHints: {
+      cellPaddingY: "单元格内容上下的留白。",
+      cellPaddingX: "单元格内容左右的留白。",
+      rowHeight: "每行的最小高度，也就是表格的密度。",
+      fontSize: "表头、单元格与页脚的文字大小。",
+      radius: "表格四角与筛选控件的圆角。"
+    },
+    sizingNote: "这几个滑块还没有对应的 --arcana-* 变量：生成的 CSS 会直接为表格各部分输出普通规则。",
+    stageCaption: "真实组件 · 随每个变量实时变化",
+    cssTab: "CSS",
+    tableAria: "Arcana DataTable 主题预览",
+    infoAria: "关于 {label}"
   },
 
   demos: {

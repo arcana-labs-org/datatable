@@ -9,6 +9,7 @@ export const it: Messages = {
     lead: "Una data table tipizzata per Vue 3, React, Angular e Svelte. La stessa configurazione, lo stesso comportamento, lo stesso risultato — in ognuno dei quattro framework.",
     navDocs: "Docs",
     navPlayground: "Playground",
+    navThemeBuilder: "Editor del tema",
     topNavAria: "Aree del sito",
     githubStars: "{count} stelle su GitHub",
     searchPlaceholder: "Cerca nella documentazione… (⌘K)",
@@ -412,6 +413,50 @@ export const it: Messages = {
       theme: "Palette visiva della tabella.",
       locale: "Lingua dei testi interni della tabella."
     }
+  },
+
+  themeBuilder: {
+    panelAria: "Impostazioni del tema",
+    settings: "Tema",
+    reset: "Ripristina",
+    groupPreset: "Preset",
+    groupColors: "Colori",
+    groupSizing: "Spaziatura e tipografia",
+    preset: "Preset di base",
+    presetHint: "Palette di partenza: tutti i colori qui sotto sono misurati rispetto a essa.",
+    presetPickerAria: "Scegli il preset di base",
+    colorHints: {
+      accent: "Anello di focus, pagina corrente ed evidenziazioni di ordinamento.",
+      surface: "Sfondo del corpo della tabella.",
+      surfaceMuted: "Sfondo dell'intestazione, del piè di pagina e della riga dei totali.",
+      text: "Colore del testo principale all'interno delle celle.",
+      textMuted: "Testi secondari: piè di pagina, segnaposto e suggerimenti.",
+      border: "Colore dei bordi di celle, campi e pannelli.",
+      rowHover: "Sfondo della riga sotto il cursore.",
+      rowChecked: "Sfondo delle righe selezionate.",
+      headerHover: "Sfondo della cella di intestazione al passaggio del mouse.",
+      selectedBg: "Opzione selezionata all'interno dei pannelli di filtro."
+    },
+    clearColor: "Ripristina {token}",
+    sizing: {
+      cellPaddingY: "Padding verticale",
+      cellPaddingX: "Padding orizzontale",
+      rowHeight: "Altezza della riga",
+      fontSize: "Dimensione del testo",
+      radius: "Raggio del bordo"
+    },
+    sizingHints: {
+      cellPaddingY: "Spazio sopra e sotto il contenuto della cella.",
+      cellPaddingX: "Spazio a sinistra e a destra del contenuto della cella.",
+      rowHeight: "Altezza minima di ogni riga: la densità della tabella.",
+      fontSize: "Dimensione del testo nell'intestazione, nelle celle e nel piè di pagina.",
+      radius: "Arrotondamento degli angoli della tabella e dei campi di filtro."
+    },
+    sizingNote: "Questi controlli non hanno ancora un token --arcana-*: il CSS generato emette regole dirette sulle parti della griglia.",
+    stageCaption: "componente reale · reagisce a ogni token",
+    cssTab: "CSS",
+    tableAria: "Anteprima del tema di Arcana DataTable",
+    infoAria: "Informazioni su {label}"
   },
 
   demos: {

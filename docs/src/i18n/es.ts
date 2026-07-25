@@ -9,6 +9,7 @@ export const es: Messages = {
     lead: "Una tabla de datos tipada para Vue 3, React, Angular y Svelte. La misma configuración, el mismo comportamiento, el mismo resultado — en cualquiera de los cuatro frameworks.",
     navDocs: "Docs",
     navPlayground: "Playground",
+    navThemeBuilder: "Editor de tema",
     topNavAria: "Áreas del sitio",
     githubStars: "{count} estrellas en GitHub",
     searchPlaceholder: "Buscar en la documentación… (⌘K)",
@@ -412,6 +413,50 @@ export const es: Messages = {
       theme: "Paleta visual de la tabla.",
       locale: "Idioma de los textos internos de la tabla."
     }
+  },
+
+  themeBuilder: {
+    panelAria: "Ajustes del tema",
+    settings: "Tema",
+    reset: "Restablecer",
+    groupPreset: "Preajuste",
+    groupColors: "Colores",
+    groupSizing: "Espaciado y tipografía",
+    preset: "Preajuste base",
+    presetHint: "Paleta de partida; todos los colores de abajo se miden respecto a ella.",
+    presetPickerAria: "Elegir preajuste base",
+    colorHints: {
+      accent: "Anillo de foco, página actual y resaltados de ordenación.",
+      surface: "Fondo del cuerpo de la tabla.",
+      surfaceMuted: "Fondo de la cabecera, del pie y de la fila de totales.",
+      text: "Color del texto principal dentro de las celdas.",
+      textMuted: "Textos secundarios: pie, marcadores de posición y pistas.",
+      border: "Color de los bordes de celdas, campos y paneles.",
+      rowHover: "Fondo de la fila bajo el cursor.",
+      rowChecked: "Fondo de las filas marcadas.",
+      headerHover: "Fondo de la celda de cabecera al pasar el cursor.",
+      selectedBg: "Opción seleccionada dentro de los paneles de filtro."
+    },
+    clearColor: "Restablecer {token}",
+    sizing: {
+      cellPaddingY: "Relleno vertical",
+      cellPaddingX: "Relleno horizontal",
+      rowHeight: "Altura de la fila",
+      fontSize: "Tamaño de fuente",
+      radius: "Radio del borde"
+    },
+    sizingHints: {
+      cellPaddingY: "Espacio por encima y por debajo del contenido de la celda.",
+      cellPaddingX: "Espacio a la izquierda y a la derecha del contenido de la celda.",
+      rowHeight: "Altura mínima de cada fila: la densidad de la tabla.",
+      fontSize: "Tamaño del texto en la cabecera, las celdas y el pie.",
+      radius: "Redondeo de las esquinas de la tabla y de los campos de filtro."
+    },
+    sizingNote: "Estos controles todavía no tienen un token --arcana-*: el CSS generado emite reglas directas sobre las partes de la tabla.",
+    stageCaption: "componente real · reacciona a cada token",
+    cssTab: "CSS",
+    tableAria: "Vista previa del tema de Arcana DataTable",
+    infoAria: "Acerca de {label}"
   },
 
   demos: {

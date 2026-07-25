@@ -9,6 +9,7 @@ export const ja: Messages = {
     lead: "Vue 3、React、Angular、Svelte に対応した型付きデータテーブルです。同じ設定、同じ挙動、同じ結果を、4 つのフレームワークのどれでも実現できます。",
     navDocs: "ドキュメント",
     navPlayground: "プレイグラウンド",
+    navThemeBuilder: "テーマエディター",
     topNavAria: "サイトのエリア",
     githubStars: "GitHub のスター {count} 件",
     searchPlaceholder: "ドキュメントを検索… (⌘K)",
@@ -412,6 +413,50 @@ export const ja: Messages = {
       theme: "テーブルのビジュアルテーマ。",
       locale: "テーブル内蔵テキストの言語。"
     },
+  },
+
+  themeBuilder: {
+    panelAria: "テーマ設定",
+    settings: "テーマ",
+    reset: "リセット",
+    groupPreset: "プリセット",
+    groupColors: "配色",
+    groupSizing: "余白とタイポグラフィ",
+    preset: "ベースプリセット",
+    presetHint: "出発点となる配色。以下の色はすべてここを基準にします。",
+    presetPickerAria: "ベースプリセットを選択",
+    colorHints: {
+      accent: "フォーカスリング、現在のページ、並び替えのハイライト。",
+      surface: "テーブル本体の背景。",
+      surfaceMuted: "ヘッダー・フッター・集計行の背景。",
+      text: "セル本文の文字色。",
+      textMuted: "補助的なテキスト（フッター、プレースホルダー、ヒント）。",
+      border: "セル・入力欄・パネルの境界線の色。",
+      rowHover: "カーソルが乗った行の背景。",
+      rowChecked: "チェック済みの行の背景。",
+      headerHover: "ヘッダーセルにカーソルを乗せたときの背景。",
+      selectedBg: "フィルターパネル内で選択中の項目。"
+    },
+    clearColor: "{token} をリセット",
+    sizing: {
+      cellPaddingY: "上下の余白",
+      cellPaddingX: "左右の余白",
+      rowHeight: "行の高さ",
+      fontSize: "文字サイズ",
+      radius: "角丸"
+    },
+    sizingHints: {
+      cellPaddingY: "セルの内容の上下に取る余白。",
+      cellPaddingX: "セルの内容の左右に取る余白。",
+      rowHeight: "各行の最小の高さ。表の密度そのものです。",
+      fontSize: "ヘッダー・セル・フッターの文字の大きさ。",
+      radius: "テーブルの角とフィルター入力欄の丸み。"
+    },
+    sizingNote: "これらのスライダーにはまだ --arcana-* トークンがありません。生成される CSS はテーブル各部への通常のルールとして出力されます。",
+    stageCaption: "本物のコンポーネント · すべてのトークンに反応します",
+    cssTab: "CSS",
+    tableAria: "Arcana DataTable のテーマプレビュー",
+    infoAria: "{label} について"
   },
 
   demos: {

@@ -9,6 +9,7 @@ export const de: Messages = {
     lead: "Eine typisierte Datentabelle für Vue 3, React, Angular und Svelte. Dieselbe Konfiguration, dasselbe Verhalten, dasselbe Ergebnis — in jedem der vier Frameworks.",
     navDocs: "Docs",
     navPlayground: "Playground",
+    navThemeBuilder: "Theme-Editor",
     topNavAria: "Bereiche der Website",
     githubStars: "{count} Sterne auf GitHub",
     searchPlaceholder: "Dokumentation durchsuchen… (⌘K)",
@@ -412,6 +413,50 @@ export const de: Messages = {
       theme: "Visuelle Palette der Tabelle.",
       locale: "Sprache der internen Tabellentexte."
     }
+  },
+
+  themeBuilder: {
+    panelAria: "Theme-Einstellungen",
+    settings: "Theme",
+    reset: "Zurücksetzen",
+    groupPreset: "Preset",
+    groupColors: "Farben",
+    groupSizing: "Abstände und Typografie",
+    preset: "Basis-Preset",
+    presetHint: "Ausgangspalette; alle Farben unten werden daran gemessen.",
+    presetPickerAria: "Basis-Preset wählen",
+    colorHints: {
+      accent: "Fokusring, aktuelle Seite und Sortier-Hervorhebungen.",
+      surface: "Hintergrund des Tabellenkörpers.",
+      surfaceMuted: "Hintergrund von Kopfzeile, Fußzeile und Summenzeile.",
+      text: "Farbe des Haupttexts in den Zellen.",
+      textMuted: "Sekundäre Texte: Fußzeile, Platzhalter und Hinweise.",
+      border: "Farbe der Rahmen von Zellen, Feldern und Panels.",
+      rowHover: "Hintergrund der Zeile unter dem Mauszeiger.",
+      rowChecked: "Hintergrund der ausgewählten Zeilen.",
+      headerHover: "Hintergrund der Kopfzelle beim Überfahren.",
+      selectedBg: "Ausgewählte Option in den Filter-Panels."
+    },
+    clearColor: "{token} zurücksetzen",
+    sizing: {
+      cellPaddingY: "Vertikaler Innenabstand",
+      cellPaddingX: "Horizontaler Innenabstand",
+      rowHeight: "Zeilenhöhe",
+      fontSize: "Schriftgröße",
+      radius: "Eckenradius"
+    },
+    sizingHints: {
+      cellPaddingY: "Abstand über und unter dem Zelleninhalt.",
+      cellPaddingX: "Abstand links und rechts vom Zelleninhalt.",
+      rowHeight: "Mindesthöhe jeder Zeile — die Dichte der Tabelle.",
+      fontSize: "Textgröße in Kopfzeile, Zellen und Fußzeile.",
+      radius: "Abrundung der Tabellenecken und der Filterfelder."
+    },
+    sizingNote: "Für diese Regler gibt es noch kein --arcana-*-Token: das generierte CSS schreibt direkte Regeln auf die Teile der Tabelle.",
+    stageCaption: "echte Komponente · reagiert auf jedes Token",
+    cssTab: "CSS",
+    tableAria: "Theme-Vorschau der Arcana DataTable",
+    infoAria: "Über {label}"
   },
 
   demos: {

@@ -9,6 +9,7 @@ export const en: Messages = {
     lead: "A typed data table for Vue 3, React, Angular and Svelte. The same configuration, the same behavior, the same result — in any of the four frameworks.",
     navDocs: "Docs",
     navPlayground: "Playground",
+    navThemeBuilder: "Theme Builder",
     topNavAria: "Site areas",
     githubStars: "{count} stars on GitHub",
     searchPlaceholder: "Search the docs… (⌘K)",
@@ -412,6 +413,50 @@ export const en: Messages = {
       theme: "Visual palette of the table.",
       locale: "Language of the table's built-in texts."
     }
+  },
+
+  themeBuilder: {
+    panelAria: "Theme settings",
+    settings: "Theme",
+    reset: "Reset",
+    groupPreset: "Preset",
+    groupColors: "Colors",
+    groupSizing: "Spacing & typography",
+    preset: "Base preset",
+    presetHint: "Starting palette; every color below is measured against it.",
+    presetPickerAria: "Choose base preset",
+    colorHints: {
+      accent: "Focus ring, current page and sorting highlights.",
+      surface: "Background of the table body.",
+      surfaceMuted: "Background of the header, the footer and the summary row.",
+      text: "Main text color inside the cells.",
+      textMuted: "Secondary texts: footer, placeholders and hints.",
+      border: "Color of the cell, input and panel borders.",
+      rowHover: "Row background under the cursor.",
+      rowChecked: "Background of the checked rows.",
+      headerHover: "Header cell background on hover.",
+      selectedBg: "Selected option inside the filter panels."
+    },
+    clearColor: "Reset {token}",
+    sizing: {
+      cellPaddingY: "Vertical padding",
+      cellPaddingX: "Horizontal padding",
+      rowHeight: "Row height",
+      fontSize: "Font size",
+      radius: "Border radius"
+    },
+    sizingHints: {
+      cellPaddingY: "Space above and below the cell content.",
+      cellPaddingX: "Space to the left and right of the cell content.",
+      rowHeight: "Minimum height of every row — the density of the table.",
+      fontSize: "Text size in the header, the cells and the footer.",
+      radius: "Rounding of the table corners and of the filter fields."
+    },
+    sizingNote: "These sliders have no --arcana-* token yet: the generated CSS emits plain rules on the grid parts.",
+    stageCaption: "real component · reacts to every token",
+    cssTab: "CSS",
+    tableAria: "Arcana DataTable theme preview",
+    infoAria: "About {label}"
   },
 
   demos: {

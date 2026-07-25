@@ -79,7 +79,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .topbar-search {
   flex: 1;
-  max-width: 380px;
+  max-width: 285px;
   margin-left: 8px;
 }
 .topbar-search input {
@@ -1142,6 +1142,95 @@ table.ref-table td .t-type {
   font-size: 11.5px;
   color: var(--accent);
 }
+
+/* ============ Theme Builder (reuses the pg-* inspector) ============ */
+
+/* Ponto índigo nas linhas cujo valor saiu do default/preset. */
+.tb-inspector .pg-row.is-mod::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.tb-color-ctl,
+.tb-range-ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.tb-color {
+  width: 30px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #cfe2f6;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+.tb-color::-webkit-color-swatch-wrapper { padding: 2px; }
+.tb-color::-webkit-color-swatch { border: 0; border-radius: 2px; }
+.tb-color:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tb-color-clear:disabled { opacity: 0; pointer-events: none; }
+.tb-range { width: 96px; accent-color: var(--accent); }
+.tb-val {
+  min-width: 32px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  text-align: right;
+}
+.tb-note {
+  margin: 8px 14px 0;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: #5d7796;
+}
+
+/*
+ * Preview do Theme Builder. O wrapper `.tb-stage` carrega a classe do preset
+ * (paleta completa) + as vars inline sobrescritas; como o próprio grid repete
+ * a classe `arcana-theme-*` no seu root, ela sombrearia o que herdaríamos daqui
+ * — o `inherit` abaixo devolve a cascata pros tokens que a tela expõe.
+ */
+.tb-stage .arcana-grid {
+  --arcana-accent: inherit;
+  --arcana-surface: inherit;
+  --arcana-surface-muted: inherit;
+  --arcana-text: inherit;
+  --arcana-text-muted: inherit;
+  --arcana-border: inherit;
+  --arcana-row-hover: inherit;
+  --arcana-row-checked: inherit;
+  --arcana-header-hover: inherit;
+  --arcana-selected-bg: inherit;
+}
+
+/*
+ * Espaçamento/tipografia/raio não têm token `--arcana-*`: são vars próprias da
+ * docs (`--tb-*`). O `!important` do padding existe porque os adapters escrevem
+ * `padding: 8px 10px` inline em cada célula.
+ */
+.tb-stage .arcana-grid .grid-header-cell,
+.tb-stage .arcana-grid .grid-cell,
+.tb-stage .arcana-grid .grid-summarizer-cell {
+  padding: var(--tb-cell-pad-y, 8px) var(--tb-cell-pad-x, 10px) !important;
+  font-size: var(--tb-font-size, 12px);
+}
+.tb-stage .arcana-grid .grid-row,
+.tb-stage .arcana-grid .grid-cell { min-height: var(--tb-row-height, 32px); }
+.tb-stage .arcana-grid .grid-footer,
+.tb-stage .arcana-grid .arcana-grid-status { font-size: var(--tb-font-size, 12px); }
+.tb-stage .arcana-grid.grid-wrapper { border-radius: var(--tb-radius, 0px); }
+.tb-stage .arcana-grid .arcana-grid-datatable-select,
+.tb-stage .arcana-grid .arcana-input { border-radius: var(--tb-radius, 4px); }
 
 
 /* ---- Nav scrim (mobile) ---- */

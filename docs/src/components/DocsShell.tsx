@@ -3,6 +3,7 @@ import { CodeBlock } from "./CodeBlock";
 import { LangSwitcher } from "./LangSwitcher";
 import { FrameworkSwitcher } from "./FrameworkSwitcher";
 import { Playground } from "./Playground";
+import { ThemeBuilder } from "./ThemeBuilder";
 import { fmt, useLang } from "../i18n";
 import arcanaLogo from "../assets/arcana-logo-light.png";
 
@@ -39,11 +40,17 @@ export const FW_BADGE: Record<Framework, string> = {
   svelte: "Svelte"
 };
 
-type DocsView = "docs" | "playground";
+type DocsView = "docs" | "playground" | "theme";
 
-/** `#/playground` é a rota do playground; qualquer outro hash (âncoras de seção) é docs. */
+/** Views com painel lateral de ajustes (o botão ☰ abre o inspector, não a navegação). */
+const PANEL_VIEWS: DocsView[] = ["playground", "theme"];
+
+/** `#/playground` e `#/theme-builder` são rotas; qualquer outro hash (âncoras de seção) é docs. */
 function readView(): DocsView {
-  return window.location.hash.startsWith("#/playground") ? "playground" : "docs";
+  const hash = window.location.hash;
+  if (hash.startsWith("#/playground")) return "playground";
+  if (hash.startsWith("#/theme-builder")) return "theme";
+  return "docs";
 }
 
 function readStoredFramework(): Framework {
@@ -243,10 +250,12 @@ export function DocsShell({ groups }: { groups: DocsGroup[] }) {
   }, [groups, normalizedQuery, msg.meta.locale]);
 
   const closeNav = () => setNavOpen(false);
+  const hasPanel = PANEL_VIEWS.includes(view);
+  const panelId = view === "playground" ? "playground-panel" : view === "theme" ? "theme-builder-panel" : "docs-sidebar";
 
   return <>
     <header className="topbar">
-      <button className="menu-btn" type="button" aria-label={navOpen ? (view === "playground" ? msg.shell.closeSettings : msg.shell.closeNav) : (view === "playground" ? msg.shell.openSettings : msg.shell.openNav)} aria-expanded={navOpen} aria-controls={view === "playground" ? "playground-panel" : "docs-sidebar"} onClick={() => setNavOpen((open) => !open)}>
+      <button className="menu-btn" type="button" aria-label={navOpen ? (hasPanel ? msg.shell.closeSettings : msg.shell.closeNav) : (hasPanel ? msg.shell.openSettings : msg.shell.openNav)} aria-expanded={navOpen} aria-controls={panelId} onClick={() => setNavOpen((open) => !open)}>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" /></svg>
       </button>
       <a className="brand" href="#instalacao">
@@ -256,6 +265,7 @@ export function DocsShell({ groups }: { groups: DocsGroup[] }) {
       <nav className="top-nav" aria-label={msg.shell.topNavAria}>
         <a className={view === "docs" ? "top-nav-link is-active" : "top-nav-link"} aria-current={view === "docs" ? "page" : undefined} href="#instalacao">{msg.shell.navDocs}</a>
         <a className={view === "playground" ? "top-nav-link is-active" : "top-nav-link"} aria-current={view === "playground" ? "page" : undefined} href="#/playground">{msg.shell.navPlayground}</a>
+        <a className={view === "theme" ? "top-nav-link is-active" : "top-nav-link"} aria-current={view === "theme" ? "page" : undefined} href="#/theme-builder">{msg.shell.navThemeBuilder}</a>
       </nav>
       {view === "docs" ? <div className="topbar-search" role="search">
         <input ref={searchRef} type="search" placeholder={msg.shell.searchPlaceholder} aria-label={msg.shell.searchAria} value={query} onChange={(event) => setQuery(event.target.value)} />
@@ -271,9 +281,9 @@ export function DocsShell({ groups }: { groups: DocsGroup[] }) {
       </div>
     </header>
 
-    {navOpen ? <button className="nav-scrim" type="button" aria-label={view === "playground" ? msg.shell.closeSettings : msg.shell.closeNav} onClick={closeNav} /> : null}
+    {navOpen ? <button className="nav-scrim" type="button" aria-label={hasPanel ? msg.shell.closeSettings : msg.shell.closeNav} onClick={closeNav} /> : null}
 
-    {view === "playground" ? <Playground framework={framework} panelOpen={navOpen} /> : <div className="layout">
+    {view === "playground" ? <Playground framework={framework} panelOpen={navOpen} /> : view === "theme" ? <ThemeBuilder framework={framework} panelOpen={navOpen} /> : <div className="layout">
       <nav className={navOpen ? "sidebar is-open" : "sidebar"} id="docs-sidebar" aria-label={msg.shell.sidebarAria}>
         {visibleGroups.length === 0 ? <p className="nav-empty">{msg.shell.noSectionsFound}</p> : null}
         {visibleGroups.map((group) => <div className="nav-group" key={group.label}>
