@@ -107,45 +107,12 @@ button { font-family: inherit; cursor: pointer; }
   gap: 16px;
 }
 
-.fw-toggle {
-  display: inline-flex;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2px;
-  background: #f8fafc;
-}
-.fw-btn {
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 4px;
-  transition: color .15s, background .15s;
-}
-.fw-btn.is-active {
-  background: var(--ink);
-  color: #fff;
-}
-.fw-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
+/* Framework logo — shown (in colour) inside the framework dropdown, which
+   reuses the language-switcher chrome (`.lang-*`). */
 .fw-logo {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   flex: 0 0 auto;
-  opacity: .55;
-  filter: grayscale(1);
-  transition: opacity .15s, filter .15s;
-}
-.fw-btn.is-active .fw-logo,
-.fw-btn:hover .fw-logo {
-  opacity: 1;
-  filter: none;
 }
 
 /* ============ Language switcher ============ */
