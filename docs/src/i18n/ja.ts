@@ -12,6 +12,7 @@ export const ja: Messages = {
     navThemeBuilder: "テーマエディター",
     topNavAria: "サイトのエリア",
     githubStars: "GitHub のスター {count} 件",
+    npmPackage: "npm の @arcanalabs/datatable",
     searchPlaceholder: "ドキュメントを検索… (⌘K)",
     searchAria: "ドキュメントを検索",
     chooseFramework: "フレームワークを選択",

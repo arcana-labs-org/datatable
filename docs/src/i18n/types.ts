@@ -102,6 +102,8 @@ export interface Messages {
     topNavAria: string;
     /** aria-label of the GitHub star count; {count} placeholder. */
     githubStars: string;
+    /** aria-label do link para a página do pacote no npm. */
+    npmPackage: string;
     searchPlaceholder: string;
     searchAria: string;
     chooseFramework: string;

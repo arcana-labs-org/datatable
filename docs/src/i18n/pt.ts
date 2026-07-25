@@ -12,6 +12,7 @@ export const pt: Messages = {
     navThemeBuilder: "Editor de tema",
     topNavAria: "Áreas do site",
     githubStars: "{count} estrelas no GitHub",
+    npmPackage: "@arcanalabs/datatable no npm",
     searchPlaceholder: "Buscar na documentação… (⌘K)",
     searchAria: "Buscar na documentação",
     chooseFramework: "Escolher framework",

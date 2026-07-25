@@ -12,6 +12,7 @@ export const ru: Messages = {
     navThemeBuilder: "Редактор темы",
     topNavAria: "Разделы сайта",
     githubStars: "{count} звёзд на GitHub",
+    npmPackage: "@arcanalabs/datatable на npm",
     searchPlaceholder: "Поиск по документации… (⌘K)",
     searchAria: "Поиск по документации",
     chooseFramework: "Выбрать фреймворк",

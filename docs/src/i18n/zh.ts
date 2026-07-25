@@ -12,6 +12,7 @@ export const zh: Messages = {
     navThemeBuilder: "主题编辑器",
     topNavAria: "站点区域",
     githubStars: "GitHub 上 {count} 个星标",
+    npmPackage: "@arcanalabs/datatable 在 npm 上",
     searchPlaceholder: "搜索文档…（⌘K）",
     searchAria: "搜索文档",
     chooseFramework: "选择框架",
