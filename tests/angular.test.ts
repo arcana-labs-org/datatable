@@ -42,6 +42,32 @@ describe("Angular adapter", () => {
     expect(element.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("1rem");
   });
 
+  it("hides sort icons when ordering is disabled globally or per column", async () => {
+    const global = await renderTable({
+      mode: "dataset", dataset: [], orderByEnabled: false,
+      columns: [{ name: "name", label: "Name" }, { name: "email", label: "Email" }]
+    });
+    expect(global.element.querySelectorAll(".arcana-sort")).toHaveLength(0);
+    global.fixture.destroy();
+
+    const column = await renderTable({
+      mode: "dataset", dataset: [],
+      columns: [{ name: "name", label: "Name", orderByEnabled: false }, { name: "email", label: "Email" }]
+    });
+    const headers = column.element.querySelectorAll(".grid-header [data-col-name]");
+    expect(headers[0].querySelector(".arcana-sort")).toBeNull();
+    expect(headers[1].querySelector(".arcana-sort")).toBeTruthy();
+  });
+
+  it("uses ArcanaInput's icon slot with a magnifying glass in text filters", async () => {
+    const { element } = await renderTable({
+      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+    });
+    expect(element.querySelector(".arcana-search-input input.arcana-input")).toBeTruthy();
+    expect(element.querySelector(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon")).toBeTruthy();
+    expect(element.querySelector(".arcana-search-input")?.textContent).toContain("Filtrar Name");
+  });
+
   it("renders rows and exposes the imperative grid API", async () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));
@@ -222,7 +248,8 @@ describe("Angular adapter", () => {
     expect(element.querySelector(".arcana-grid__per-page")?.textContent).toContain("Per page:");
     expect(element.querySelector(".grid-header")?.textContent).toContain("Actions");
     expect(element.querySelector('input[aria-label="Select all"]')).toBeTruthy();
-    expect(element.querySelector('input[aria-label="Filter Name"]')).toBeTruthy();
+    expect(element.querySelector(".arcana-search-input input")).toBeTruthy();
+    expect(element.querySelector(".arcana-search-input")?.textContent).toContain("Filter Name");
     click(element.querySelector(".grid-header-cell.grid-header-order"));
     fixture.detectChanges();
     const sortMenu = element.querySelector(".arcana-sort-menu")!;

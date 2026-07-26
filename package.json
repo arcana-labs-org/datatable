@@ -64,6 +64,9 @@
     "./styles.css": "./dist/arcanalabs-datatable.css",
     "./package.json": "./package.json"
   },
+  "dependencies": {
+    "maska": "^1.5.2"
+  },
   "scripts": {
     "dev": "vite --config docs/vite.config.ts",
     "docs:dev": "vite --config docs/vite.config.ts",
@@ -80,7 +83,7 @@
   "peerDependencies": {
     "@angular/common": ">=17.0.0",
     "@angular/core": ">=17.0.0",
-    "@arcanalabs/ui-components": ">=1.1.0",
+    "@arcanalabs/ui-components": ">=2.1.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
     "svelte": ">=5.0.0",
@@ -108,11 +111,11 @@
   },
   "devDependencies": {
     "@angular/common": "^21.2.18",
-    "@arcanalabs/ui-components": "^1.1.0",
     "@angular/compiler": "^21.2.18",
     "@angular/compiler-cli": "^21.2.18",
     "@angular/core": "^21.2.18",
     "@angular/platform-browser": "^21.2.18",
+    "@arcanalabs/ui-components": "^2.1.0",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/svelte": "^5.4.2",

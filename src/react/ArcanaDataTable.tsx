@@ -5,7 +5,7 @@ import { arcanaThemeClass } from "../core/theme";
 import { startColumnDrag } from "../core/drag";
 import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, gridRootStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { ContextMenuItem, DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, SearchOption, StyleMap } from "../core/types";
-import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/react";
+import { ArcanaInput, ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/react";
 import "../assets/ArcanaGrid.css";
 
 export interface ArcanaDataTableProps<Row extends DataTableRow = DataTableRow> {
@@ -43,7 +43,19 @@ function FilterField<Row extends DataTableRow>({ column, value, disabled, messag
   if (column.searchType === "DATE" || column.searchType === "DATE_MONTH") {
     return <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
   }
-  return <input type="search" value={String(draft)} disabled={disabled} className="arcana-grid-datatable-input" aria-label={filterLabel} onChange={(event) => setDraft(event.target.value)} onBlur={() => onChange(draft)} onKeyDown={(event) => { if (event.key === "Enter") onChange(draft); }} />;
+  return <label className="arcana-search-input">
+    <span className="arcana-visually-hidden">{filterLabel}</span>
+    <ArcanaInput
+      type="search"
+      value={String(draft)}
+      disabled={disabled}
+      className="arcana-grid-datatable-input"
+      iconStart={<svg className="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>}
+      onValueChange={(next) => setDraft(next ?? "")}
+      onBlur={() => onChange(draft)}
+      onKeyDown={(event) => { if (event.key === "Enter") onChange(draft); }}
+    />
+  </label>;
 }
 
 /**
@@ -228,7 +240,7 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
           {expandable ? <div className={`grid-header-cell grid-expand-cell ${pinClass(PIN_SLOT_EXPANDER)}`} style={reactStyle({ ...expanderStyle, ...pinStyle(PIN_SLOT_EXPANDER) })} /> : null}
           {config.checkboxEnabled ? <div className={`grid-header-cell ${pinClass(PIN_SLOT_CHECKBOX)}`} style={reactStyle({ ...selectionStyle, ...pinStyle(PIN_SLOT_CHECKBOX) })}><input type="checkbox" checked={state.rows.some((row) => row._isChecked)} disabled={config.isCheckboxHeaderDisabled?.(grid)} aria-label={messages.selectAll} onChange={(event) => grid.toggleAll(event.target.checked)} /></div> : null}
           {config.radioButtonSelectionEnabled ? <div className={`grid-header-cell ${pinClass(PIN_SLOT_RADIO)}`} style={reactStyle({ ...selectionStyle, ...pinStyle(PIN_SLOT_RADIO) })} /> : null}
-          {columns.map((column) => { const sort = sortOf(column); return <div key={column.name} data-col-name={column.name} tabIndex={isColumnReorderable(column, grid) ? 0 : undefined} className={`grid-header-cell ${alignmentClass(column, grid)} ${orderable(column) ? "grid-header-order" : ""} ${pinClass(column.name)}${dragClass(column)}`} style={reactStyle({ ...colStyle(column), ...pinStyle(column.name) })} role="columnheader" aria-sort={orderable(column) ? ariaSortValue(sort.direction) : undefined} onClick={(event) => onHeaderClick(event, column)} onPointerDown={(event) => startReorder(event, column)} onKeyDown={(event) => onHeaderKeyDown(event, column)}><Content value={headerValue(column)} html={column.html === true} /><span className="arcana-sort" aria-hidden="true">{sortGlyph(sort.direction)}{sort.multi && sort.direction ? <span className="arcana-sort-priority">{sort.priority}</span> : null}</span>{isColumnResizable(column, grid) ? <span className="arcana-col-resizer" role="separator" aria-hidden="true" onPointerDown={(event) => startResize(event, column)} onClick={(event) => event.stopPropagation()} /> : null}</div>; })}
+          {columns.map((column) => { const sort = sortOf(column); return <div key={column.name} data-col-name={column.name} tabIndex={isColumnReorderable(column, grid) ? 0 : undefined} className={`grid-header-cell ${alignmentClass(column, grid)} ${orderable(column) ? "grid-header-order" : ""} ${pinClass(column.name)}${dragClass(column)}`} style={reactStyle({ ...colStyle(column), ...pinStyle(column.name) })} role="columnheader" aria-sort={orderable(column) ? ariaSortValue(sort.direction) : undefined} onClick={(event) => onHeaderClick(event, column)} onPointerDown={(event) => startReorder(event, column)} onKeyDown={(event) => onHeaderKeyDown(event, column)}><Content value={headerValue(column)} html={column.html === true} />{orderable(column) ? <span className="arcana-sort" aria-hidden="true">{sortGlyph(sort.direction)}{sort.multi && sort.direction ? <span className="arcana-sort-priority">{sort.priority}</span> : null}</span> : null}{isColumnResizable(column, grid) ? <span className="arcana-col-resizer" role="separator" aria-hidden="true" onPointerDown={(event) => startResize(event, column)} onClick={(event) => event.stopPropagation()} /> : null}</div>; })}
           {config.actions ? <div className={`grid-header-cell ${pinClass(PIN_SLOT_ACTIONS)}`} style={reactStyle({ ...actionStyle(grid), ...pinStyle(PIN_SLOT_ACTIONS) })}>{messages.actions}</div> : null}
         </div>
         {config.searchEnabled !== false ? <div className="grid-search-row" role="row">

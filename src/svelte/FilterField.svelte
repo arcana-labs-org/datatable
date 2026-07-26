@@ -7,7 +7,22 @@
    */
   import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
   import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
-  import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/svelte";
+  import { ArcanaInput as UiArcanaInput, ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/svelte";
+  import type { Component, Snippet } from "svelte";
+
+  // ui-components 2.1.0 implements the icon snippets, but its generated
+  // Svelte declaration omits them. Keep the adapter typed until that upstream
+  // declaration catches up with the runtime API.
+  const ArcanaInput = UiArcanaInput as Component<{
+    value?: string | number | null;
+    type?: string;
+    disabled?: boolean;
+    class?: string;
+    iconStart?: Snippet;
+    onValueChange?: (value: string | number | null) => void;
+    onBlur?: (event: FocusEvent) => void;
+    onKeydown?: (event: KeyboardEvent) => void;
+  }>;
 
   let { column, value, disabled = false, messages, locale, onChange }: {
     column: DataTableColumn<DataTableRow>;
@@ -55,14 +70,20 @@
 {:else if column.searchType === "DATE" || column.searchType === "DATE_MONTH"}
   <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
 {:else}
-  <input
-    type="search"
-    value={String(draft ?? "")}
-    {disabled}
-    class="arcana-grid-datatable-input"
-    aria-label={filterLabel}
-    oninput={(event) => { draft = (event.currentTarget as HTMLInputElement).value; }}
-    onblur={() => onChange(draft)}
-    onkeydown={(event) => { if (event.key === "Enter") onChange(draft); }}
-  />
+  {#snippet searchIcon()}
+    <svg class="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+  {/snippet}
+  <label class="arcana-search-input">
+    <span class="arcana-visually-hidden">{filterLabel}</span>
+    <ArcanaInput
+      type="search"
+      value={String(draft ?? "")}
+      {disabled}
+      class="arcana-grid-datatable-input"
+      iconStart={searchIcon}
+      onValueChange={(next) => { draft = next ?? ""; }}
+      onBlur={() => onChange(draft)}
+      onKeydown={(event) => { if (event.key === "Enter") onChange(draft); }}
+    />
+  </label>
 {/if}

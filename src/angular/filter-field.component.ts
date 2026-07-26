@@ -4,7 +4,7 @@ import {
 } from "@angular/core";
 import { formatMessage, getDefaultArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
-import { ArcanaDatePickerComponent, ArcanaSelectComponent, type SelectOption } from "@arcanalabs/ui-components/angular";
+import { ArcanaDatePickerComponent, ArcanaInputComponent, ArcanaSelectComponent, type SelectOption } from "@arcanalabs/ui-components/angular";
 
 /**
  * Renders the filter control for a column, mirroring the React/Vue
@@ -17,8 +17,11 @@ import { ArcanaDatePickerComponent, ArcanaSelectComponent, type SelectOption } f
   selector: "div[arcanaFilterField]",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ArcanaSelectComponent, ArcanaDatePickerComponent],
+  imports: [ArcanaInputComponent, ArcanaSelectComponent, ArcanaDatePickerComponent],
   template: `
+    <ng-template #searchIcon>
+      <svg class="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+    </ng-template>
     @switch (kind()) {
       @case ("range") {
         <div arcanaDatePicker type="daterange" [value]="rangeValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
@@ -33,16 +36,20 @@ import { ArcanaDatePickerComponent, ArcanaSelectComponent, type SelectOption } f
         <div arcanaDatePicker [type]="column.searchType === 'DATE' ? 'date' : 'month'" [value]="stringValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @default {
-        <input
-          type="search"
-          [value]="stringValue()"
-          [disabled]="disabled"
-          class="arcana-grid-datatable-input"
-          [attr.aria-label]="filterLabel()"
-          (input)="onInput($event)"
-          (blur)="valueChange.emit(draft)"
-          (keydown.enter)="valueChange.emit(draft)"
-        />
+        <label class="arcana-search-input">
+          <span class="arcana-visually-hidden">{{ filterLabel() }}</span>
+          <input
+            arcanaInput
+            type="search"
+            [iconStart]="searchIcon"
+            [value]="stringValue()"
+            [disabled]="disabled"
+            class="arcana-grid-datatable-input"
+            (input)="onInput($event)"
+            (blur)="valueChange.emit(draft)"
+            (keydown.enter)="valueChange.emit(draft)"
+          />
+        </label>
       }
     }
   `

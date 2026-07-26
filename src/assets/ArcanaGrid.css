@@ -469,8 +469,7 @@
 /* Mobile/Tablet breakpoint (768px and below) — vertical card layout (VERTICAL_RECORD mode only) */
 @media screen and (max-width: 768px) {
     .arcana-grid-responsive-vertical.grid-wrapper {
-        border-left: none;
-        border-right: none;
+        border: none;
     }
 
     .arcana-grid-responsive-vertical .arcana-grid-body {
@@ -665,8 +664,7 @@
    ============================================ */
 
 .arcana-grid.grid-wrapper {
-    border-right: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border: 1px solid var(--arcana-border);
     border-radius: var(--arcana-border-radius);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -1434,6 +1432,50 @@
     background: var(--arcana-input-bg);
     color: var(--arcana-text);
     font: inherit;
+}
+
+.arcana-grid .arcana-search-input,
+.arcana-grid .arcana-input-wrap {
+    display: block;
+    width: 100%;
+}
+
+.arcana-grid .arcana-input-wrap {
+    position: relative;
+}
+
+.arcana-grid .arcana-input__icon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 9px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    color: var(--arcana-text-placeholder);
+    pointer-events: none;
+}
+
+.arcana-grid .arcana-search-input__icon {
+    display: block;
+    width: 14px;
+    height: 14px;
+}
+
+.arcana-grid .arcana-grid-datatable-input.arcana-input--icon-start {
+    padding-left: 30px;
+}
+
+.arcana-grid .arcana-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .arcana-grid .arcana-grid-datatable-input:focus,
@@ -2307,4 +2349,48 @@
 
 .arcana-theme-midnight .arcana-grid-datatable-select {
     color: var(--arcana-input-text);
+}
+
+/* The rounded scroll container owns the complete outer border. Keeping the
+   top/bottom edges on its children lets overflow clip those edges at the
+   curved corners, which makes the border look cut off. These rules live after
+   the compatibility blocks so the ownership cannot be overwritten later. */
+.arcana-grid .grid-header .grid-header-cell,
+.arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell {
+    border-top: 0;
+}
+
+.arcana-grid > .grid-footer,
+.arcana-grid > .arcana-grid-datatable-footer {
+    border-bottom: 0;
+}
+
+.arcana-grid .arcana-grid-body > .grid-summarizer:last-child .grid-summarizer-cell,
+.arcana-grid .arcana-grid-body > .arcana-grid-datatable-summarizer:last-child .arcana-grid-datatable-summarizer-cell,
+.arcana-grid .arcana-grid-body > .grid-body:last-child > .grid-row:last-child .grid-cell,
+.arcana-grid .arcana-grid-body > .arcana-grid-datatable-body:last-child > .arcana-grid-datatable-row:last-child .arcana-grid-datatable-cell,
+.arcana-grid .arcana-grid-body > .grid-body:last-child > .grid-detail-row:last-child .grid-detail-cell {
+    border-bottom: 0;
+}
+
+/* VERTICAL_RECORD uses individually bordered cards on small screens instead
+   of one outer table frame. Restore the few edges that the cards/footer own. */
+@media screen and (max-width: 768px) {
+    .arcana-grid-responsive-vertical.grid-wrapper {
+        border: none;
+    }
+
+    .arcana-grid-responsive-vertical > .grid-footer,
+    .arcana-grid-responsive-vertical > .arcana-grid-datatable-footer {
+        border-bottom: 1px solid var(--arcana-border);
+    }
+
+    .arcana-grid-responsive-vertical .arcana-grid-body > .grid-summarizer:last-child .grid-summarizer-cell,
+    .arcana-grid-responsive-vertical .arcana-grid-body > .arcana-grid-datatable-summarizer:last-child .arcana-grid-datatable-summarizer-cell {
+        border-bottom: 1px solid var(--arcana-border-strong);
+    }
+
+    .arcana-grid-responsive-vertical .arcana-grid-body > .grid-body:last-child > .grid-detail-row:last-child .grid-detail-cell {
+        border-bottom: 1px solid var(--arcana-border);
+    }
 }

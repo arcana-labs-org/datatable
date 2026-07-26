@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
-import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/vue";
+import { ArcanaInput, ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/vue";
 
 const props = defineProps<{
   column: DataTableColumn<DataTableRow>;
@@ -28,7 +28,7 @@ onMounted(async () => { options.value = await props.column.searchConfig?.() ?? [
 
 const commit = (next: unknown) => { value.value = next; emit("change", next); };
 const commitText = () => emit("change", value.value);
-const onInput = (event: Event) => { value.value = (event.target as HTMLInputElement).value; };
+const onTextInput = (next: string | number | null) => { value.value = next ?? ""; };
 
 const rangeValue = computed<[string, string]>(() => Array.isArray(value.value)
   ? [String(value.value[0] ?? ""), String(value.value[1] ?? "")]
@@ -76,15 +76,20 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
     :aria-label="filterLabel"
     @change="commit"
   />
-  <input
-    v-else
-    type="search"
-    :value="value as string"
-    :disabled="disabled"
-    class="arcana-grid-datatable-input"
-    :aria-label="filterLabel"
-    @input="onInput"
-    @change="commitText"
-    @keyup.enter="commitText"
-  />
+  <label v-else class="arcana-search-input">
+    <span class="arcana-visually-hidden">{{ filterLabel }}</span>
+    <ArcanaInput
+      type="search"
+      :model-value="String(value ?? '')"
+      :disabled="disabled"
+      class="arcana-grid-datatable-input"
+      @update:model-value="onTextInput"
+      @blur="commitText"
+      @keydown.enter="commitText"
+    >
+      <template #icon-start>
+        <svg class="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+      </template>
+    </ArcanaInput>
+  </label>
 </template>

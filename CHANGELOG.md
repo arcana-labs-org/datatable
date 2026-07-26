@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0 — 2026-07-26
+
+### Alterações
+- A dependência `@arcanalabs/ui-components` agora requer a versão 2.1.0 ou superior; os filtros de texto usam o novo slot inicial de `ArcanaInput` com um ícone de lupa em todos os adapters.
+
+### Correções
+- Colunas sem ordenação — por configuração global ou individual — não exibem mais o ícone de sort.
+- A borda externa passou a pertencer ao container da tabela, evitando que os cantos arredondados cortem partes da borda.
+
 ## 1.3.0 — 2026-07-26
 
 ### Novos recursos

@@ -10,6 +10,31 @@ describe("Vue adapter", () => {
     expect((wrapper.find(".arcana-grid").element as HTMLElement).style.borderRadius).toBe("0.75rem");
   });
 
+  it("hides sort icons when ordering is disabled globally or per column", async () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", dataset: [], orderByEnabled: false,
+      columns: [{ name: "name", label: "Name" }, { name: "email", label: "Email" }]
+    } } });
+    expect(wrapper.findAll(".arcana-sort")).toHaveLength(0);
+
+    await wrapper.setProps({ config: {
+      mode: "dataset", dataset: [],
+      columns: [{ name: "name", label: "Name", orderByEnabled: false }, { name: "email", label: "Email" }]
+    } });
+    const headers = wrapper.findAll(".grid-header [data-col-name]");
+    expect(headers[0].find(".arcana-sort").exists()).toBe(false);
+    expect(headers[1].find(".arcana-sort").exists()).toBe(true);
+  });
+
+  it("uses ArcanaInput's icon slot with a magnifying glass in text filters", () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+    } } });
+    expect(wrapper.find(".arcana-search-input input.arcana-input").exists()).toBe(true);
+    expect(wrapper.find(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon").exists()).toBe(true);
+    expect(wrapper.find(".arcana-search-input").text()).toContain("Filtrar Name");
+  });
+
   it("renders rows and preserves the exposed SparkGrid methods", async () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));
@@ -162,7 +187,8 @@ describe("Vue adapter", () => {
     expect(wrapper.find(".arcana-grid__per-page").text()).toContain("Per page:");
     expect(wrapper.find(".grid-header").text()).toContain("Actions");
     expect(wrapper.find('input[aria-label="Select all"]').exists()).toBe(true);
-    expect(wrapper.find('input[aria-label="Filter Name"]').exists()).toBe(true);
+    expect(wrapper.find(".arcana-search-input input").exists()).toBe(true);
+    expect(wrapper.find(".arcana-search-input").text()).toContain("Filter Name");
     await wrapper.find(".grid-header-cell.grid-header-order").trigger("click");
     const sortMenu = wrapper.find(".arcana-sort-menu");
     expect(sortMenu.attributes("aria-label")).toBe("Sorting");

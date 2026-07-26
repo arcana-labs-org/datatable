@@ -12,6 +12,31 @@ describe("React adapter", () => {
     expect(container.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("12px");
   });
 
+  it("hides sort icons when ordering is disabled globally or per column", () => {
+    const { container, rerender } = render(<ArcanaDataTable config={{
+      mode: "dataset", dataset: [], orderByEnabled: false,
+      columns: [{ name: "name", label: "Name" }, { name: "email", label: "Email" }]
+    }} />);
+    expect(container.querySelectorAll(".arcana-sort")).toHaveLength(0);
+
+    rerender(<ArcanaDataTable config={{
+      mode: "dataset", dataset: [],
+      columns: [{ name: "name", label: "Name", orderByEnabled: false }, { name: "email", label: "Email" }]
+    }} />);
+    const headers = container.querySelectorAll<HTMLElement>(".grid-header [data-col-name]");
+    expect(headers[0].querySelector(".arcana-sort")).toBeNull();
+    expect(headers[1].querySelector(".arcana-sort")).toBeTruthy();
+  });
+
+  it("uses ArcanaInput's icon slot with a magnifying glass in text filters", () => {
+    const { container } = render(<ArcanaDataTable config={{
+      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+    }} />);
+    const input = screen.getByLabelText("Filtrar Name");
+    expect(input.classList.contains("arcana-input")).toBe(true);
+    expect(container.querySelector(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon")).toBeTruthy();
+  });
+
   it("renders rows and exposes the imperative grid API", () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));
