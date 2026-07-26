@@ -150,6 +150,7 @@ const themeConfigLines = [
   "const config = {", "  mode: 'dataset',", "  dataset: rows,",
   "  // per table: wins over the global default",
   "  theme: 'ocean', // a preset or the name of your own theme",
+  "  borderRadius: 12, // number = px; strings accept any CSS length",
   "  columns", "}"
 ];
 
@@ -198,6 +199,7 @@ export const themeCode: SnippetPair = {
     "  config = {", "    mode: 'dataset',", "    dataset: rows,",
     "    // per table: wins over the global default",
     "    theme: 'ocean', // a preset or the name of your own theme",
+    "    borderRadius: '0.75rem',",
     "    columns", "  }",
     "}", "",
     "// Custom theme: define the arcana-theme-{name} class in your CSS",

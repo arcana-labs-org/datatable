@@ -3,7 +3,7 @@ import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
 import { startColumnDrag } from "../core/drag";
-import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, gridRootStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { ContextMenuItem, DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, SearchOption, StyleMap } from "../core/types";
 import { ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/react";
 import "../assets/ArcanaGrid.css";
@@ -221,7 +221,7 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
   const menuColumnOrderable = menuColumn ? orderable(menuColumn) : false;
 
   return (
-    <div className={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} aria-label={config.ariaLabel ?? messages.gridLabel} aria-busy={state.loading}>
+    <div className={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} style={reactStyle(gridRootStyle(config))} aria-label={config.ariaLabel ?? messages.gridLabel} aria-busy={state.loading}>
       {state.error ? <div className="arcana-grid-error" role="alert">{messages.loadError}</div> : null}
       <div className="arcana-grid-body" style={config.overflowEnabled ? { maxHeight: config.height ?? 560, overflow: "auto" } : undefined}>
         <div className={`grid-header ${config.stickyHeaderEnabled ? "grid-header-sticky" : ""}`} role="row">

@@ -4,7 +4,7 @@ import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
 import { startColumnDrag } from "../core/drag";
-import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, gridRootStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, StyleMap } from "../core/types";
 import FilterField from "./FilterField.vue";
 import "../assets/ArcanaGrid.css";
@@ -211,7 +211,7 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
 </script>
 
 <template>
-  <div class="arcana-grid grid-wrapper" :class="[themeClass, { 'arcana-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD' }]" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
+  <div class="arcana-grid grid-wrapper" :class="[themeClass, { 'arcana-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD' }]" :style="gridRootStyle(config)" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
     <div v-if="state.error" class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
     <div class="arcana-grid-body" :style="config.overflowEnabled ? { maxHeight: `${config.height ?? 560}px`, overflow: 'auto' } : undefined">
       <div class="grid-header" :class="{ 'grid-header-sticky': config.stickyHeaderEnabled }" role="row">

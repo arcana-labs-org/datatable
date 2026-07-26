@@ -14,7 +14,7 @@
   import { formatMessage, resolveArcanaLocale, resolveArcanaMessages } from "../core/locale";
   import { arcanaThemeClass } from "../core/theme";
   import { startColumnDrag } from "../core/drag";
-  import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expanderStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+  import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expanderStyle, gridRootStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
   import type { ContextMenuItem, DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, OrderBy, StyleMap } from "../core/types";
   import Content from "./Content.svelte";
   import ExpandedRowContent from "./ExpandedRowContent.svelte";
@@ -214,7 +214,7 @@
   export function getExpandedRows() { return grid.getExpandedRows(); }
 </script>
 
-<div class={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} aria-label={config.ariaLabel ?? msg.gridLabel} aria-busy={snap.loading}>
+<div class={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} style={inlineStyle(gridRootStyle(config))} aria-label={config.ariaLabel ?? msg.gridLabel} aria-busy={snap.loading}>
   {#if snap.error}<div class="arcana-grid-error" role="alert">{msg.loadError}</div>{/if}
   <div class="arcana-grid-body" style={config.overflowEnabled ? `max-height: ${config.height ?? 560}px; overflow: auto` : undefined}>
     <div class={`grid-header ${config.stickyHeaderEnabled ? "grid-header-sticky" : ""}`} role="row">

@@ -5,6 +5,13 @@ import type { DataTableApi } from "../src";
 import { ArcanaDataTable } from "../src/react";
 
 describe("React adapter", () => {
+  it("applies a numeric native borderRadius to the grid root in pixels", () => {
+    const { container } = render(<ArcanaDataTable config={{
+      mode: "dataset", dataset: [], columns: [], borderRadius: 12
+    }} />);
+    expect(container.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("12px");
+  });
+
   it("renders rows and exposes the imperative grid API", () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));

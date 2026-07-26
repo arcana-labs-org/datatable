@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 — 2026-07-26
+
+### Novos recursos
+- **Cantos arredondados nativos**: use `config.borderRadius` em qualquer adapter com um número (pixels) ou uma medida CSS (`"0.75rem"`, por exemplo). Temas personalizados também podem definir o novo token `--arcana-border-radius`; a configuração por tabela tem precedência.
+
 ## 1.2.1 — 2026-07-23
 
 ### Correções

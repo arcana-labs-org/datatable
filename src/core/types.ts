@@ -129,6 +129,12 @@ export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
    */
   theme?: ArcanaTheme;
   /**
+   * Rounds the outer corners of the grid. Numbers are interpreted as pixels;
+   * strings accept any valid CSS length (for example `"0.75rem"`).
+   * Defaults to the theme token `--arcana-border-radius` (initially `0px`).
+   */
+  borderRadius?: number | string;
+  /**
    * Locale of the grid's built-in strings (pagination, filters, sort menu,
    * calendar, …). Falls back to the global default set via
    * `setDefaultArcanaLocale` (initially `pt-BR`).

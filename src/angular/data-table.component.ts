@@ -6,7 +6,7 @@ import { createDataTable } from "../core/controller";
 import { formatMessage, resolveArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
 import { arcanaThemeClass } from "../core/theme";
 import { startColumnDrag } from "../core/drag";
-import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expanderStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, type PinPlan, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
+import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expanderStyle, gridRootStyle, inlineStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, type PinPlan, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type {
   ContextMenuItem, DataTableAction, DataTableApi, DataTableColumn, DataTableConfig,
   DataTableRow, DataTableSnapshot, OrderBy, Renderable, SortDirection
@@ -36,7 +36,7 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
   imports: [ArcanaContentDirective, ArcanaExpandedRowComponent, ArcanaFilterFieldComponent],
   styles: [":host { display: block; }"],
   template: `
-    <div class="arcana-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' arcana-grid-responsive-vertical' : '' }}{{ className ? ' ' + className : '' }}" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
+    <div class="arcana-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' arcana-grid-responsive-vertical' : '' }}{{ className ? ' ' + className : '' }}" [style]="rootStyle()" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
       @if (snap.error) {
         <div class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
       }
@@ -190,6 +190,7 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   readonly pageSizes = [10, 25, 50, 100, 250, 500];
   readonly expanderCellStyle = inlineStyle(expanderStyle);
   readonly selectionHeaderStyle = inlineStyle(selectionStyle);
+  rootStyle(): string { return inlineStyle(gridRootStyle(this.config)); }
 
   private unsubscribe: (() => void) | null = null;
   private readonly cdr = inject(ChangeDetectorRef);

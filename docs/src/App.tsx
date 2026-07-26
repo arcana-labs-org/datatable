@@ -39,6 +39,7 @@ const customThemeCss = `/* my-theme.css — any name works; here, "candy" */
   --arcana-surface-muted: #fdf2f8;   /* grid header and footer */
   --arcana-border: #fbcfe8;          /* cell and input borders */
   --arcana-accent: #db2777;          /* focus, current page, selection */
+  --arcana-border-radius: 12px;       /* native grid corner radius */
   --arcana-row-checked: #fce7f3;     /* checked row */
   --arcana-row-focused: #fdf2f8;     /* focused row */
   --arcana-panel-bg: #fff0f7;        /* portaled select and calendar */
@@ -57,6 +58,7 @@ const customThemeCss = `/* my-theme.css — any name works; here, "candy" */
 const PROPERTY_META: Array<{ key: PropertyKey; name: string; type: string; def: string | null | undefined }> = [
   { key: "mode", name: "mode", type: "remote | dataset", def: null },
   { key: "theme", name: "theme", type: "zinc | ocean | forest | midnight | string", def: "zinc" },
+  { key: "borderRadius", name: "borderRadius", type: "number | string", def: "0" },
   { key: "locale", name: "locale", type: "pt-BR | en | es | it | zh | ja | de | ru", def: "pt-BR" },
   { key: "messages", name: "messages", type: "Partial<ArcanaMessages>", def: undefined },
   { key: "dataset", name: "dataset", type: "DataTableRow[]", def: undefined },
@@ -253,7 +255,7 @@ function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
             <P>{s.themes.p4}</P>
             <P>{s.themes.p5}</P>
             <CodeBlock lang="css" file="my-theme.css" code={customThemeCss} />
-            {chips(["theme", "setDefaultArcanaTheme", "getDefaultArcanaTheme", "arcana-theme-{name}", "--arcana-*"])}
+            {chips(["theme", "borderRadius", "setDefaultArcanaTheme", "getDefaultArcanaTheme", "arcana-theme-{name}", "--arcana-border-radius"])}
           </>
         },
         {

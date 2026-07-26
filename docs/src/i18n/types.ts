@@ -15,6 +15,7 @@ export type Lang = "en" | "pt-BR" | "es" | "it" | "zh" | "ja" | "de" | "ru";
 export type PropertyKey =
   | "mode"
   | "theme"
+  | "borderRadius"
   | "locale"
   | "messages"
   | "dataset"

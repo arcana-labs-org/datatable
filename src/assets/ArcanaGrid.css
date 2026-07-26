@@ -27,6 +27,7 @@
     /* borders */
     --arcana-border: #dddddd;
     --arcana-border-strong: #bbbbbb;
+    --arcana-border-radius: 0px;
     /* text */
     --arcana-text: #263238;
     --arcana-text-muted: #71717a;
@@ -666,6 +667,7 @@
 .arcana-grid.grid-wrapper {
     border-right: 1px solid var(--arcana-border);
     border-left: 1px solid var(--arcana-border);
+    border-radius: var(--arcana-border-radius);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }

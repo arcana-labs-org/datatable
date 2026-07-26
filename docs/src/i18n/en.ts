@@ -209,6 +209,7 @@ export const en: Messages = {
       descriptions: {
         mode: "Defines where filters, sorting and pagination are executed.",
         theme: "Visual theme of the grid and the portaled panels — a preset or the name of your own theme (arcana-theme-{name} class); the global default changes with setDefaultArcanaTheme.",
+        borderRadius: "Rounds the grid's outer corners. Numbers are pixels; strings accept any CSS length. Overrides the theme's --arcana-border-radius token.",
         locale: "Locale of the grid's built-in strings (8 shipped packs); the global default changes with setDefaultArcanaLocale.",
         messages: "Per-key overrides of the built-in strings, applied on top of the resolved locale pack.",
         dataset: "Full collection for local operations; infers dataset mode.",
@@ -451,9 +452,9 @@ export const en: Messages = {
       cellPaddingX: "Space to the left and right of the cell content.",
       rowHeight: "Minimum height of every row — the density of the table.",
       fontSize: "Text size in the header, the cells and the footer.",
-      radius: "Rounding of the table corners and of the filter fields."
+      radius: "Native rounding of the table's outer corners."
     },
-    sizingNote: "These sliders have no --arcana-* token yet: the generated CSS emits plain rules on the grid parts.",
+    sizingNote: "Radius uses the native --arcana-border-radius token; the other sizing controls still emit plain rules.",
     stageCaption: "real component · reacts to every token",
     cssTab: "CSS",
     tableAria: "Arcana DataTable theme preview",

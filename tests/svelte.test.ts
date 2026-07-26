@@ -25,6 +25,13 @@ afterEach(() => {
 });
 
 describe("Svelte adapter", () => {
+  it("applies a numeric native borderRadius to the grid root in pixels", () => {
+    const { target } = renderTable({
+      mode: "dataset", dataset: [], columns: [], borderRadius: 10
+    });
+    expect(target.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("10px");
+  });
+
   it("renders rows and exposes the imperative grid API", () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));

@@ -209,6 +209,7 @@ export const zh: Messages = {
       descriptions: {
         mode: "定义筛选、排序和分页在何处执行。",
         theme: "表格及被传送面板的视觉主题——预设主题或你自定义主题的名字（arcana-theme-{name} class）；全局默认值通过 setDefaultArcanaTheme 修改。",
+        borderRadius: "设置表格外角的圆角。数字按像素处理；字符串可使用任意 CSS 长度。它会覆盖主题的 --arcana-border-radius 令牌。",
         locale: "表格内置文案的语言（内置 8 个语言包）；全局默认值通过 setDefaultArcanaLocale 修改。",
         messages: "对内置文案的逐条覆盖，叠加在解析出的语言包之上。",
         dataset: "供本地操作使用的完整集合；会自动推断为 dataset 模式。",
@@ -451,9 +452,9 @@ export const zh: Messages = {
       cellPaddingX: "单元格内容左右的留白。",
       rowHeight: "每行的最小高度，也就是表格的密度。",
       fontSize: "表头、单元格与页脚的文字大小。",
-      radius: "表格四角与筛选控件的圆角。"
+      radius: "原生设置表格外侧四角的圆角。"
     },
-    sizingNote: "这几个滑块还没有对应的 --arcana-* 变量：生成的 CSS 会直接为表格各部分输出普通规则。",
+    sizingNote: "圆角使用原生 --arcana-border-radius 令牌；其他尺寸控件仍会生成普通规则。",
     stageCaption: "真实组件 · 随每个变量实时变化",
     cssTab: "CSS",
     tableAria: "Arcana DataTable 主题预览",

@@ -109,18 +109,16 @@ const PRESET_COLORS: Record<ArcanaThemePreset, Record<ColorToken, string>> = {
 };
 
 /**
- * Sizing/typography knobs. The library has no `--arcana-*` token for these yet
- * (cell padding is written inline by the adapters, font-size/radius live in
- * plain rules), so each one drives a docs-owned `--tb-*` variable consumed by
- * the `.tb-stage` rules in `styles.css`. The generated CSS therefore emits
- * plain declarations for them instead of tokens.
+ * Sizing/typography knobs. Border radius uses the library's native
+ * `--arcana-border-radius` token; the remaining knobs still drive docs-owned
+ * `--tb-*` variables because the library has no public tokens for them yet.
  */
 const SIZING = [
   { key: "cellPaddingY", cssVar: "--tb-cell-pad-y", min: 0, max: 24, step: 1, def: 8 },
   { key: "cellPaddingX", cssVar: "--tb-cell-pad-x", min: 0, max: 32, step: 1, def: 10 },
   { key: "rowHeight", cssVar: "--tb-row-height", min: 24, max: 72, step: 1, def: 32 },
   { key: "fontSize", cssVar: "--tb-font-size", min: 10, max: 20, step: 1, def: 12 },
-  { key: "radius", cssVar: "--tb-radius", min: 0, max: 20, step: 1, def: 0 }
+  { key: "radius", cssVar: "--arcana-border-radius", min: 0, max: 20, step: 1, def: 0 }
 ] as const;
 
 type SizingKey = (typeof SIZING)[number]["key"];
@@ -245,31 +243,31 @@ function buildCss(state: ThemeState): string {
     `   Base: the '${state.preset}' preset; only what you changed is listed. */`
   ];
 
-  if (colors.length > 0) {
+  const radiusChanged = sizing.includes("radius");
+  if (colors.length > 0 || radiusChanged) {
     lines.push(`.arcana-theme-${CUSTOM_THEME_NAME} {`);
     colors.forEach((token) => lines.push(`  --arcana-${token}: ${state.colors[token]};`));
+    if (radiusChanged) lines.push(`  --arcana-border-radius: ${state.radius}px;`);
     lines.push("}");
   }
 
-  if (sizing.length > 0) {
-    if (colors.length > 0) lines.push("");
-    lines.push("/* Sizing and typography have no --arcana-* token (yet) — plain rules. */");
-    const padded = sizing.includes("cellPaddingY") || sizing.includes("cellPaddingX");
-    if (padded || sizing.includes("fontSize")) {
+  const plainSizing = sizing.filter((key) => key !== "radius");
+  if (plainSizing.length > 0) {
+    if (colors.length > 0 || radiusChanged) lines.push("");
+    lines.push("/* Remaining sizing and typography use plain rules. */");
+    const padded = plainSizing.includes("cellPaddingY") || plainSizing.includes("cellPaddingX");
+    if (padded || plainSizing.includes("fontSize")) {
       lines.push(`.arcana-theme-${CUSTOM_THEME_NAME} .grid-header-cell,`);
       lines.push(`.arcana-theme-${CUSTOM_THEME_NAME} .grid-cell,`);
       lines.push(`.arcana-theme-${CUSTOM_THEME_NAME} .grid-summarizer-cell {`);
       // The adapters write `padding: 8px 10px` inline on every cell.
       if (padded) lines.push(`  padding: ${state.cellPaddingY}px ${state.cellPaddingX}px !important; /* set inline by the adapters */`);
-      if (sizing.includes("fontSize")) lines.push(`  font-size: ${state.fontSize}px;`);
+      if (plainSizing.includes("fontSize")) lines.push(`  font-size: ${state.fontSize}px;`);
       lines.push("}");
     }
-    if (sizing.includes("rowHeight")) {
+    if (plainSizing.includes("rowHeight")) {
       lines.push(`.arcana-theme-${CUSTOM_THEME_NAME} .grid-row,`);
       lines.push(`.arcana-theme-${CUSTOM_THEME_NAME} .grid-cell { min-height: ${state.rowHeight}px; }`);
-    }
-    if (sizing.includes("radius")) {
-      lines.push(`.arcana-theme-${CUSTOM_THEME_NAME}.grid-wrapper { border-radius: ${state.radius}px; }`);
     }
   }
 

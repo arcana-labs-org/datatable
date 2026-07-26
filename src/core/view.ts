@@ -1,5 +1,13 @@
 import type { ArcanaMessages } from "./locale";
-import type { DataTableApi, DataTableColumn, DataTableRow, OrderBy, SortDirection, StyleMap } from "./types";
+import type { DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, OrderBy, SortDirection, StyleMap } from "./types";
+
+/**
+ * Inline style for the grid root. Leaving `borderRadius` undefined lets the
+ * active theme's `--arcana-border-radius` token control the corners.
+ */
+export function gridRootStyle<Row extends DataTableRow>(config: DataTableConfig<Row>): StyleMap {
+  return config.borderRadius === undefined ? {} : { borderRadius: config.borderRadius };
+}
 
 /**
  * Column cell sizing. `overrideWidth` (px) takes precedence over `column.width`
@@ -265,4 +273,3 @@ export function pagination(current: number, total: number, perPage: number): num
   const end = Math.min(last, current + 2);
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
-

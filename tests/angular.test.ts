@@ -35,6 +35,13 @@ const click = (element: Element | null) => {
 };
 
 describe("Angular adapter", () => {
+  it("applies a CSS-length native borderRadius to the grid root", async () => {
+    const { element } = await renderTable({
+      mode: "dataset", dataset: [], columns: [], borderRadius: "1rem"
+    });
+    expect(element.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("1rem");
+  });
+
   it("renders rows and exposes the imperative grid API", async () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));

@@ -209,6 +209,7 @@ export const ja: Messages = {
       descriptions: {
         mode: "フィルター、ソート、ページネーションをどこで実行するかを定義します。",
         theme: "グリッドとポータルされるパネルのビジュアルテーマです。プリセット、または独自テーマの名前（arcana-theme-{name} クラス）を指定します。グローバルなデフォルトは setDefaultArcanaTheme で変更します。",
+        borderRadius: "グリッド外側の角を丸めます。数値はピクセル、文字列は任意の CSS 長さを指定できます。テーマの --arcana-border-radius トークンを上書きします。",
         locale: "グリッド内蔵文言のロケール（8 パック同梱）。グローバルデフォルトは setDefaultArcanaLocale で変更します。",
         messages: "内蔵文言のキー単位の上書きです。解決されたロケールパックの上に適用されます。",
         dataset: "ローカル操作用の全コレクションです。dataset モードが推論されます。",
@@ -451,9 +452,9 @@ export const ja: Messages = {
       cellPaddingX: "セルの内容の左右に取る余白。",
       rowHeight: "各行の最小の高さ。表の密度そのものです。",
       fontSize: "ヘッダー・セル・フッターの文字の大きさ。",
-      radius: "テーブルの角とフィルター入力欄の丸み。"
+      radius: "テーブル外側の角をネイティブに丸めます。"
     },
-    sizingNote: "これらのスライダーにはまだ --arcana-* トークンがありません。生成される CSS はテーブル各部への通常のルールとして出力されます。",
+    sizingNote: "角丸にはネイティブの --arcana-border-radius トークンを使い、その他のサイズ設定は引き続き通常のルールを生成します。",
     stageCaption: "本物のコンポーネント · すべてのトークンに反応します",
     cssTab: "CSS",
     tableAria: "Arcana DataTable のテーマプレビュー",

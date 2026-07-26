@@ -209,6 +209,7 @@ export const it: Messages = {
       descriptions: {
         mode: "Definisce dove vengono eseguiti filtri, ordinamento e paginazione.",
         theme: "Tema visivo della griglia e dei pannelli in portal — un preset o il nome di un tema proprio (classe arcana-theme-{name}); il default globale cambia con setDefaultArcanaTheme.",
+        borderRadius: "Arrotonda gli angoli esterni della griglia. I numeri sono pixel; le stringhe accettano qualsiasi misura CSS. Sovrascrive il token --arcana-border-radius del tema.",
         locale: "Locale delle stringhe interne della griglia (8 pack inclusi); il default globale cambia con setDefaultArcanaLocale.",
         messages: "Sostituzioni puntuali delle stringhe interne, applicate sopra il pack del locale risolto.",
         dataset: "Collezione completa per le operazioni locali; inferisce la modalità dataset.",
@@ -451,9 +452,9 @@ export const it: Messages = {
       cellPaddingX: "Spazio a sinistra e a destra del contenuto della cella.",
       rowHeight: "Altezza minima di ogni riga: la densità della tabella.",
       fontSize: "Dimensione del testo nell'intestazione, nelle celle e nel piè di pagina.",
-      radius: "Arrotondamento degli angoli della tabella e dei campi di filtro."
+      radius: "Arrotondamento nativo degli angoli esterni della tabella."
     },
-    sizingNote: "Questi controlli non hanno ancora un token --arcana-*: il CSS generato emette regole dirette sulle parti della griglia.",
+    sizingNote: "Il raggio usa il token nativo --arcana-border-radius; gli altri controlli di dimensione generano ancora regole dirette.",
     stageCaption: "componente reale · reagisce a ogni token",
     cssTab: "CSS",
     tableAria: "Anteprima del tema di Arcana DataTable",

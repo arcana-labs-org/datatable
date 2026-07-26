@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 import { ArcanaDataTable } from "../src/vue";
 
 describe("Vue adapter", () => {
+  it("applies a CSS-length native borderRadius to the grid root", () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", dataset: [], columns: [], borderRadius: "0.75rem"
+    } } });
+    expect((wrapper.find(".arcana-grid").element as HTMLElement).style.borderRadius).toBe("0.75rem");
+  });
+
   it("renders rows and preserves the exposed SparkGrid methods", async () => {
     const checked = vi.fn();
     const selectionStyle = vi.fn(() => ({ background: "#e2f4ed" }));

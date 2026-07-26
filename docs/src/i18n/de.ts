@@ -209,6 +209,7 @@ export const de: Messages = {
       descriptions: {
         mode: "Bestimmt, wo Filter, Sortierung und Paginierung ausgeführt werden.",
         theme: "Visuelles Theme des Grids und der portalierten Panels — ein Preset oder der Name eines eigenen Themes (Klasse arcana-theme-{name}); der globale Standard ändert sich mit setDefaultArcanaTheme.",
+        borderRadius: "Rundet die äußeren Ecken des Grids ab. Zahlen sind Pixel; Strings akzeptieren jedes CSS-Längenmaß. Überschreibt das Theme-Token --arcana-border-radius.",
         locale: "Locale der eingebauten Texte des Grids (8 mitgelieferte Pakete); der globale Standard ändert sich mit setDefaultArcanaLocale.",
         messages: "Punktuelle Überschreibungen der eingebauten Texte, angewendet über dem aufgelösten Locale-Paket.",
         dataset: "Vollständige Sammlung für lokale Operationen; impliziert den dataset-Modus.",
@@ -451,9 +452,9 @@ export const de: Messages = {
       cellPaddingX: "Abstand links und rechts vom Zelleninhalt.",
       rowHeight: "Mindesthöhe jeder Zeile — die Dichte der Tabelle.",
       fontSize: "Textgröße in Kopfzeile, Zellen und Fußzeile.",
-      radius: "Abrundung der Tabellenecken und der Filterfelder."
+      radius: "Native Abrundung der äußeren Tabellenecken."
     },
-    sizingNote: "Für diese Regler gibt es noch kein --arcana-*-Token: das generierte CSS schreibt direkte Regeln auf die Teile der Tabelle.",
+    sizingNote: "Der Radius nutzt das native Token --arcana-border-radius; die übrigen Größenregler erzeugen weiterhin direkte Regeln.",
     stageCaption: "echte Komponente · reagiert auf jedes Token",
     cssTab: "CSS",
     tableAria: "Theme-Vorschau der Arcana DataTable",

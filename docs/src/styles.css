@@ -1211,11 +1211,12 @@ table.ref-table td .t-type {
   --arcana-row-checked: inherit;
   --arcana-header-hover: inherit;
   --arcana-selected-bg: inherit;
+  --arcana-border-radius: inherit;
 }
 
 /*
- * Espaçamento/tipografia/raio não têm token `--arcana-*`: são vars próprias da
- * docs (`--tb-*`). O `!important` do padding existe porque os adapters escrevem
+ * Espaçamento/tipografia ainda usam vars próprias da docs (`--tb-*`). O
+ * `!important` do padding existe porque os adapters escrevem
  * `padding: 8px 10px` inline em cada célula.
  */
 .tb-stage .arcana-grid .grid-header-cell,
@@ -1228,9 +1229,6 @@ table.ref-table td .t-type {
 .tb-stage .arcana-grid .grid-cell { min-height: var(--tb-row-height, 32px); }
 .tb-stage .arcana-grid .grid-footer,
 .tb-stage .arcana-grid .arcana-grid-status { font-size: var(--tb-font-size, 12px); }
-.tb-stage .arcana-grid.grid-wrapper { border-radius: var(--tb-radius, 0px); }
-.tb-stage .arcana-grid .arcana-grid-datatable-select,
-.tb-stage .arcana-grid .arcana-input { border-radius: var(--tb-radius, 4px); }
 
 
 /* ---- Nav scrim (mobile) ---- */
