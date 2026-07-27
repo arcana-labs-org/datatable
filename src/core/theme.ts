@@ -5,9 +5,8 @@ import type { ArcanaTheme, ArcanaThemePreset } from "./types";
  *
  * Every theme is a CSS class (`arcana-theme-{name}`) that only overrides the
  * `--arcana-*` custom properties declared in `ArcanaGrid.css`. The grid root
- * receives the class, and — because the select/calendar panels are portaled
- * to `<body>` and therefore do NOT inherit variables from the grid — the same
- * class is propagated to every portaled panel.
+ * and grid-owned floating menus receive the class. Select and calendar
+ * portals are styled by the global `@arcanalabs/ui-components` theme.
  */
 export const ARCANA_THEMES: readonly ArcanaThemePreset[] = ["zinc", "ocean", "forest", "midnight"];
 
@@ -30,8 +29,7 @@ export function arcanaThemeClass(theme?: ArcanaTheme): string {
 
 /**
  * Resolves the theme class from the nearest themed ancestor of `element`.
- * Used by the portaled panels (select/calendar), which render on `<body>`
- * and must repeat the theme class of the grid that owns their trigger.
+ * Used by grid-owned floating elements such as drag ghosts and menus.
  */
 export function arcanaThemeClassFrom(element: Element | null | undefined): string {
   const host = element?.closest?.('[class*="arcana-theme-"]');

@@ -9,20 +9,20 @@ export function codePair(lines: string[], vueLines = lines, angularLines = vueLi
   return {
     react: [
       "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
-      "import '@arcanalabs/datatable/styles.css'", "", "const rows = [/* your data */]", "",
+      "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "", "const rows = [/* your data */]", "",
       "const config = {", ...lines.map((line) => `  ${line}`), "}", "",
       "export function Example() {", "  return <ArcanaDataTable config={config} />", "}"
     ].join("\n"),
     vue: [
       "<script setup lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
-      "import '@arcanalabs/datatable/styles.css'", "", "const rows = [/* your data */]", "",
+      "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "", "const rows = [/* your data */]", "",
       "const config = {", ...vueLines.map((line) => `  ${line}`), "}", "</script>", "",
       "<template><ArcanaDataTable :config=\"config\" /></template>"
     ].join("\n"),
     angular: [
       "import { Component } from '@angular/core'",
       "import { ArcanaDataTableComponent } from '@arcanalabs/datatable/angular'",
-      "// styles: import '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
+      "// styles: import '@arcanalabs/ui-components/styles.css' and '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
       "", "const rows = [/* your data */]", "",
       "@Component({",
       "  selector: 'app-example',",
@@ -36,7 +36,7 @@ export function codePair(lines: string[], vueLines = lines, angularLines = vueLi
     ].join("\n"),
     svelte: [
       "<script lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'",
-      "import '@arcanalabs/datatable/styles.css'", "", "const rows = [/* your data */]", "",
+      "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "", "const rows = [/* your data */]", "",
       "const config = {", ...svelteLines.map((line) => `  ${line}`), "}", "</script>", "",
       "<ArcanaDataTable {config} />"
     ].join("\n")
@@ -53,7 +53,7 @@ export const installCode: SnippetPair = {
 export const firstUseCode: SnippetPair = {
   react: [
     "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "const config = {", "  mode: 'remote',", "  columns: [",
     "    { name: 'client', label: 'Client' },",
     "    { name: 'amount', label: 'Amount', type: 'CURRENCY' }", "  ],",
@@ -62,7 +62,7 @@ export const firstUseCode: SnippetPair = {
   ].join("\n"),
   vue: [
     "<script setup lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
-    "import '@arcanalabs/datatable/styles.css'", "", "const config = {", "  mode: 'remote',", "  columns: [",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "", "const config = {", "  mode: 'remote',", "  columns: [",
     "    { name: 'client', label: 'Client' },", "    { name: 'amount', label: 'Amount', type: 'CURRENCY' }",
     "  ],", "  datasource: async (params) => api.invoices.list(params)", "}", "</script>", "",
     "<template>", "  <ArcanaDataTable :config=\"config\" />", "</template>"
@@ -70,7 +70,7 @@ export const firstUseCode: SnippetPair = {
   angular: [
     "import { Component } from '@angular/core'",
     "import { ArcanaDataTableComponent } from '@arcanalabs/datatable/angular'",
-    "// styles: import '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
+    "// styles: import '@arcanalabs/ui-components/styles.css' and '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
     "",
     "@Component({",
     "  selector: 'app-invoices',",
@@ -87,7 +87,7 @@ export const firstUseCode: SnippetPair = {
   ].join("\n"),
   svelte: [
     "<script lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'",
-    "import '@arcanalabs/datatable/styles.css'", "", "const config = {", "  mode: 'remote',", "  columns: [",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "", "const config = {", "  mode: 'remote',", "  columns: [",
     "    { name: 'client', label: 'Client' },", "    { name: 'amount', label: 'Amount', type: 'CURRENCY' }",
     "  ],", "  datasource: async (params) => api.invoices.list(params)", "}", "</script>", "",
     "<ArcanaDataTable {config} />"
@@ -95,10 +95,10 @@ export const firstUseCode: SnippetPair = {
 };
 
 export const stylesCode: SnippetPair = {
-  react: "// once, at the application entrypoint\nimport '@arcanalabs/datatable/styles.css'",
-  vue: "// once, at the application entrypoint\nimport '@arcanalabs/datatable/styles.css'",
-  angular: "/* once, in the app's global styles.css (or in angular.json > \"styles\") */\n@import '@arcanalabs/datatable/styles.css';",
-  svelte: "// once, at the application entrypoint\nimport '@arcanalabs/datatable/styles.css'"
+  react: "// once, at the application entrypoint\nimport '@arcanalabs/ui-components/styles.css'\nimport '@arcanalabs/datatable/styles.css'",
+  vue: "// once, at the application entrypoint\nimport '@arcanalabs/ui-components/styles.css'\nimport '@arcanalabs/datatable/styles.css'",
+  angular: "/* once, in the app's global styles.css (or in angular.json > \"styles\") */\n@import '@arcanalabs/ui-components/styles.css';\n@import '@arcanalabs/datatable/styles.css';",
+  svelte: "// once, at the application entrypoint\nimport '@arcanalabs/ui-components/styles.css'\nimport '@arcanalabs/datatable/styles.css'"
 };
 
 const modeConfigLines = [
@@ -109,19 +109,19 @@ const modeConfigLines = [
 
 export const modeCode: SnippetPair = {
   react: [
-    "import { ArcanaDataTable } from '@arcanalabs/datatable/react'", "import '@arcanalabs/datatable/styles.css'", "",
+    "import { ArcanaDataTable } from '@arcanalabs/datatable/react'", "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     ...modeConfigLines, "",
     "export function Example() {", "  return <>", "    <ArcanaDataTable config={remoteConfig} />", "    <ArcanaDataTable config={datasetConfig} />", "  </>", "}"
   ].join("\n"),
   vue: [
-    "<script setup lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'", "import '@arcanalabs/datatable/styles.css'", "",
+    "<script setup lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'", "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     ...modeConfigLines, "</script>", "",
     "<template>", "  <ArcanaDataTable :config=\"remoteConfig\" />", "  <ArcanaDataTable :config=\"datasetConfig\" />", "</template>"
   ].join("\n"),
   angular: [
     "import { Component } from '@angular/core'",
     "import { ArcanaDataTableComponent } from '@arcanalabs/datatable/angular'",
-    "// styles: import '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
+    "// styles: import '@arcanalabs/ui-components/styles.css' and '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
     "",
     "@Component({",
     "  selector: 'app-example',",
@@ -139,7 +139,7 @@ export const modeCode: SnippetPair = {
     "}"
   ].join("\n"),
   svelte: [
-    "<script lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'", "import '@arcanalabs/datatable/styles.css'", "",
+    "<script lang=\"ts\">", "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'", "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     ...modeConfigLines, "</script>", "",
     "<ArcanaDataTable config={remoteConfig} />",
     "<ArcanaDataTable config={datasetConfig} />"
@@ -158,7 +158,7 @@ export const themeCode: SnippetPair = {
   react: [
     "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
     "import { setDefaultArcanaTheme } from '@arcanalabs/datatable'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "// global: applies to every table without its own theme",
     "setDefaultArcanaTheme('midnight')", "",
     ...themeConfigLines, "",
@@ -171,7 +171,7 @@ export const themeCode: SnippetPair = {
     "<script setup lang=\"ts\">",
     "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
     "import { setDefaultArcanaTheme } from '@arcanalabs/datatable'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "// global: applies to every table without its own theme",
     "setDefaultArcanaTheme('midnight')", "",
     ...themeConfigLines, "</script>", "",
@@ -184,7 +184,7 @@ export const themeCode: SnippetPair = {
     "import { Component } from '@angular/core'",
     "import { ArcanaDataTableComponent } from '@arcanalabs/datatable/angular'",
     "import { setDefaultArcanaTheme } from '@arcanalabs/datatable'",
-    "// styles: import '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
+    "// styles: import '@arcanalabs/ui-components/styles.css' and '@arcanalabs/datatable/styles.css' once (global styles.css or angular.json)",
     "",
     "// global: applies to every table without its own theme",
     "setDefaultArcanaTheme('midnight')",
@@ -210,7 +210,7 @@ export const themeCode: SnippetPair = {
     "<script lang=\"ts\">",
     "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'",
     "import { setDefaultArcanaTheme } from '@arcanalabs/datatable'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "// global: applies to every table without its own theme",
     "setDefaultArcanaTheme('midnight')", "",
     ...themeConfigLines, "",
@@ -238,7 +238,7 @@ export const localizationCode: SnippetPair = {
   react: [
     "import { ArcanaDataTable } from '@arcanalabs/datatable/react'",
     "import { setDefaultArcanaLocale } from '@arcanalabs/datatable'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "// global: applies to every table without its own locale",
     "setDefaultArcanaLocale('en')", "",
     ...localizationConfigLines, "",
@@ -250,7 +250,7 @@ export const localizationCode: SnippetPair = {
     "<script setup lang=\"ts\">",
     "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'",
     "import { setDefaultArcanaLocale } from '@arcanalabs/datatable'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "// global: applies to every table without its own locale",
     "setDefaultArcanaLocale('en')", "",
     ...localizationConfigLines, "</script>", "",
@@ -290,7 +290,7 @@ export const localizationCode: SnippetPair = {
     "<script lang=\"ts\">",
     "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'",
     "import { setDefaultArcanaLocale } from '@arcanalabs/datatable'",
-    "import '@arcanalabs/datatable/styles.css'", "",
+    "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "// global: applies to every table without its own locale",
     "setDefaultArcanaLocale('en')", "",
     ...localizationConfigLines, "",
@@ -325,7 +325,7 @@ export const actionsCode = codePair(
 
 export const expandableCode: SnippetPair = {
   react: [
-    "import { ArcanaDataTable } from '@arcanalabs/datatable/react'", "import '@arcanalabs/datatable/styles.css'", "",
+    "import { ArcanaDataTable } from '@arcanalabs/datatable/react'", "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "const config = {", "  mode: 'dataset',", "  dataset: rows,", "  columns,",
     "  expandableRowsEnabled: true,", "  expandRowOnClick: false, // true: the whole row toggles the expansion", "",
     "  // SYNC: uses the row's own data",
@@ -345,7 +345,7 @@ export const expandableCode: SnippetPair = {
   ].join("\n"),
   vue: [
     "<script setup lang=\"ts\">", "import { h } from 'vue'",
-    "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'", "import '@arcanalabs/datatable/styles.css'", "",
+    "import { ArcanaDataTable } from '@arcanalabs/datatable/vue'", "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "const config = {", "  mode: 'dataset',", "  dataset: rows,", "  columns,",
     "  expandableRowsEnabled: true,", "  expandRowOnClick: false, // true: the whole row toggles the expansion", "",
     "  // SYNC: uses the row's own data",
@@ -396,7 +396,7 @@ export const expandableCode: SnippetPair = {
   ].join("\n"),
   svelte: [
     "<script lang=\"ts\">",
-    "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'", "import '@arcanalabs/datatable/styles.css'", "",
+    "import { ArcanaDataTable } from '@arcanalabs/datatable/svelte'", "import '@arcanalabs/ui-components/styles.css'", "import '@arcanalabs/datatable/styles.css'", "",
     "const config = {", "  mode: 'dataset',", "  dataset: rows,", "  columns,",
     "  expandableRowsEnabled: true,", "  expandRowOnClick: false, // true: the whole row toggles the expansion", "",
     "  // SYNC: uses the row's own data — the renderer returns an HTML",

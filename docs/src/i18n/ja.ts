@@ -57,7 +57,7 @@ export const ja: Messages = {
     },
     styles: {
       title: "スタイル",
-      p1: "スタイルシートはオプトインです。アプリケーションのルートで一度だけ <c>@arcanalabs/datatable/styles.css</c> をインポートしてください。テーブル、フィルター、ページネーション、ローディング状態をカバーします。",
+      p1: "スタイルシートはオプトインです。アプリケーションのルートで <c>@arcanalabs/ui-components/styles.css</c>、続けて <c>@arcanalabs/datatable/styles.css</c> を一度だけインポートしてください。前者はネイティブなフィルターコントロール、後者はグリッド、ページネーション、ローディング状態を担当します。",
       p2: "独自のデザインを使いたい場合は、CSS のインポートを省略するだけで構いません。マークアップはセマンティックかつ安定しており、外部からスタイルを適用できるように設計されています。",
     },
     modes: {
@@ -79,10 +79,10 @@ export const ja: Messages = {
       title: "テーマ",
       previewLabel: "実際のコンポーネント · テーマを切り替えてみてください",
       p1: "グリッドの外観はすべてデザイントークン（<c>--arcana-*</c> CSS 変数）の上に構築されており、パッケージには 4 つのテーマが同梱されています。<c>zinc</c>（デフォルトのライトなニュートラル）、<c>ocean</c>（ブルー系）、<c>forest</c>（グリーン系）、<c>midnight</c>（完全なダーク）です。",
-      p2: "テーブルごとには <c>config.theme</c> で選択し、グローバルなデフォルトは <c>setDefaultArcanaTheme(theme)</c> で設定します。独自の <c>theme</c> を持たないすべてのテーブルに適用されます（現在の値は <c>getDefaultArcanaTheme()</c> で取得できます）。テーマはルート要素に <c>arcana-theme-*</c> クラスとして適用され、<c><body></c> へポータルされるパネル（セレクト、カレンダー、コンテキスト／ソートメニュー）にも繰り返し付与されます。これらはテレポートされるため、そのままではグリッドの変数を継承できないからです。",
-      p3: "デモでは、<c>midnight</c> テーマの状態で「部署」フィルターや「日付」カレンダーを開くと、ダークなパネルを確認できます。",
+      p2: "テーブルごとには <c>config.theme</c> で選択し、グローバルなデフォルトは <c>setDefaultArcanaTheme(theme)</c> で設定します。独自の <c>theme</c> を持たないすべてのテーブルに適用されます（現在の値は <c>getDefaultArcanaTheme()</c> で取得できます）。クラスはルートとグリッド固有のフローティングメニューに適用されます。セレクトとカレンダーのポータルパネルは、<c>@arcanalabs/ui-components</c> のグローバルスタイルとテーマを使用します。",
+      p3: "デモでプリセットを切り替え、グリッドとコンパクトなフィルターコントロールを比較できます。",
       customHeading: "独自テーマの作成",
-      p4: "テーマとは、<c>--arcana-*</c> トークンを上書きする <c>arcana-theme-{name}</c> という CSS クラスにすぎません。プリセットに限らず任意の名前が使えます。アプリケーションの CSS でクラスを宣言し、その名前を <c>config.theme</c>（または <c>setDefaultArcanaTheme</c>）に渡してください。同じクラスがグリッドとポータルされたパネルの両方に自動的に適用されるため、1 つのセレクターですべてをカバーできます。",
+      p4: "テーマとは、<c>--arcana-*</c> トークンを上書きする <c>arcana-theme-{name}</c> という CSS クラスにすぎません。プリセットに限らず任意の名前が使えます。アプリケーションの CSS でクラスを宣言し、その名前を <c>config.theme</c>（または <c>setDefaultArcanaTheme</c>）に渡してください。グリッド内のコントロールは、<c>ui-components</c> のクラスを上書きせずに同じトークンを継承します。",
       p5: "すべてのトークンを再定義する必要はありません。主要なものから始めて、必要に応じて残りを上書きしてください。完全な一覧はパッケージの <c>styles.css</c> の先頭にあります。上のデモの <c>candy</c> テーマはまさにその例で、パッケージの外にあるこのドキュメントの CSS で定義されています。",
     },
     localization: {
@@ -208,7 +208,7 @@ export const ja: Messages = {
       },
       descriptions: {
         mode: "フィルター、ソート、ページネーションをどこで実行するかを定義します。",
-        theme: "グリッドとポータルされるパネルのビジュアルテーマです。プリセット、または独自テーマの名前（arcana-theme-{name} クラス）を指定します。グローバルなデフォルトは setDefaultArcanaTheme で変更します。",
+        theme: "グリッドとトークンを継承するコントロールのビジュアルテーマです。プリセット、または独自の arcana-theme-{name} クラスを指定します。グローバルなデフォルトは setDefaultArcanaTheme で変更します。",
         borderRadius: "グリッド外側の角を丸めます。数値はピクセル、文字列は任意の CSS 長さを指定できます。テーマの --arcana-border-radius トークンを上書きします。",
         locale: "グリッド内蔵文言のロケール（8 パック同梱）。グローバルデフォルトは setDefaultArcanaLocale で変更します。",
         messages: "内蔵文言のキー単位の上書きです。解決されたロケールパックの上に適用されます。",
@@ -437,7 +437,7 @@ export const ja: Messages = {
       rowHover: "カーソルが乗った行の背景。",
       rowChecked: "チェック済みの行の背景。",
       headerHover: "ヘッダーセルにカーソルを乗せたときの背景。",
-      selectedBg: "フィルターパネル内で選択中の項目。"
+      selectedBg: "グリッド内フィルターコントロールのフォーカスと選択色。"
     },
     clearColor: "{token} をリセット",
     sizing: {

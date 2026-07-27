@@ -28,10 +28,17 @@ describe("Vue adapter", () => {
 
   it("uses ArcanaInput's icon slot with a magnifying glass in text filters", () => {
     const wrapper = mount(ArcanaDataTable, { props: { config: {
-      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+      mode: "dataset", dataset: [], columns: [
+        { name: "name", label: "Name" },
+        { name: "area", label: "Area", searchType: "LIST" },
+        { name: "date", label: "Date", searchType: "DATE" }
+      ]
     } } });
     expect(wrapper.find(".arcana-search-input input.arcana-input").exists()).toBe(true);
+    expect(wrapper.find(".arcana-search-input input.arcana-input--sm").exists()).toBe(true);
     expect(wrapper.find(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon").exists()).toBe(true);
+    expect(wrapper.find(".arcana-select--sm").exists()).toBe(true);
+    expect(wrapper.find(".arcana-cal--sm").exists()).toBe(true);
     expect(wrapper.find(".arcana-search-input").text()).toContain("Filtrar Name");
   });
 

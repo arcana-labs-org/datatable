@@ -16,6 +16,7 @@
   const ArcanaInput = UiArcanaInput as Component<{
     value?: string | number | null;
     type?: string;
+    size?: "sm" | "md" | "lg";
     disabled?: boolean;
     class?: string;
     iconStart?: Snippet;
@@ -62,13 +63,13 @@
 </script>
 
 {#if column.searchType === "DATE_RANGE"}
-  <ArcanaDatePicker type="daterange" value={rangeValue} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
+  <ArcanaDatePicker type="daterange" size="sm" value={rangeValue} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
 {:else if column.searchType === "BOOLEAN"}
-  <ArcanaSelect value={String(draft ?? "")} options={booleanOptions} {disabled} placeholder={msg.booleanAll} onChange={commit} />
+  <ArcanaSelect size="sm" value={String(draft ?? "")} options={booleanOptions} {disabled} placeholder={msg.booleanAll} onChange={commit} />
 {:else if column.searchType === "LIST" || column.searchType === "REMOTE"}
-  <ArcanaSelect multiple value={listValue} {options} {disabled} placeholder={msg.booleanAll} onChange={commit} />
+  <ArcanaSelect size="sm" multiple value={listValue} {options} {disabled} placeholder={msg.booleanAll} onChange={commit} />
 {:else if column.searchType === "DATE" || column.searchType === "DATE_MONTH"}
-  <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
+  <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} size="sm" value={String(draft ?? "")} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
 {:else}
   {#snippet searchIcon()}
     <svg class="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
@@ -77,9 +78,9 @@
     <span class="arcana-visually-hidden">{filterLabel}</span>
     <ArcanaInput
       type="search"
+      size="sm"
       value={String(draft ?? "")}
       {disabled}
-      class="arcana-grid-datatable-input"
       iconStart={searchIcon}
       onValueChange={(next) => { draft = next ?? ""; }}
       onBlur={() => onChange(draft)}

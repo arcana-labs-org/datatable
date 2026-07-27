@@ -5,14 +5,10 @@
    look). Themes (`arcana-theme-ocean|forest|midnight`, end of this file)
    only override these variables.
 
-   IMPORTANT: the select/calendar panels are portaled to <body>, so they do
-   NOT inherit variables from `.arcana-grid` — defaults are declared on the
-   panels too, and the components repeat the `arcana-theme-*` class on every
-   portaled panel.
+   Filter controls use the native @arcanalabs/ui-components stylesheet.
+   This file only defines grid tokens and grid-specific layout adjustments.
    ============================================ */
 .arcana-grid,
-.arcana-select__panel,
-.arcana-cal__panel,
 .arcana-drag-ghost {
     /* surfaces */
     --arcana-bg: transparent;
@@ -41,6 +37,15 @@
     --arcana-accent-contrast: #ffffff;
     --arcana-focus-ring: #176b87;
     --arcana-cell-focus: #000000;
+    /* ui-components semantic tokens used by the filter controls */
+    --arcana-border-subtle: #d6dde2;
+    --arcana-surface-subtle: #fafafa;
+    --arcana-solid: #18181b;
+    --arcana-solid-hover: #27272a;
+    --arcana-solid-active: #09090b;
+    --arcana-ui: #f4f4f5;
+    --arcana-ui-hover: #f4f4f5;
+    --arcana-on-solid: #ffffff;
     /* rows */
     --arcana-row-hover: #f5f5f5;
     --arcana-row-checked: #e8eef5;
@@ -52,24 +57,6 @@
     --arcana-sort-idle: #d9dfe3;
     --arcana-sort-hover: #000000;
     --arcana-sort-hint: #82909a;
-    /* inputs and filter controls (arcana-select__*, arcana-cal__*) */
-    --arcana-input-bg: #ffffff;
-    --arcana-input-bg-disabled: #fafafa;
-    --arcana-input-text: #09090b;
-    --arcana-input-border: #e4e4e7;
-    --arcana-input-border-base: #d6dde2;
-    --arcana-input-border-hover: #d4d4d8;
-    --arcana-input-border-active: #18181b;
-    --arcana-select-border: #dcdfe6;
-    --arcana-select-border-hover: #c0c4cc;
-    --arcana-select-focus: #409eff;
-    /* portaled panels */
-    --arcana-panel-bg: #ffffff;
-    --arcana-panel-border: #e4e4e7;
-    --arcana-item-hover: #f4f4f5;
-    --arcana-selected-bg: #18181b;
-    --arcana-selected-text: #ffffff;
-    --arcana-day-adjacent: #d4d4d8;
     /* context/sort menus */
     --arcana-menu-border: #d7dde1;
     --arcana-menu-hover: #eef5f6;
@@ -263,20 +250,21 @@
 .arcana-grid .arcana-grid-datatable-select {
     width: 100%;
     padding: 6px 8px;
-    border: 1px solid var(--arcana-select-border);
+    border: 1px solid var(--arcana-border-subtle);
     border-radius: 4px;
-    background: var(--arcana-input-bg);
+    background: var(--arcana-surface);
+    color: var(--arcana-text);
     font-size: 12px;
     cursor: pointer;
 }
 
 .arcana-grid .arcana-grid-datatable-select:hover {
-    border-color: var(--arcana-select-border-hover);
+    border-color: var(--arcana-border);
 }
 
 .arcana-grid .arcana-grid-datatable-select:focus {
     outline: none;
-    border-color: var(--arcana-select-focus);
+    border-color: var(--arcana-solid);
 }
 
 .arcana-grid .arcana-grid-pages {
@@ -1171,7 +1159,7 @@
 }
 
 .arcana-grid .grid-expand-toggle:hover {
-    background: var(--arcana-item-hover);
+    background: var(--arcana-ui-hover);
     color: var(--arcana-ink);
 }
 
@@ -1346,7 +1334,7 @@
 /* Floating drag ghost: a chip with the column label that follows the pointer
    during a header drag. It is portaled to <body> (positioned via transform),
    repeats the grid theme class and shares the token defaults at the top of
-   this file, so it themes exactly like the portaled panels. */
+   this file, so it inherits the same grid theme tokens. */
 .arcana-drag-ghost {
     position: fixed;
     top: 0;
@@ -1422,48 +1410,15 @@
     border-left: 1px solid var(--arcana-pin-border) !important;
 }
 
-.arcana-grid .arcana-grid-datatable-input {
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 30px;
-    padding: 5px 9px;
-    border: 1px solid var(--arcana-input-border-base);
-    border-radius: 4px;
-    background: var(--arcana-input-bg);
-    color: var(--arcana-text);
-    font: inherit;
-}
-
-.arcana-grid .arcana-search-input,
-.arcana-grid .arcana-input-wrap {
+.arcana-grid .arcana-search-input {
     display: block;
     width: 100%;
-}
-
-.arcana-grid .arcana-input-wrap {
-    position: relative;
-}
-
-.arcana-grid .arcana-input__icon {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 9px;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    color: var(--arcana-text-placeholder);
-    pointer-events: none;
 }
 
 .arcana-grid .arcana-search-input__icon {
     display: block;
     width: 14px;
     height: 14px;
-}
-
-.arcana-grid .arcana-grid-datatable-input.arcana-input--icon-start {
-    padding-left: 30px;
 }
 
 .arcana-grid .arcana-visually-hidden {
@@ -1478,7 +1433,6 @@
     border: 0;
 }
 
-.arcana-grid .arcana-grid-datatable-input:focus,
 .arcana-grid .arcana-grid-datatable-select:focus,
 .arcana-grid button:focus-visible {
     outline: 2px solid var(--arcana-focus-ring);
@@ -1494,7 +1448,7 @@
     overflow: hidden;
     border: 1px solid var(--arcana-menu-border, #d7dde1);
     border-radius: 8px;
-    background: var(--arcana-panel-bg, #fff);
+    background: var(--arcana-surface, #fff);
     box-shadow: 0 16px 40px rgba(22, 34, 43, .18);
 }
 
@@ -1612,564 +1566,12 @@
 }
 
 /* ============================================
-   ARCANA FILTER CONTROLS — shadcn-style (zinc)
-   Panels are teleported/portaled to <body>, so their rules are NOT
-   nested under .arcana-grid. Classes are prefixed `arcana-` to avoid
-   clashing with host apps that already ship shadcn-like classes.
-   ============================================ */
-
-/* ── Free-text filter input: align the native input with the zinc theme ── */
-.arcana-grid .grid-search-row .arcana-grid-datatable-input {
-    border-color: var(--arcana-input-border);
-    border-radius: 6px;
-    font-size: 12px;
-    color: var(--arcana-input-text);
-    transition: border-color 150ms ease;
-}
-
-.arcana-grid .grid-search-row .arcana-grid-datatable-input::placeholder {
-    color: var(--arcana-text-placeholder);
-}
-
-.arcana-grid .grid-search-row .arcana-grid-datatable-input:hover:not(:disabled) {
-    border-color: var(--arcana-input-border-hover);
-}
-
-.arcana-grid .grid-search-row .arcana-grid-datatable-input:focus {
-    outline: none;
-    border-color: var(--arcana-input-border-active);
-}
-
-.arcana-grid .grid-search-row .arcana-grid-datatable-input:disabled {
-    background: var(--arcana-input-bg-disabled);
-    color: var(--arcana-text-placeholder);
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-/* ═════════════════════════════════════════════════
-   ARCANA SELECT — trigger
-   ═════════════════════════════════════════════════ */
-.arcana-select {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    font-family: inherit;
-}
-
-.arcana-select__trigger {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    width: 100%;
-    min-height: 30px;
-    padding: 4px 9px;
-    background: var(--arcana-input-bg);
-    color: var(--arcana-input-text);
-    border: 1px solid var(--arcana-input-border);
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.4;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 150ms ease, background-color 150ms ease;
-    outline: none;
-    box-shadow: none;
-}
-
-.arcana-select__trigger:hover:not(:disabled) {
-    border-color: var(--arcana-input-border-hover);
-}
-
-.arcana-select__trigger:focus-visible,
-.arcana-select__trigger--open,
-.arcana-select__trigger--open:hover {
-    border-color: var(--arcana-input-border-active);
-    outline: none;
-}
-
-.arcana-select__trigger:disabled {
-    background: var(--arcana-input-bg-disabled);
-    color: var(--arcana-text-placeholder);
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.arcana-select__label {
-    flex: 1 1 auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.arcana-select__label--placeholder {
-    color: var(--arcana-text-placeholder);
-}
-
-.arcana-select__caret {
-    flex-shrink: 0;
-    color: var(--arcana-text-muted);
-    transition: transform 200ms ease, color 150ms ease;
-}
-
-.arcana-select__trigger--open .arcana-select__caret,
-.arcana-select__caret.is-open {
-    transform: rotate(180deg);
-    color: var(--arcana-ink);
-}
-
-/* Clear (×): only visible while hovering the trigger; replaces the caret */
-.arcana-select__clear {
-    flex-shrink: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    color: var(--arcana-text-muted);
-    cursor: pointer;
-    border-radius: 4px;
-    transition: color 100ms ease, background-color 100ms ease;
-}
-
-.arcana-select__clear:hover {
-    color: var(--arcana-ink);
-    background: var(--arcana-item-hover);
-}
-
-.arcana-select__trigger--has-clear:hover .arcana-select__clear {
-    display: flex;
-}
-
-.arcana-select__trigger--has-clear:hover .arcana-select__caret {
-    display: none;
-}
-
-/* ═════════════════════════════════════════════════
-   ARCANA SELECT — panel (portaled to <body>)
-   ═════════════════════════════════════════════════ */
-.arcana-select__panel {
-    z-index: 10100;
-    background: var(--arcana-panel-bg);
-    border: 1px solid var(--arcana-panel-border);
-    border-radius: 8px;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.06),
-        0 2px 4px rgba(0, 0, 0, 0.04);
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 4px;
-    box-sizing: border-box;
-    font-family: inherit;
-    outline: none;
-}
-
-.arcana-select__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.arcana-select__search {
-    position: sticky;
-    top: -4px;
-    z-index: 1;
-    margin: -4px -4px 4px;
-    padding: 8px;
-    background: var(--arcana-panel-bg);
-    border-bottom: 1px solid var(--arcana-panel-border);
-}
-
-.arcana-select__search-icon {
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--arcana-text-muted);
-    pointer-events: none;
-}
-
-.arcana-select__search-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 5px 10px 5px 32px;
-    background: var(--arcana-input-bg);
-    color: var(--arcana-input-text);
-    border: 1px solid var(--arcana-input-border);
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 12.5px;
-    line-height: 1.4;
-    outline: none;
-    transition: border-color 150ms ease;
-}
-
-.arcana-select__search-input::placeholder {
-    color: var(--arcana-text-placeholder);
-}
-
-.arcana-select__search-input:focus {
-    border-color: var(--arcana-input-border-active);
-}
-
-.arcana-select__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 7px 9px;
-    border-radius: 6px;
-    font-size: 12.5px;
-    color: var(--arcana-ink);
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 100ms ease, color 100ms ease;
-    line-height: 1.4;
-}
-
-.arcana-select__item:hover,
-.arcana-select__item.is-highlighted {
-    background: var(--arcana-item-hover);
-    color: var(--arcana-input-text);
-}
-
-/* shadcn-style: selected does NOT change bg, only shows the checkmark */
-.arcana-select__item.is-selected {
-    background: transparent;
-    color: var(--arcana-input-text);
-    font-weight: 500;
-}
-
-.arcana-select__item.is-selected.is-highlighted,
-.arcana-select__item.is-selected:hover {
-    background: var(--arcana-item-hover);
-}
-
-.arcana-select__item-label {
-    flex: 1 1 auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.arcana-select__item-check {
-    flex-shrink: 0;
-    color: var(--arcana-input-text);
-}
-
-.arcana-select__empty {
-    padding: 14px 10px;
-    text-align: center;
-    color: var(--arcana-text-muted);
-    font-size: 12px;
-    font-style: italic;
-}
-
-/* ═════════════════════════════════════════════════
-   ARCANA CALENDAR — input (DATE / DATE_MONTH / DATE_RANGE)
-   ═════════════════════════════════════════════════ */
-.arcana-cal {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    font-family: inherit;
-}
-
-.arcana-cal__input {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    min-height: 30px;
-    padding: 4px 9px;
-    background: var(--arcana-input-bg);
-    color: var(--arcana-input-text);
-    border: 1px solid var(--arcana-input-border);
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.4;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 150ms ease, background-color 150ms ease;
-    outline: none;
-    box-shadow: none;
-}
-
-.arcana-cal__input:hover:not(:disabled) {
-    border-color: var(--arcana-input-border-hover);
-}
-
-.arcana-cal__input:focus-visible,
-.arcana-cal__input--open,
-.arcana-cal__input--open:hover {
-    border-color: var(--arcana-input-border-active);
-    outline: none;
-}
-
-.arcana-cal__input:disabled {
-    background: var(--arcana-input-bg-disabled);
-    color: var(--arcana-text-placeholder);
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.arcana-cal__input-icon {
-    flex-shrink: 0;
-    color: var(--arcana-text-muted);
-    transition: color 150ms ease;
-}
-
-.arcana-cal__input--open .arcana-cal__input-icon {
-    color: var(--arcana-ink);
-}
-
-.arcana-cal__input:disabled .arcana-cal__input-icon {
-    color: var(--arcana-text-placeholder);
-}
-
-.arcana-cal__input-label {
-    flex: 1 1 auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.arcana-cal__input-label--placeholder {
-    color: var(--arcana-text-placeholder);
-}
-
-.arcana-cal__clear {
-    flex-shrink: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    color: var(--arcana-text-muted);
-    cursor: pointer;
-    border-radius: 4px;
-    transition: color 100ms ease, background-color 100ms ease;
-}
-
-.arcana-cal__clear:hover {
-    color: var(--arcana-ink);
-    background: var(--arcana-item-hover);
-}
-
-.arcana-cal__input--has-clear:hover .arcana-cal__clear {
-    display: flex;
-}
-
-/* ═════════════════════════════════════════════════
-   ARCANA CALENDAR — panel (portaled to <body>)
-   ═════════════════════════════════════════════════ */
-.arcana-cal__panel {
-    position: fixed;
-    z-index: 10100;
-    background: var(--arcana-panel-bg);
-    border: 1px solid var(--arcana-panel-border);
-    border-radius: 8px;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.06),
-        0 2px 4px rgba(0, 0, 0, 0.04);
-    padding: 10px;
-    box-sizing: border-box;
-    font-family: inherit;
-    outline: none;
-}
-
-.arcana-cal__panels {
-    display: flex;
-    gap: 14px;
-}
-
-.arcana-cal__panel--range .arcana-cal__month-panel + .arcana-cal__month-panel {
-    border-left: 1px solid var(--arcana-item-hover);
-    padding-left: 14px;
-}
-
-.arcana-cal__header {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    margin-bottom: 6px;
-}
-
-.arcana-cal__title {
-    flex: 1 1 auto;
-    text-align: center;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--arcana-ink);
-    white-space: nowrap;
-}
-
-.arcana-cal__nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    color: var(--arcana-text-muted);
-    font-family: inherit;
-    font-size: 14px;
-    line-height: 1;
-    cursor: pointer;
-    transition: background-color 100ms ease, color 100ms ease;
-}
-
-.arcana-cal__nav:hover {
-    background: var(--arcana-item-hover);
-    color: var(--arcana-ink);
-}
-
-/* Keeps range titles centered where the inner nav buttons are omitted */
-.arcana-cal__nav-spacer {
-    flex-shrink: 0;
-    width: 50px;
-}
-
-.arcana-cal__weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 32px);
-    margin-bottom: 2px;
-}
-
-.arcana-cal__weekday {
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--arcana-text-muted);
-}
-
-.arcana-cal__grid {
-    display: grid;
-    grid-template-columns: repeat(7, 32px);
-}
-
-.arcana-cal__day {
-    width: 32px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 12px;
-    color: var(--arcana-ink);
-    cursor: pointer;
-    transition: background-color 100ms ease, color 100ms ease;
-}
-
-.arcana-cal__day:hover {
-    background: var(--arcana-item-hover);
-}
-
-.arcana-cal__day--adjacent {
-    color: var(--arcana-day-adjacent);
-}
-
-/* Today: subtle ink outline (Element Plus-style accent, zinc palette) */
-.arcana-cal__day--today {
-    box-shadow: inset 0 0 0 1px var(--arcana-selected-bg);
-    font-weight: 600;
-}
-
-/* Range preview/committed band */
-.arcana-cal__day--in-range {
-    background: var(--arcana-item-hover);
-    border-radius: 0;
-}
-
-.arcana-cal__day--selected,
-.arcana-cal__day--range-start,
-.arcana-cal__day--range-end {
-    background: var(--arcana-selected-bg);
-    color: var(--arcana-selected-text);
-    font-weight: 500;
-}
-
-.arcana-cal__day--selected:hover,
-.arcana-cal__day--range-start:hover,
-.arcana-cal__day--range-end:hover {
-    background: var(--arcana-selected-bg);
-    color: var(--arcana-selected-text);
-}
-
-.arcana-cal__day--range-start {
-    border-radius: 6px 0 0 6px;
-}
-
-.arcana-cal__day--range-end {
-    border-radius: 0 6px 6px 0;
-}
-
-.arcana-cal__day--range-start.arcana-cal__day--range-end {
-    border-radius: 6px;
-}
-
-/* Month (4×3) panel — DATE_MONTH */
-.arcana-cal__months {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-    width: 224px;
-}
-
-.arcana-cal__month {
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 12px;
-    color: var(--arcana-ink);
-    cursor: pointer;
-    transition: background-color 100ms ease, color 100ms ease;
-}
-
-.arcana-cal__month:hover {
-    background: var(--arcana-item-hover);
-}
-
-.arcana-cal__month--today {
-    box-shadow: inset 0 0 0 1px var(--arcana-selected-bg);
-    font-weight: 600;
-}
-
-.arcana-cal__month--selected,
-.arcana-cal__month--selected:hover {
-    background: var(--arcana-selected-bg);
-    color: var(--arcana-selected-text);
-    font-weight: 500;
-}
-
-/* ============================================
    ARCANA THEMES
    `zinc` is the default look — it lives in the token defaults at the top of
    this file, so `arcana-theme-zinc` needs no extra rules. Each theme below
    only overrides the `--arcana-*` variables. The class is applied to the
-   grid root AND repeated on every portaled panel (select, calendar,
-   context/sort menus), since panels on <body> do not inherit from the grid.
+   grid root and to the grid-owned context/sort menus. Select and calendar
+   portals keep the global ui-components theme because they live on <body>.
    ============================================ */
 
 .arcana-theme-ocean {
@@ -2193,6 +1595,14 @@
     --arcana-accent-contrast: #ffffff;
     --arcana-focus-ring: #0f5e79;
     --arcana-cell-focus: #0f5e79;
+    --arcana-border-subtle: #c7d9e5;
+    --arcana-surface-subtle: #f2f7fa;
+    --arcana-solid: #0f5e79;
+    --arcana-solid-hover: #0d5169;
+    --arcana-solid-active: #0b4559;
+    --arcana-ui: #eef5fa;
+    --arcana-ui-hover: #e4eff6;
+    --arcana-on-solid: #ffffff;
     --arcana-row-hover: #eef5fa;
     --arcana-row-checked: #d3e7f5;
     --arcana-row-focused: #d9eef4;
@@ -2202,22 +1612,6 @@
     --arcana-sort-idle: #b3cddd;
     --arcana-sort-hover: #0f5e79;
     --arcana-sort-hint: #6e93a7;
-    --arcana-input-bg: #ffffff;
-    --arcana-input-bg-disabled: #f2f7fa;
-    --arcana-input-text: #123647;
-    --arcana-input-border: #c7d9e5;
-    --arcana-input-border-base: #c7d9e5;
-    --arcana-input-border-hover: #9fbdd0;
-    --arcana-input-border-active: #0f5e79;
-    --arcana-select-border: #c7d9e5;
-    --arcana-select-border-hover: #9fbdd0;
-    --arcana-select-focus: #0f5e79;
-    --arcana-panel-bg: #ffffff;
-    --arcana-panel-border: #c7d9e5;
-    --arcana-item-hover: #e4eff6;
-    --arcana-selected-bg: #0f5e79;
-    --arcana-selected-text: #ffffff;
-    --arcana-day-adjacent: #b8cdd9;
     --arcana-menu-border: #c7d9e5;
     --arcana-menu-hover: #e4eff6;
     --arcana-menu-divider: #dbe8f2;
@@ -2246,6 +1640,14 @@
     --arcana-accent-contrast: #ffffff;
     --arcana-focus-ring: #1d6f42;
     --arcana-cell-focus: #1d6f42;
+    --arcana-border-subtle: #ccdccb;
+    --arcana-surface-subtle: #f3f8f3;
+    --arcana-solid: #1d6f42;
+    --arcana-solid-hover: #185e38;
+    --arcana-solid-active: #144f30;
+    --arcana-ui: #f0f7f0;
+    --arcana-ui-hover: #e7f2e8;
+    --arcana-on-solid: #ffffff;
     --arcana-row-hover: #f0f7f0;
     --arcana-row-checked: #d8ecd9;
     --arcana-row-focused: #e0f2e2;
@@ -2255,22 +1657,6 @@
     --arcana-sort-idle: #b7cfb9;
     --arcana-sort-hover: #14532d;
     --arcana-sort-hint: #6f8f7a;
-    --arcana-input-bg: #ffffff;
-    --arcana-input-bg-disabled: #f3f8f3;
-    --arcana-input-text: #1c3a2a;
-    --arcana-input-border: #ccdccb;
-    --arcana-input-border-base: #ccdccb;
-    --arcana-input-border-hover: #a9c4a8;
-    --arcana-input-border-active: #1d6f42;
-    --arcana-select-border: #ccdccb;
-    --arcana-select-border-hover: #a9c4a8;
-    --arcana-select-focus: #1d6f42;
-    --arcana-panel-bg: #ffffff;
-    --arcana-panel-border: #ccdccb;
-    --arcana-item-hover: #e7f2e8;
-    --arcana-selected-bg: #1d6f42;
-    --arcana-selected-text: #ffffff;
-    --arcana-day-adjacent: #bed0c4;
     --arcana-menu-border: #ccdccb;
     --arcana-menu-hover: #e7f2e8;
     --arcana-menu-divider: #e0ecdf;
@@ -2301,6 +1687,14 @@
     --arcana-accent-contrast: #ffffff;
     --arcana-focus-ring: #60a5fa;
     --arcana-cell-focus: #94a3b8;
+    --arcana-border-subtle: #334155;
+    --arcana-surface-subtle: #16202f;
+    --arcana-solid: #e2e8f0;
+    --arcana-solid-hover: #cbd5e1;
+    --arcana-solid-active: #94a3b8;
+    --arcana-ui: #253349;
+    --arcana-ui-hover: #334155;
+    --arcana-on-solid: #0f172a;
     --arcana-row-hover: #253349;
     --arcana-row-checked: #1d3a5f;
     --arcana-row-focused: #173733;
@@ -2310,22 +1704,6 @@
     --arcana-sort-idle: #475569;
     --arcana-sort-hover: #f1f5f9;
     --arcana-sort-hint: #64748b;
-    --arcana-input-bg: #1e293b;
-    --arcana-input-bg-disabled: #16202f;
-    --arcana-input-text: #e2e8f0;
-    --arcana-input-border: #334155;
-    --arcana-input-border-base: #334155;
-    --arcana-input-border-hover: #475569;
-    --arcana-input-border-active: #94a3b8;
-    --arcana-select-border: #334155;
-    --arcana-select-border-hover: #475569;
-    --arcana-select-focus: #60a5fa;
-    --arcana-panel-bg: #1e293b;
-    --arcana-panel-border: #334155;
-    --arcana-item-hover: #334155;
-    --arcana-selected-bg: #e2e8f0;
-    --arcana-selected-text: #0f172a;
-    --arcana-day-adjacent: #475569;
     --arcana-menu-border: #334155;
     --arcana-menu-hover: #334155;
     --arcana-menu-divider: #334155;
@@ -2345,10 +1723,6 @@
    and force readable text inside native selects. */
 .arcana-theme-midnight {
     color-scheme: dark;
-}
-
-.arcana-theme-midnight .arcana-grid-datatable-select {
-    color: var(--arcana-input-text);
 }
 
 /* The rounded scroll container owns the complete outer border. Keeping the

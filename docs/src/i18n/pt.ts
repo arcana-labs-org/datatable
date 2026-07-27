@@ -57,7 +57,7 @@ export const pt: Messages = {
     },
     styles: {
       title: "Estilos",
-      p1: "A folha de estilos é opt-in: importe <c>@arcanalabs/datatable/styles.css</c> uma única vez, na raiz da aplicação. Ela cobre a tabela, os filtros, a paginação e os estados de carregamento.",
+      p1: "As folhas de estilos são opt-in: importe <c>@arcanalabs/ui-components/styles.css</c> e depois <c>@arcanalabs/datatable/styles.css</c> uma única vez, na raiz da aplicação. A primeira estiliza os controles nativos de filtro; a segunda cobre o grid, a paginação e os estados de carregamento.",
       p2: "Se preferir um visual próprio, basta não importar o CSS — a marcação é semântica e estável, pensada para ser estilizada por fora."
     },
     modes: {
@@ -79,10 +79,10 @@ export const pt: Messages = {
       title: "Temas",
       previewLabel: "componente real · troque o tema",
       p1: "Todo o visual do grid é construído sobre design tokens (variáveis CSS <c>--arcana-*</c>), e o pacote traz quatro temas prontos: <c>zinc</c> (o neutro claro padrão), <c>ocean</c> (azuis), <c>forest</c> (verdes) e <c>midnight</c> (escuro completo).",
-      p2: "Escolha por tabela com <c>config.theme</c>, ou defina o padrão global com <c>setDefaultArcanaTheme(theme)</c> — usado por toda tabela sem <c>theme</c> próprio (<c>getDefaultArcanaTheme()</c> lê o valor atual). O tema é aplicado como a classe <c>arcana-theme-*</c> no elemento raiz e repetido nos painéis portalados para o <c><body></c> (select, calendário e menus de contexto/ordenação), que por serem teleportados não herdariam as variáveis do grid.",
-      p3: "Na demo, abra o filtro de Área ou o calendário de Data com o tema <c>midnight</c> para ver os painéis escuros:",
+      p2: "Escolha por tabela com <c>config.theme</c>, ou defina o padrão global com <c>setDefaultArcanaTheme(theme)</c> — usado por toda tabela sem <c>theme</c> próprio (<c>getDefaultArcanaTheme()</c> lê o valor atual). O tema é aplicado no elemento raiz e nos menus flutuantes pertencentes ao grid. Select e calendário usam os estilos e o tema globais do <c>@arcanalabs/ui-components</c> em seus painéis portalados.",
+      p3: "Na demo, alterne os presets para comparar o grid e os controles compactos de filtro:",
       customHeading: "Criando o seu próprio tema",
-      p4: "Um tema é apenas uma classe CSS <c>arcana-theme-{nome}</c> que sobrescreve os tokens <c>--arcana-*</c> — qualquer nome serve, não só os presets. Declare a classe no CSS da sua aplicação e passe o nome em <c>config.theme</c> (ou em <c>setDefaultArcanaTheme</c>): a mesma classe é aplicada automaticamente no grid e nos painéis portalados, então um único seletor cobre tudo.",
+      p4: "Um tema é apenas uma classe CSS <c>arcana-theme-{nome}</c> que sobrescreve os tokens <c>--arcana-*</c> — qualquer nome serve, não só os presets. Declare a classe no CSS da sua aplicação e passe o nome em <c>config.theme</c> (ou em <c>setDefaultArcanaTheme</c>). Os controles dentro do grid herdam os mesmos tokens sem sobrescrever classes do <c>ui-components</c>.",
       p5: "Você não precisa redefinir todos os tokens — comece pelos principais e sobrescreva o resto conforme necessário; a lista completa está no topo do <c>styles.css</c> do pacote. O tema <c>candy</c> da demo acima é exatamente este exemplo, definido no CSS desta documentação, fora do pacote:"
     },
     localization: {
@@ -208,7 +208,7 @@ export const pt: Messages = {
       },
       descriptions: {
         mode: "Define onde filtros, sort e paginação são executados.",
-        theme: "Tema visual do grid e dos painéis portalados — preset ou o nome de um tema próprio (classe arcana-theme-{nome}); o padrão global muda com setDefaultArcanaTheme.",
+        theme: "Tema visual do grid e dos controles que herdam seus tokens — preset ou o nome de um tema próprio (classe arcana-theme-{nome}); o padrão global muda com setDefaultArcanaTheme.",
         borderRadius: "Arredonda os cantos externos do grid. Números são pixels; strings aceitam qualquer medida CSS. Sobrescreve o token --arcana-border-radius do tema.",
         locale: "Locale das strings internas do grid (8 packs embutidos); o padrão global muda com setDefaultArcanaLocale.",
         messages: "Substituições pontuais das strings internas, aplicadas por cima do pack do locale resolvido.",
@@ -437,7 +437,7 @@ export const pt: Messages = {
       rowHover: "Fundo da linha sob o cursor.",
       rowChecked: "Fundo das linhas marcadas.",
       headerHover: "Fundo da célula de cabeçalho no hover.",
-      selectedBg: "Opção selecionada dentro dos painéis de filtro."
+      selectedBg: "Foco e seleção dos controles de filtro dentro do grid."
     },
     clearColor: "Restaurar {token}",
     sizing: {

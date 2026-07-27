@@ -1,3 +1,4 @@
+@import "@arcanalabs/ui-components/styles.css";
 @import "../../src/assets/ArcanaGrid.css";
 
 :root {
@@ -534,10 +535,9 @@ table.ref-table td .t-type {
   --arcana-surface-muted: #fdf2f8;
   --arcana-border: #fbcfe8;
   --arcana-accent: #db2777;
+  --arcana-solid: #db2777;
   --arcana-row-checked: #fce7f3;
   --arcana-row-focused: #fdf2f8;
-  --arcana-panel-bg: #fff0f7;
-  --arcana-panel-border: #fbcfe8;
 }
 
 .method-grid {
@@ -1210,7 +1210,7 @@ table.ref-table td .t-type {
   --arcana-row-hover: inherit;
   --arcana-row-checked: inherit;
   --arcana-header-hover: inherit;
-  --arcana-selected-bg: inherit;
+  --arcana-solid: inherit;
   --arcana-border-radius: inherit;
 }
 

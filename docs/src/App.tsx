@@ -39,11 +39,10 @@ const customThemeCss = `/* my-theme.css — any name works; here, "candy" */
   --arcana-surface-muted: #fdf2f8;   /* grid header and footer */
   --arcana-border: #fbcfe8;          /* cell and input borders */
   --arcana-accent: #db2777;          /* focus, current page, selection */
+  --arcana-solid: #db2777;           /* ui-components focus and selection */
   --arcana-border-radius: 12px;       /* native grid corner radius */
   --arcana-row-checked: #fce7f3;     /* checked row */
   --arcana-row-focused: #fdf2f8;     /* focused row */
-  --arcana-panel-bg: #fff0f7;        /* portaled select and calendar */
-  --arcana-panel-border: #fbcfe8;
 }
 
 /* then, in your app:

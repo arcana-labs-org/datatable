@@ -57,7 +57,7 @@ export const zh: Messages = {
     },
     styles: {
       title: "样式",
-      p1: "样式表是可选引入的：在应用的根部导入一次 <c>@arcanalabs/datatable/styles.css</c> 即可。它覆盖了表格、筛选器、分页和加载状态。",
+      p1: "样式表可按需引入：在应用根部先导入 <c>@arcanalabs/ui-components/styles.css</c>，再导入 <c>@arcanalabs/datatable/styles.css</c>，各一次。前者负责原生筛选控件，后者负责表格、分页和加载状态。",
       p2: "如果你偏好自己的外观，直接跳过 CSS 导入即可——组件的标记结构语义化且稳定，天生适合从外部进行样式定制。"
     },
     modes: {
@@ -79,10 +79,10 @@ export const zh: Messages = {
       title: "主题",
       previewLabel: "真实组件 · 切换主题",
       p1: "表格的整体外观基于设计令牌（<c>--arcana-*</c> CSS 变量）构建，包内附带四套现成主题：<c>zinc</c>（默认的浅色中性主题）、<c>ocean</c>（蓝色系）、<c>forest</c>（绿色系）和 <c>midnight</c>（全暗色）。",
-      p2: "通过 <c>config.theme</c> 为单个表格指定主题，或用 <c>setDefaultArcanaTheme(theme)</c> 设置全局默认值——所有未设置自身 <c>theme</c> 的表格都会使用它（<c>getDefaultArcanaTheme()</c> 读取当前值）。主题以 <c>arcana-theme-*</c> class 的形式应用在根元素上，并同步应用到传送（portal）至 <c><body></c> 的面板上（下拉选择、日历以及上下文/排序菜单）——这些面板因为被传送出去，本不会继承表格的变量。",
-      p3: "在演示中，切换到 <c>midnight</c> 主题后打开“部门”筛选器或“日期”日历，即可看到暗色面板：",
+      p2: "通过 <c>config.theme</c> 为单个表格指定主题，或用 <c>setDefaultArcanaTheme(theme)</c> 设置全局默认值——所有未设置自身 <c>theme</c> 的表格都会使用它（<c>getDefaultArcanaTheme()</c> 读取当前值）。该 class 应用于根元素及表格自身的浮动菜单。下拉选择和日历的 portal 面板使用 <c>@arcanalabs/ui-components</c> 的全局样式与主题。",
+      p3: "在演示中切换预设，比较表格与紧凑型筛选控件：",
       customHeading: "创建你自己的主题",
-      p4: "主题不过是一个覆盖 <c>--arcana-*</c> 令牌的 <c>arcana-theme-{name}</c> CSS class——任何名字都可以，不限于预设。在你应用的 CSS 中声明这个 class，并把名字传给 <c>config.theme</c>（或 <c>setDefaultArcanaTheme</c>）：同一个 class 会自动应用到表格和被传送的面板上，因此一个选择器就能覆盖全部。",
+      p4: "主题不过是一个覆盖 <c>--arcana-*</c> 令牌的 <c>arcana-theme-{name}</c> CSS class——任何名字都可以，不限于预设。在应用 CSS 中声明它，并把名字传给 <c>config.theme</c>（或 <c>setDefaultArcanaTheme</c>）。表格内控件会继承相同令牌，无需覆盖 <c>ui-components</c> 的 class。",
       p5: "你不必重新定义所有令牌——先从主要的入手，其余按需覆盖；完整列表位于包内 <c>styles.css</c> 的顶部。上面演示中的 <c>candy</c> 主题正是这样一个例子，它定义在本文档的 CSS 中，位于包外："
     },
     localization: {
@@ -208,7 +208,7 @@ export const zh: Messages = {
       },
       descriptions: {
         mode: "定义筛选、排序和分页在何处执行。",
-        theme: "表格及被传送面板的视觉主题——预设主题或你自定义主题的名字（arcana-theme-{name} class）；全局默认值通过 setDefaultArcanaTheme 修改。",
+        theme: "表格及继承其令牌的控件视觉主题——预设或自定义 arcana-theme-{name} class；全局默认值通过 setDefaultArcanaTheme 修改。",
         borderRadius: "设置表格外角的圆角。数字按像素处理；字符串可使用任意 CSS 长度。它会覆盖主题的 --arcana-border-radius 令牌。",
         locale: "表格内置文案的语言（内置 8 个语言包）；全局默认值通过 setDefaultArcanaLocale 修改。",
         messages: "对内置文案的逐条覆盖，叠加在解析出的语言包之上。",
@@ -437,7 +437,7 @@ export const zh: Messages = {
       rowHover: "鼠标悬停时的行背景。",
       rowChecked: "已勾选行的背景。",
       headerHover: "表头单元格悬停时的背景。",
-      selectedBg: "筛选面板中被选中的选项。"
+      selectedBg: "表格内筛选控件的焦点与选中颜色。"
     },
     clearColor: "重置 {token}",
     sizing: {

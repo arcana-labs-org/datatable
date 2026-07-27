@@ -24,16 +24,16 @@ import { ArcanaDatePickerComponent, ArcanaInputComponent, ArcanaSelectComponent,
     </ng-template>
     @switch (kind()) {
       @case ("range") {
-        <div arcanaDatePicker type="daterange" [value]="rangeValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
+        <div arcanaDatePicker type="daterange" size="sm" [value]="rangeValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @case ("boolean") {
-        <div arcanaSelect [value]="stringValue()" [options]="booleanOptions()" [disabled]="disabled" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
+        <div arcanaSelect size="sm" [value]="stringValue()" [options]="booleanOptions()" [disabled]="disabled" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @case ("list") {
-        <div arcanaSelect [multiple]="true" [value]="listValue()" [options]="selectOptions()" [disabled]="disabled" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
+        <div arcanaSelect size="sm" [multiple]="true" [value]="listValue()" [options]="selectOptions()" [disabled]="disabled" [placeholder]="msg().booleanAll" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @case ("date") {
-        <div arcanaDatePicker [type]="column.searchType === 'DATE' ? 'date' : 'month'" [value]="stringValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
+        <div arcanaDatePicker size="sm" [type]="column.searchType === 'DATE' ? 'date' : 'month'" [value]="stringValue()" [disabled]="disabled" [locale]="datePickerLocale()" [ariaLabel]="filterLabel()" (change)="commit($event)"></div>
       }
       @default {
         <label class="arcana-search-input">
@@ -41,10 +41,10 @@ import { ArcanaDatePickerComponent, ArcanaInputComponent, ArcanaSelectComponent,
           <input
             arcanaInput
             type="search"
+            size="sm"
             [iconStart]="searchIcon"
             [value]="stringValue()"
             [disabled]="disabled"
-            class="arcana-grid-datatable-input"
             (input)="onInput($event)"
             (blur)="valueChange.emit(draft)"
             (keydown.enter)="valueChange.emit(draft)"

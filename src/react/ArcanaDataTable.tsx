@@ -31,25 +31,25 @@ function FilterField<Row extends DataTableRow>({ column, value, disabled, messag
   const commit = (next: unknown) => { setDraft(next); onChange(next); };
   if (column.searchType === "DATE_RANGE") {
     const range: [string, string] = Array.isArray(draft) ? [String(draft[0] ?? ""), String(draft[1] ?? "")] : ["", ""];
-    return <ArcanaDatePicker type="daterange" value={range} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
+    return <ArcanaDatePicker type="daterange" size="sm" value={range} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
   }
   if (column.searchType === "BOOLEAN") {
-    return <ArcanaSelect value={String(draft ?? "")} options={booleanOptions.map((option) => ({ label: option.label, value: String(option.value) }))} disabled={disabled} placeholder={messages.booleanAll} onChange={commit} />;
+    return <ArcanaSelect size="sm" value={String(draft ?? "")} options={booleanOptions.map((option) => ({ label: option.label, value: String(option.value) }))} disabled={disabled} placeholder={messages.booleanAll} onChange={commit} />;
   }
   if (column.searchType === "LIST" || column.searchType === "REMOTE") {
     const selected = Array.isArray(draft) ? draft.map(String) : draft == null || draft === "" ? [] : [String(draft)];
-    return <ArcanaSelect multiple value={selected} options={options.map((option) => ({ label: option.label, value: String(option.value) }))} disabled={disabled} placeholder={messages.booleanAll} onChange={commit} />;
+    return <ArcanaSelect size="sm" multiple value={selected} options={options.map((option) => ({ label: option.label, value: String(option.value) }))} disabled={disabled} placeholder={messages.booleanAll} onChange={commit} />;
   }
   if (column.searchType === "DATE" || column.searchType === "DATE_MONTH") {
-    return <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} value={String(draft ?? "")} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
+    return <ArcanaDatePicker type={column.searchType === "DATE" ? "date" : "month"} size="sm" value={String(draft ?? "")} disabled={disabled} locale={locale} ariaLabel={filterLabel} onValueChange={commit} />;
   }
   return <label className="arcana-search-input">
     <span className="arcana-visually-hidden">{filterLabel}</span>
     <ArcanaInput
       type="search"
+      size="sm"
       value={String(draft)}
       disabled={disabled}
-      className="arcana-grid-datatable-input"
       iconStart={<svg className="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>}
       onValueChange={(next) => setDraft(next ?? "")}
       onBlur={() => onChange(draft)}

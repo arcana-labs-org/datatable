@@ -123,9 +123,10 @@ export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
    */
   mode?: DataTableMode;
   /**
-   * Visual theme applied to the grid root and to the portaled panels
-   * (select, calendar, context/sort menus). Falls back to the global
-   * default set via `setDefaultArcanaTheme` (initially `zinc`).
+   * Visual theme applied to the grid root and grid-owned floating menus.
+   * Select and calendar portals follow the global ui-components theme.
+   * Falls back to the global default set via `setDefaultArcanaTheme`
+   * (initially `zinc`).
    */
   theme?: ArcanaTheme;
   /**

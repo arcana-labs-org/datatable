@@ -33,7 +33,7 @@ const COLOR_TOKENS = [
   "row-hover",
   "row-checked",
   "header-hover",
-  "selected-bg"
+  "solid"
 ] as const;
 
 type ColorToken = (typeof COLOR_TOKENS)[number];
@@ -49,7 +49,7 @@ const COLOR_HINT_KEY: Record<ColorToken, keyof Messages["themeBuilder"]["colorHi
   "row-hover": "rowHover",
   "row-checked": "rowChecked",
   "header-hover": "headerHover",
-  "selected-bg": "selectedBg"
+  "solid": "selectedBg"
 };
 
 /**
@@ -68,7 +68,7 @@ const PRESET_COLORS: Record<ArcanaThemePreset, Record<ColorToken, string>> = {
     "row-hover": "#f5f5f5",
     "row-checked": "#e8eef5",
     "header-hover": "#d4dce5",
-    "selected-bg": "#18181b"
+    "solid": "#18181b"
   },
   ocean: {
     "accent": "#0f5e79",
@@ -80,7 +80,7 @@ const PRESET_COLORS: Record<ArcanaThemePreset, Record<ColorToken, string>> = {
     "row-hover": "#eef5fa",
     "row-checked": "#d3e7f5",
     "header-hover": "#cadeed",
-    "selected-bg": "#0f5e79"
+    "solid": "#0f5e79"
   },
   forest: {
     "accent": "#1d6f42",
@@ -92,7 +92,7 @@ const PRESET_COLORS: Record<ArcanaThemePreset, Record<ColorToken, string>> = {
     "row-hover": "#f0f7f0",
     "row-checked": "#d8ecd9",
     "header-hover": "#d1e5d1",
-    "selected-bg": "#1d6f42"
+    "solid": "#1d6f42"
   },
   midnight: {
     "accent": "#3b82f6",
@@ -104,7 +104,7 @@ const PRESET_COLORS: Record<ArcanaThemePreset, Record<ColorToken, string>> = {
     "row-hover": "#253349",
     "row-checked": "#1d3a5f",
     "header-hover": "#27364f",
-    "selected-bg": "#e2e8f0"
+    "solid": "#e2e8f0"
   }
 };
 

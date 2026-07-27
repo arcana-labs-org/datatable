@@ -22,10 +22,15 @@ npm install @arcanalabs/datatable
 
 ```tsx
 import { ArcanaDataTable } from "@arcanalabs/datatable/react"; // or /vue, /angular, /svelte
+import "@arcanalabs/ui-components/styles.css";
 import "@arcanalabs/datatable/styles.css";
 
 <ArcanaDataTable config={{ columns, datasource: (params) => api.orders.list(params) }} />
 ```
+
+Import both stylesheets once at the application entrypoint. Input, Select and
+DatePicker use the official `@arcanalabs/ui-components` stylesheet and their
+native `sm` variant; the DataTable CSS only adds grid layout and theme tokens.
 
 Everything else — remote/dataset modes, filters, sorting, selection, expandable rows,
 themes, localization (8 languages) and the full API reference — lives in the

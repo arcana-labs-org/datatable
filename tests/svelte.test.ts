@@ -50,10 +50,17 @@ describe("Svelte adapter", () => {
 
   it("uses ArcanaInput's icon slot with a magnifying glass in text filters", () => {
     const { target } = renderTable({
-      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+      mode: "dataset", dataset: [], columns: [
+        { name: "name", label: "Name" },
+        { name: "area", label: "Area", searchType: "LIST" },
+        { name: "date", label: "Date", searchType: "DATE" }
+      ]
     });
     expect(target.querySelector(".arcana-search-input input.arcana-input")).toBeTruthy();
+    expect(target.querySelector(".arcana-search-input input.arcana-input--sm")).toBeTruthy();
     expect(target.querySelector(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon")).toBeTruthy();
+    expect(target.querySelector(".arcana-select--sm")).toBeTruthy();
+    expect(target.querySelector(".arcana-cal--sm")).toBeTruthy();
     expect(target.querySelector(".arcana-search-input")?.textContent).toContain("Filtrar Name");
   });
 

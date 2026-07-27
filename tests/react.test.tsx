@@ -30,11 +30,18 @@ describe("React adapter", () => {
 
   it("uses ArcanaInput's icon slot with a magnifying glass in text filters", () => {
     const { container } = render(<ArcanaDataTable config={{
-      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+      mode: "dataset", dataset: [], columns: [
+        { name: "name", label: "Name" },
+        { name: "area", label: "Area", searchType: "LIST" },
+        { name: "date", label: "Date", searchType: "DATE" }
+      ]
     }} />);
     const input = screen.getByLabelText("Filtrar Name");
     expect(input.classList.contains("arcana-input")).toBe(true);
+    expect(input.classList.contains("arcana-input--sm")).toBe(true);
     expect(container.querySelector(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon")).toBeTruthy();
+    expect(container.querySelector(".arcana-select--sm")).toBeTruthy();
+    expect(container.querySelector(".arcana-cal--sm")).toBeTruthy();
   });
 
   it("renders rows and exposes the imperative grid API", () => {

@@ -61,10 +61,17 @@ describe("Angular adapter", () => {
 
   it("uses ArcanaInput's icon slot with a magnifying glass in text filters", async () => {
     const { element } = await renderTable({
-      mode: "dataset", dataset: [], columns: [{ name: "name", label: "Name" }]
+      mode: "dataset", dataset: [], columns: [
+        { name: "name", label: "Name" },
+        { name: "area", label: "Area", searchType: "LIST" },
+        { name: "date", label: "Date", searchType: "DATE" }
+      ]
     });
     expect(element.querySelector(".arcana-search-input input.arcana-input")).toBeTruthy();
+    expect(element.querySelector(".arcana-search-input input.arcana-input--sm")).toBeTruthy();
     expect(element.querySelector(".arcana-search-input .arcana-input-wrap .arcana-search-input__icon")).toBeTruthy();
+    expect(element.querySelector(".arcana-select--sm")).toBeTruthy();
+    expect(element.querySelector(".arcana-cal--sm")).toBeTruthy();
     expect(element.querySelector(".arcana-search-input")?.textContent).toContain("Filtrar Name");
   });
 

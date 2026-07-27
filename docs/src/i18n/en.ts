@@ -57,7 +57,7 @@ export const en: Messages = {
     },
     styles: {
       title: "Styles",
-      p1: "The stylesheet is opt-in: import <c>@arcanalabs/datatable/styles.css</c> once, at the root of your application. It covers the table, the filters, the pagination and the loading states.",
+      p1: "The stylesheets are opt-in: import <c>@arcanalabs/ui-components/styles.css</c> and then <c>@arcanalabs/datatable/styles.css</c> once at the application root. The first styles the native filter controls; the second covers the grid, pagination and loading states.",
       p2: "If you prefer your own look, simply skip the CSS import — the markup is semantic and stable, designed to be styled from the outside."
     },
     modes: {
@@ -79,10 +79,10 @@ export const en: Messages = {
       title: "Themes",
       previewLabel: "real component · switch the theme",
       p1: "The entire look of the grid is built on design tokens (the <c>--arcana-*</c> CSS variables), and the package ships four ready-made themes: <c>zinc</c> (the default light neutral), <c>ocean</c> (blues), <c>forest</c> (greens) and <c>midnight</c> (fully dark).",
-      p2: "Pick one per table with <c>config.theme</c>, or set the global default with <c>setDefaultArcanaTheme(theme)</c> — used by every table without its own <c>theme</c> (<c>getDefaultArcanaTheme()</c> reads the current value). The theme is applied as the <c>arcana-theme-*</c> class on the root element and repeated on the panels portaled to the <c><body></c> (select, calendar and the context/sorting menus), which, being teleported, would not inherit the grid variables.",
-      p3: "In the demo, open the Area filter or the Date calendar with the <c>midnight</c> theme to see the dark panels:",
+      p2: "Pick one per table with <c>config.theme</c>, or set the global default with <c>setDefaultArcanaTheme(theme)</c> — used by every table without its own <c>theme</c> (<c>getDefaultArcanaTheme()</c> reads the current value). The theme class is applied to the root and to grid-owned floating menus. Select and calendar use the global <c>@arcanalabs/ui-components</c> styles and theme in their portaled panels.",
+      p3: "In the demo, switch presets to compare the grid and its compact filter controls:",
       customHeading: "Creating your own theme",
-      p4: "A theme is just a <c>arcana-theme-{name}</c> CSS class that overrides the <c>--arcana-*</c> tokens — any name works, not just the presets. Declare the class in your application's CSS and pass the name in <c>config.theme</c> (or in <c>setDefaultArcanaTheme</c>): the same class is applied automatically to the grid and to the portaled panels, so a single selector covers everything.",
+      p4: "A theme is just a <c>arcana-theme-{name}</c> CSS class that overrides the <c>--arcana-*</c> tokens — any name works, not just the presets. Declare it in your application's CSS and pass the name in <c>config.theme</c> (or <c>setDefaultArcanaTheme</c>). Controls inside the grid inherit the same tokens without overriding <c>ui-components</c> classes.",
       p5: "You don't need to redefine every token — start with the main ones and override the rest as needed; the full list sits at the top of the package's <c>styles.css</c>. The <c>candy</c> theme in the demo above is exactly this example, defined in this documentation's CSS, outside the package:"
     },
     localization: {
@@ -208,7 +208,7 @@ export const en: Messages = {
       },
       descriptions: {
         mode: "Defines where filters, sorting and pagination are executed.",
-        theme: "Visual theme of the grid and the portaled panels — a preset or the name of your own theme (arcana-theme-{name} class); the global default changes with setDefaultArcanaTheme.",
+        theme: "Visual theme of the grid and controls that inherit its tokens — a preset or your own arcana-theme-{name} class; the global default changes with setDefaultArcanaTheme.",
         borderRadius: "Rounds the grid's outer corners. Numbers are pixels; strings accept any CSS length. Overrides the theme's --arcana-border-radius token.",
         locale: "Locale of the grid's built-in strings (8 shipped packs); the global default changes with setDefaultArcanaLocale.",
         messages: "Per-key overrides of the built-in strings, applied on top of the resolved locale pack.",
@@ -437,7 +437,7 @@ export const en: Messages = {
       rowHover: "Row background under the cursor.",
       rowChecked: "Background of the checked rows.",
       headerHover: "Header cell background on hover.",
-      selectedBg: "Selected option inside the filter panels."
+      selectedBg: "Focus and selection color for filter controls inside the grid."
     },
     clearColor: "Reset {token}",
     sizing: {

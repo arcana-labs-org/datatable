@@ -42,6 +42,7 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
   <ArcanaDatePicker
     v-if="column.searchType === 'DATE_RANGE'"
     type="daterange"
+    size="sm"
     :model-value="rangeValue"
     :disabled="disabled"
     :locale="locale"
@@ -50,6 +51,7 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
   />
   <ArcanaSelect
     v-else-if="column.searchType === 'BOOLEAN'"
+    size="sm"
     :model-value="String(value ?? '')"
     :options="booleanOptions"
     :disabled="disabled"
@@ -59,6 +61,7 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
   />
   <ArcanaSelect
     v-else-if="column.searchType === 'LIST' || column.searchType === 'REMOTE'"
+    size="sm"
     multiple
     :model-value="listValue"
     :options="options"
@@ -70,6 +73,7 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
   <ArcanaDatePicker
     v-else-if="column.searchType === 'DATE' || column.searchType === 'DATE_MONTH'"
     :type="column.searchType === 'DATE' ? 'date' : 'month'"
+    size="sm"
     :model-value="String(value ?? '')"
     :disabled="disabled"
     :locale="locale"
@@ -80,9 +84,9 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
     <span class="arcana-visually-hidden">{{ filterLabel }}</span>
     <ArcanaInput
       type="search"
+      size="sm"
       :model-value="String(value ?? '')"
       :disabled="disabled"
-      class="arcana-grid-datatable-input"
       @update:model-value="onTextInput"
       @blur="commitText"
       @keydown.enter="commitText"

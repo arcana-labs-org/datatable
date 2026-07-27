@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0 — 2026-07-26
+
+### Alterações
+- Os filtros agora usam integralmente o stylesheet e a variante compacta nativa de `@arcanalabs/ui-components`; as cópias locais de CSS de Input, Select e DatePicker foram removidas. Importe `@arcanalabs/ui-components/styles.css` antes de `@arcanalabs/datatable/styles.css`.
+- Os temas da DataTable passaram a alimentar os tokens semânticos oficiais de `ui-components`, sem sobrescrever suas classes internas.
+
 ## 1.4.0 — 2026-07-26
 
 ### Alterações
