@@ -652,10 +652,18 @@
    ============================================ */
 
 .arcana-grid.grid-wrapper {
+    position: relative;
     border: 1px solid var(--arcana-border);
     border-radius: var(--arcana-border-radius);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+}
+
+/* While a remote request is in flight the ArcanaLoadingOverlay covers the
+   whole grid; keep a minimum height so the centered spinner has room during
+   the initial (empty) load. */
+.arcana-grid.grid-wrapper[aria-busy="true"] {
+    min-height: 180px;
 }
 
 .arcana-grid .arcana-grid-body,

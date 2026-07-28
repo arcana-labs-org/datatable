@@ -5,7 +5,7 @@ import { arcanaThemeClass } from "../core/theme";
 import { startColumnDrag } from "../core/drag";
 import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, gridRootStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { ContextMenuItem, DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, SearchOption, StyleMap } from "../core/types";
-import { ArcanaInput, ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/react";
+import { ArcanaInput, ArcanaSelect, ArcanaDatePicker, ArcanaLoadingOverlay } from "@arcanalabs/ui-components/react";
 import "../assets/ArcanaGrid.css";
 
 export interface ArcanaDataTableProps<Row extends DataTableRow = DataTableRow> {
@@ -235,6 +235,7 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
   return (
     <div className={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} style={reactStyle(gridRootStyle(config))} aria-label={config.ariaLabel ?? messages.gridLabel} aria-busy={state.loading}>
       {state.error ? <div className="arcana-grid-error" role="alert">{messages.loadError}</div> : null}
+      <ArcanaLoadingOverlay visible={state.loading} text={messages.loading} />
       <div className="arcana-grid-body" style={config.overflowEnabled ? { maxHeight: config.height ?? 560, overflow: "auto" } : undefined}>
         <div className={`grid-header ${config.stickyHeaderEnabled ? "grid-header-sticky" : ""}`} role="row">
           {expandable ? <div className={`grid-header-cell grid-expand-cell ${pinClass(PIN_SLOT_EXPANDER)}`} style={reactStyle({ ...expanderStyle, ...pinStyle(PIN_SLOT_EXPANDER) })} /> : null}
@@ -250,7 +251,7 @@ function ArcanaDataTableInner<Row extends DataTableRow = DataTableRow>({ config,
           {config.actions ? <div className={`grid-search-row-cell ${pinClass(PIN_SLOT_ACTIONS)}`} style={reactStyle({ ...actionStyle(grid), ...pinStyle(PIN_SLOT_ACTIONS) })} /> : null}
         </div> : null}
         <div className="grid-body" role="rowgroup">
-          {state.loading && !state.rows.length ? <div className="arcana-grid-status" role="status">{messages.loading}</div> : !state.rows.length ? <div className="arcana-grid-status">{messages.empty}</div> : null}
+          {!state.loading && !state.rows.length ? <div className="arcana-grid-status">{messages.empty}</div> : null}
           {state.rows.map((row) => <Fragment key={row._uuid}>
             <div className={`grid-row flex ${row._hasFocus || focusedRow === row._uuid ? "grid-row-focused" : ""} ${row._isChecked || row._isRadioChecked ? "grid-row-checked" : ""}`} role="row" onClick={() => selectRow(row)} onDoubleClick={() => config.onDoubleClickRow?.(row, grid)}>
               {expandable ? <div className={`grid-cell grid-expand-cell arcana-grid-selection-cell ${pinClass(PIN_SLOT_EXPANDER)}`} data-label="" style={reactStyle({ ...expanderStyle, ...pinStyle(PIN_SLOT_EXPANDER) })}><button type="button" className={`grid-expand-toggle${isExpanded(row) ? " is-open" : ""}`} aria-expanded={isExpanded(row)} aria-label={isExpanded(row) ? messages.collapseRow : messages.expandRow} onClick={(event) => { event.stopPropagation(); toggleExpand(row); }}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg></button></div> : null}

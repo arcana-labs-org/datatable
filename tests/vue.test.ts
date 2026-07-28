@@ -1,5 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
+import type { DataTableApi } from "../src";
 import { ArcanaDataTable } from "../src/vue";
 
 describe("Vue adapter", () => {
@@ -99,6 +100,36 @@ describe("Vue adapter", () => {
     await wrapper.vm.$nextTick();
     expect(wrapper.find(".grid-detail-cell").text()).toContain("Conteúdo async");
     expect(wrapper.find(".grid-detail-loading").exists()).toBe(false);
+  });
+
+  it("overlays a loading spinner over existing rows during a remote refetch", async () => {
+    let resolveRefetch!: (value: unknown) => void;
+    let api!: DataTableApi;
+    const datasource = vi.fn()
+      .mockResolvedValueOnce({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 })
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveRefetch = resolve; }));
+    const wrapper = mount(ArcanaDataTable, { props: {
+      config: { searchEnabled: false, columns: [{ name: "name", label: "Nome" }], datasource },
+      onMounted: (grid: DataTableApi) => { api = grid; }
+    } });
+
+    // Initial fetch resolves: rows visible, no overlay.
+    await new Promise((resolve) => setTimeout(resolve));
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".grid-body .grid-row").exists()).toBe(true);
+    expect(wrapper.find(".arcana-loading-overlay").exists()).toBe(false);
+
+    // A refetch that stays pending shows the overlay while the rows remain visible.
+    void api.refresh();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".arcana-loading-overlay").exists()).toBe(true);
+    expect(wrapper.find(".grid-body .grid-row").exists()).toBe(true);
+
+    // Resolving the request hides the overlay again.
+    resolveRefetch({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 });
+    await new Promise((resolve) => setTimeout(resolve));
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".arcana-loading-overlay").exists()).toBe(false);
   });
 
   it("builds a multi-column sort with shift-click and resizes a column by drag", async () => {

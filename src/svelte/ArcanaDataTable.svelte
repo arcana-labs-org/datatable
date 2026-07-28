@@ -19,6 +19,7 @@
   import Content from "./Content.svelte";
   import ExpandedRowContent from "./ExpandedRowContent.svelte";
   import FilterField from "./FilterField.svelte";
+  import { ArcanaLoadingOverlay } from "@arcanalabs/ui-components/svelte";
   import "../assets/ArcanaGrid.css";
 
   let { config, class: className = "", onMounted }: {
@@ -216,6 +217,7 @@
 
 <div class={`arcana-grid grid-wrapper ${themeClass} ${config.responsiveMode === "VERTICAL_RECORD" ? "arcana-grid-responsive-vertical" : ""} ${className}`.trim()} style={inlineStyle(gridRootStyle(config))} aria-label={config.ariaLabel ?? msg.gridLabel} aria-busy={snap.loading}>
   {#if snap.error}<div class="arcana-grid-error" role="alert">{msg.loadError}</div>{/if}
+  <ArcanaLoadingOverlay visible={snap.loading} text={msg.loading} />
   <div class="arcana-grid-body" style={config.overflowEnabled ? `max-height: ${config.height ?? 560}px; overflow: auto` : undefined}>
     <div class={`grid-header ${config.stickyHeaderEnabled ? "grid-header-sticky" : ""}`} role="row">
       {#if expandable}<div class={`grid-header-cell grid-expand-cell ${pinClass(PIN_SLOT_EXPANDER)}`} style={inlineStyle(expanderStyle, pinStyle(PIN_SLOT_EXPANDER))}></div>{/if}
@@ -243,9 +245,7 @@
       </div>
     {/if}
     <div class="grid-body" role="rowgroup">
-      {#if snap.loading && !snap.rows.length}
-        <div class="arcana-grid-status" role="status">{msg.loading}</div>
-      {:else if !snap.rows.length}
+      {#if !snap.loading && !snap.rows.length}
         <div class="arcana-grid-status">{msg.empty}</div>
       {/if}
       {#each snap.rows as row (row._uuid)}

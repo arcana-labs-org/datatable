@@ -103,6 +103,34 @@ describe("Angular adapter", () => {
     expect(api.getCheckedRows()).toHaveLength(1);
   });
 
+  it("overlays a loading spinner over existing rows during a remote refetch", async () => {
+    let resolveRefetch!: (value: unknown) => void;
+    const datasource = vi.fn()
+      .mockResolvedValueOnce({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 })
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveRefetch = resolve; }));
+    const { fixture, element, api } = await renderTable({
+      searchEnabled: false, columns: [{ name: "name", label: "Nome" }], datasource
+    });
+
+    // Initial fetch resolves: rows visible, no overlay.
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(element.querySelector(".grid-body .grid-row")).toBeTruthy();
+    expect(element.querySelector(".arcana-loading-overlay__box")).toBeNull();
+
+    // A refetch that stays pending shows the overlay while the rows remain visible.
+    void api.refresh();
+    fixture.detectChanges();
+    expect(element.querySelector(".arcana-loading-overlay__box")).toBeTruthy();
+    expect(element.querySelector(".grid-body .grid-row")).toBeTruthy();
+
+    // Resolving the request hides the overlay again.
+    resolveRefetch({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 });
+    await new Promise((resolve) => setTimeout(resolve));
+    fixture.detectChanges();
+    expect(element.querySelector(".arcana-loading-overlay__box")).toBeNull();
+  });
+
   it("opens the sort menu and applies Crescente/Decrescente/Remover ordem", async () => {
     const { fixture, element, api } = await renderTable({
       mode: "dataset",

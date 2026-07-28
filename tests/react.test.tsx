@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { DataTableApi } from "../src";
@@ -94,6 +94,30 @@ describe("React adapter", () => {
     await act(async () => { resolveDetail("<strong>Conteúdo async</strong>"); });
     expect(screen.getByText("Conteúdo async")).toBeTruthy();
     expect(screen.queryByText("Carregando detalhes…")).toBeNull();
+  });
+
+  it("overlays a loading spinner over existing rows during a remote refetch", async () => {
+    let resolveRefetch!: (value: unknown) => void;
+    const datasource = vi.fn()
+      .mockResolvedValueOnce({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 })
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveRefetch = resolve; }));
+    const ref = createRef<DataTableApi>();
+    const { container } = render(<ArcanaDataTable ref={ref} config={{
+      searchEnabled: false, columns: [{ name: "name", label: "Nome" }], datasource
+    }} />);
+
+    // Initial fetch resolves: rows visible, no overlay.
+    await waitFor(() => expect(container.querySelector(".grid-body .grid-row")).toBeTruthy());
+    expect(container.querySelector(".arcana-loading-overlay")).toBeNull();
+
+    // A refetch that stays pending shows the overlay while the rows remain visible.
+    await act(async () => { void ref.current!.refresh(); });
+    expect(container.querySelector(".arcana-loading-overlay")).toBeTruthy();
+    expect(container.querySelector(".grid-body .grid-row")).toBeTruthy();
+
+    // Resolving the request hides the overlay again.
+    await act(async () => { resolveRefetch({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 }); });
+    await waitFor(() => expect(container.querySelector(".arcana-loading-overlay")).toBeNull());
   });
 
   it("localizes the built-in strings with locale: 'en' and opens an English sort menu", () => {

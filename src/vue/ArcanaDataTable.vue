@@ -7,6 +7,7 @@ import { startColumnDrag } from "../core/drag";
 import { actionStyle, alignmentClass, ariaSortValue, columnSortState, columnStyle, computePinPlan, expandedRowLoadingContent, expanderStyle, gridRootStyle, isColumnPinnable, isColumnReorderable, isColumnResizable, pagination, PIN_SLOT_ACTIONS, PIN_SLOT_CHECKBOX, PIN_SLOT_EXPANDER, PIN_SLOT_RADIO, resizeMinWidth, selectionStyle, sortGlyph } from "../core/view";
 import type { DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Renderable, StyleMap } from "../core/types";
 import FilterField from "./FilterField.vue";
+import { ArcanaLoadingOverlay } from "@arcanalabs/ui-components/vue";
 import "../assets/ArcanaGrid.css";
 
 const props = defineProps<{ config: DataTableConfig<DataTableRow> }>();
@@ -213,6 +214,7 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
 <template>
   <div class="arcana-grid grid-wrapper" :class="[themeClass, { 'arcana-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD' }]" :style="gridRootStyle(config)" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
     <div v-if="state.error" class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
+    <ArcanaLoadingOverlay :visible="state.loading" :text="msg.loading" />
     <div class="arcana-grid-body" :style="config.overflowEnabled ? { maxHeight: `${config.height ?? 560}px`, overflow: 'auto' } : undefined">
       <div class="grid-header" :class="{ 'grid-header-sticky': config.stickyHeaderEnabled }" role="row">
         <div v-if="expandable" class="grid-header-cell grid-expand-cell" :class="pinClass(PIN_SLOT_EXPANDER)" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]" />
@@ -234,8 +236,7 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
         <div v-if="config.actions" class="grid-search-row-cell" :class="pinClass(PIN_SLOT_ACTIONS)" :style="[actionStyle(grid), pinStyle(PIN_SLOT_ACTIONS)]" />
       </div>
       <div class="grid-body" role="rowgroup">
-        <div v-if="state.loading && state.rows.length === 0" class="arcana-grid-status" role="status">{{ msg.loading }}</div>
-        <div v-else-if="state.rows.length === 0" class="arcana-grid-status">{{ msg.empty }}</div>
+        <div v-if="!state.loading && state.rows.length === 0" class="arcana-grid-status">{{ msg.empty }}</div>
         <template v-for="row in state.rows" :key="row._uuid">
           <div class="grid-row flex" :class="{ 'grid-row-focused': row._hasFocus || focusedRow === row._uuid, 'grid-row-checked': row._isChecked || row._isRadioChecked }" role="row" @click="onRow(row)" @dblclick="config.onDoubleClickRow?.(row, grid)">
             <div v-if="expandable" class="grid-cell grid-expand-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_EXPANDER)" data-label="" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]"><button type="button" class="grid-expand-toggle" :class="{ 'is-open': isExpanded(row) }" :aria-expanded="isExpanded(row)" :aria-label="isExpanded(row) ? msg.collapseRow : msg.expandRow" @click="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button></div>

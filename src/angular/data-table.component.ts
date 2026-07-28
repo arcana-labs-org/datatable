@@ -11,6 +11,7 @@ import type {
   ContextMenuItem, DataTableAction, DataTableApi, DataTableColumn, DataTableConfig,
   DataTableRow, DataTableSnapshot, OrderBy, Renderable, SortDirection
 } from "../core/types";
+import { ArcanaLoadingOverlayComponent } from "@arcanalabs/ui-components/angular";
 import { ArcanaContentDirective } from "./content.directive";
 import { ArcanaExpandedRowComponent } from "./expanded-row.component";
 import { ArcanaFilterFieldComponent } from "./filter-field.component";
@@ -33,13 +34,14 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
   selector: "arcana-data-table",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ArcanaContentDirective, ArcanaExpandedRowComponent, ArcanaFilterFieldComponent],
+  imports: [ArcanaContentDirective, ArcanaExpandedRowComponent, ArcanaFilterFieldComponent, ArcanaLoadingOverlayComponent],
   styles: [":host { display: block; }"],
   template: `
     <div class="arcana-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' arcana-grid-responsive-vertical' : '' }}{{ className ? ' ' + className : '' }}" [style]="rootStyle()" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
       @if (snap.error) {
         <div class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
       }
+      <div arcanaLoadingOverlay [visible]="snap.loading" [text]="msg.loading"></div>
       <div class="arcana-grid-body" [style]="bodyStyle()">
         <div class="grid-header" [class.grid-header-sticky]="config.stickyHeaderEnabled" role="row">
           @if (expandable()) { <div class="grid-header-cell grid-expand-cell {{ pinClsExpander() }}" [style]="expanderPinStyle()"></div> }
@@ -72,9 +74,7 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
           </div>
         }
         <div class="grid-body" role="rowgroup">
-          @if (snap.loading && !snap.rows.length) {
-            <div class="arcana-grid-status" role="status">{{ msg.loading }}</div>
-          } @else if (!snap.rows.length) {
+          @if (!snap.loading && !snap.rows.length) {
             <div class="arcana-grid-status">{{ msg.empty }}</div>
           }
           @for (row of snap.rows; track row._uuid) {

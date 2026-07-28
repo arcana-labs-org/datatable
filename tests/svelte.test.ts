@@ -32,6 +32,34 @@ describe("Svelte adapter", () => {
     expect(target.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("10px");
   });
 
+  it("overlays a loading spinner over existing rows during a remote refetch", async () => {
+    let resolveRefetch!: (value: unknown) => void;
+    const datasource = vi.fn()
+      .mockResolvedValueOnce({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 })
+      .mockImplementationOnce(() => new Promise((resolve) => { resolveRefetch = resolve; }));
+    const { target, component } = renderTable({
+      searchEnabled: false, columns: [{ name: "name", label: "Nome" }], datasource
+    });
+
+    // Initial fetch resolves: rows visible, no overlay.
+    await new Promise((resolve) => setTimeout(resolve));
+    flushSync();
+    expect(target.querySelector(".grid-body .grid-row")).toBeTruthy();
+    expect(target.querySelector(".arcana-loading-overlay")).toBeNull();
+
+    // A refetch that stays pending shows the overlay while the rows remain visible.
+    void component.refresh();
+    flushSync();
+    expect(target.querySelector(".arcana-loading-overlay")).toBeTruthy();
+    expect(target.querySelector(".grid-body .grid-row")).toBeTruthy();
+
+    // Resolving the request hides the overlay again.
+    resolveRefetch({ rows: [{ id: 1, name: "Ada" }], total: 1, page: 1 });
+    await new Promise((resolve) => setTimeout(resolve));
+    flushSync();
+    expect(target.querySelector(".arcana-loading-overlay")).toBeNull();
+  });
+
   it("hides sort icons when ordering is disabled globally or per column", () => {
     const global = renderTable({
       mode: "dataset", dataset: [], orderByEnabled: false,
