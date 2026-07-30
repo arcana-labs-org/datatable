@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
-import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
+import type { DataTableColumn, DataTableRow, FilterOperator, SearchOption } from "../core/types";
 import { ArcanaInput, ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/vue";
 
 const props = defineProps<{
@@ -10,8 +10,9 @@ const props = defineProps<{
   disabled?: boolean;
   messages?: ArcanaMessages;
   locale?: ArcanaLocale;
+  operator: FilterOperator;
 }>();
-const emit = defineEmits<{ change: [value: unknown] }>();
+const emit = defineEmits<{ change: [value: unknown]; operatorChange: [value: FilterOperator] }>();
 const value = ref<unknown>(props.modelValue ?? "");
 const options = ref<SearchOption[]>([]);
 
@@ -36,9 +37,17 @@ const rangeValue = computed<[string, string]>(() => Array.isArray(value.value)
 const listValue = computed<string[]>(() => Array.isArray(value.value)
   ? value.value.map(String)
   : value.value == null || value.value === "" ? [] : [String(value.value)]);
+const operators = computed<FilterOperator[]>(() => props.column.filterOperators ?? (["NUMBER", "CURRENCY", "PERCENTAGE"].includes(props.column.type ?? "")
+  ? ["equals", "notEquals", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual"]
+  : props.column.searchType == null ? ["contains", "startsWith", "endsWith", "equals", "notEquals"] : []));
+const operatorLabels = computed<Record<FilterOperator, string>>(() => ({ contains: msg.value.opContains, startsWith: msg.value.opStartsWith, endsWith: msg.value.opEndsWith, equals: msg.value.opEquals, notEquals: msg.value.opNotEquals, greaterThan: msg.value.opGreaterThan, greaterThanOrEqual: msg.value.opGreaterThanOrEqual, lessThan: msg.value.opLessThan, lessThanOrEqual: msg.value.opLessThanOrEqual, between: msg.value.opBetween }));
 </script>
 
 <template>
+  <div class="arcana-filter-composer">
+  <select v-if="operators.length > 1" class="arcana-filter-operator" :aria-label="`${msg.filterOperator}: ${column.label}`" :value="operator" @change="emit('operatorChange', ($event.target as HTMLSelectElement).value as FilterOperator)">
+    <option v-for="item in operators" :key="item" :value="item">{{ operatorLabels[item] }}</option>
+  </select>
   <ArcanaDatePicker
     v-if="column.searchType === 'DATE_RANGE'"
     type="daterange"
@@ -96,4 +105,5 @@ const listValue = computed<string[]>(() => Array.isArray(value.value)
       </template>
     </ArcanaInput>
   </label>
+  </div>
 </template>

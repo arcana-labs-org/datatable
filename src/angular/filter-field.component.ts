@@ -3,7 +3,7 @@ import {
   OnChanges, OnDestroy, Output, SimpleChanges, inject
 } from "@angular/core";
 import { formatMessage, getDefaultArcanaLocale, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
-import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
+import type { DataTableColumn, DataTableRow, FilterOperator, SearchOption } from "../core/types";
 import { ArcanaDatePickerComponent, ArcanaInputComponent, ArcanaSelectComponent, type SelectOption } from "@arcanalabs/ui-components/angular";
 
 /**
@@ -19,6 +19,12 @@ import { ArcanaDatePickerComponent, ArcanaInputComponent, ArcanaSelectComponent,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ArcanaInputComponent, ArcanaSelectComponent, ArcanaDatePickerComponent],
   template: `
+    <div class="arcana-filter-composer">
+    @if (operators().length > 1) {
+      <select class="arcana-filter-operator" [attr.aria-label]="msg().filterOperator + ': ' + column.label" [value]="operator" (change)="operatorChange.emit(asOperator($event))">
+        @for (item of operators(); track item) { <option [value]="item">{{ operatorLabel(item) }}</option> }
+      </select>
+    }
     <ng-template #searchIcon>
       <svg class="arcana-search-input__icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m10.5 10.5 3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
     </ng-template>
@@ -52,6 +58,7 @@ import { ArcanaDatePickerComponent, ArcanaInputComponent, ArcanaSelectComponent,
         </label>
       }
     }
+    </div>
   `
 })
 export class ArcanaFilterFieldComponent implements OnChanges, OnDestroy {
@@ -62,7 +69,9 @@ export class ArcanaFilterFieldComponent implements OnChanges, OnDestroy {
   @Input() messages?: ArcanaMessages;
   /** Locale forwarded to the date picker (Intl display names). */
   @Input() locale?: ArcanaLocale;
+  @Input() operator: FilterOperator = "contains";
   @Output() valueChange = new EventEmitter<unknown>();
+  @Output() operatorChange = new EventEmitter<FilterOperator>();
 
   options: SearchOption[] = [];
   draft: unknown = "";
@@ -149,5 +158,20 @@ export class ArcanaFilterFieldComponent implements OnChanges, OnDestroy {
 
   onInput(event: Event): void {
     this.draft = (event.target as HTMLInputElement).value;
+  }
+
+  operators(): FilterOperator[] {
+    return this.column.filterOperators ?? (["NUMBER", "CURRENCY", "PERCENTAGE"].includes(this.column.type ?? "")
+      ? ["equals", "notEquals", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual"]
+      : this.column.searchType == null ? ["contains", "startsWith", "endsWith", "equals", "notEquals"] : []);
+  }
+
+  asOperator(event: Event): FilterOperator {
+    return (event.target as HTMLSelectElement).value as FilterOperator;
+  }
+
+  operatorLabel(operator: FilterOperator): string {
+    const messages = this.msg();
+    return ({ contains: messages.opContains, startsWith: messages.opStartsWith, endsWith: messages.opEndsWith, equals: messages.opEquals, notEquals: messages.opNotEquals, greaterThan: messages.opGreaterThan, greaterThanOrEqual: messages.opGreaterThanOrEqual, lessThan: messages.opLessThan, lessThanOrEqual: messages.opLessThanOrEqual, between: messages.opBetween })[operator];
   }
 }

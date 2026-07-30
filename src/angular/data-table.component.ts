@@ -37,12 +37,16 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
   imports: [ArcanaContentDirective, ArcanaExpandedRowComponent, ArcanaFilterFieldComponent, ArcanaLoadingOverlayComponent],
   styles: [":host { display: block; }"],
   template: `
-    <div class="arcana-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' arcana-grid-responsive-vertical' : '' }}{{ className ? ' ' + className : '' }}" [style]="rootStyle()" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
+    <div class="arcana-grid grid-wrapper {{ themeClass() }}{{ config.responsiveMode === 'VERTICAL_RECORD' ? ' arcana-grid-responsive-vertical' : '' }}{{ columnVirtual() ? ' arcana-column-virtualized' : '' }}{{ className ? ' ' + className : '' }}" [style]="rootStyle()" [attr.aria-label]="config.ariaLabel ?? msg.gridLabel" [attr.aria-busy]="snap.loading">
       @if (snap.error) {
         <div class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
       }
       <div arcanaLoadingOverlay [visible]="snap.loading" [text]="msg.loading"></div>
-      <div class="arcana-grid-body" [style]="bodyStyle()">
+      @if (config.columnVisibilityEnabled) {
+        <div class="arcana-column-tools"><button type="button" class="arcana-column-trigger" [attr.aria-expanded]="columnChooserOpen" (click)="columnChooserOpen = !columnChooserOpen">{{ msg.columns }}</button>
+        @if (columnChooserOpen) { <div class="arcana-column-chooser">@for (column of allColumns; track column.name) {<label><input type="checkbox" [checked]="grid.isColumnVisible(column.name)" (change)="grid.setColumnVisible(column.name, checked($event))" />{{ column.label }}</label>}<button type="button" (click)="grid.resetColumnState()">{{ msg.resetColumns }}</button></div> }</div>
+      }
+      <div class="arcana-grid-body" [style]="bodyStyle()" (scroll)="onScroll($event)">
         <div class="grid-header" [class.grid-header-sticky]="config.stickyHeaderEnabled" role="row">
           @if (expandable()) { <div class="grid-header-cell grid-expand-cell {{ pinClsExpander() }}" [style]="expanderPinStyle()"></div> }
           @if (config.checkboxEnabled) {
@@ -65,7 +69,7 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
               @if (column.searchType === "COMPONENT") {
                 <div class="grid-search-row-cell {{ pinColClass(column) }}" [style]="headerCellStyle(column)"><span [arcanaContent]="searchRenderer(column)" [arcanaContentHtml]="true"></span></div>
               } @else if (column.searchEnabled ?? true) {
-                <div class="grid-search-row-cell {{ pinColClass(column) }}" arcanaFilterField [column]="column" [value]="filterValue(column)" [disabled]="disabledFilter(column)" [messages]="msg" [locale]="gridLocale" [style]="headerCellStyle(column)" (valueChange)="applyFilter(column, $event)"></div>
+                <div class="grid-search-row-cell {{ pinColClass(column) }}" arcanaFilterField [column]="column" [value]="filterValue(column)" [operator]="grid.getFilterOperator(column.filterName ?? column.name)" [disabled]="disabledFilter(column)" [messages]="msg" [locale]="gridLocale" [style]="headerCellStyle(column)" (operatorChange)="grid.setFilterOperator(column.filterName ?? column.name, $event)" (valueChange)="applyFilter(column, $event)"></div>
               } @else {
                 <div class="grid-search-row-cell {{ pinColClass(column) }}" [style]="headerCellStyle(column)"></div>
               }
@@ -77,8 +81,12 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
           @if (!snap.loading && !snap.rows.length) {
             <div class="arcana-grid-status">{{ msg.empty }}</div>
           }
-          @for (row of snap.rows; track row._uuid) {
-            <div class="grid-row flex" [class.grid-row-focused]="row._hasFocus || focusedRow === row._uuid" [class.grid-row-checked]="row._isChecked || row._isRadioChecked" role="row" (click)="selectRow(row)" (dblclick)="onDoubleClickRow(row)">
+          @if (virtualStart()) { <div class="arcana-virtual-spacer" aria-hidden="true" [style.height.px]="virtualStart() * virtualRowHeight()"></div> }
+          @for (row of renderedRows(); track row._uuid) {
+            @if (row._arcanaGroup; as group) {
+              <div class="arcana-group-row" role="row" [style.padding-inline-start.px]="12 + group.level * 18"><strong>{{ group.label }}: {{ group.value }}</strong><span>{{ groupCount(group.count) }}</span>@for (item of aggregateEntries(group.aggregates); track item[0]) {<span class="arcana-group-aggregate">{{ aggregateLabel(item[0]) }}: {{ item[1] }}</span>}</div>
+            } @else {
+            <div class="grid-row flex" [attr.draggable]="config.rowReorderEnabled ? true : null" [class.grid-row-focused]="row._hasFocus || focusedRow === row._uuid" [class.grid-row-checked]="row._isChecked || row._isRadioChecked" [class.arcana-row-dragging]="rowDrag === row._uuid" role="row" (dragstart)="rowDrag = row._uuid ?? null" (dragover)="allowRowDrop($event)" (drop)="dropRow($event, row)" (click)="selectRow(row)" (dblclick)="onDoubleClickRow(row)">
               @if (expandable()) {
                 <div class="grid-cell grid-expand-cell arcana-grid-selection-cell {{ pinClsExpander() }}" data-label="" [style]="expanderPinStyle()">
                   <button type="button" class="grid-expand-toggle" [class.is-open]="isExpanded(row)" [attr.aria-expanded]="isExpanded(row)" [attr.aria-label]="isExpanded(row) ? msg.collapseRow : msg.expandRow" (click)="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
@@ -95,7 +103,7 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
                 </div>
               }
               @for (column of columns; track column.name) {
-                <div class="grid-cell {{ alignment(column) }} {{ pinColClass(column) }}" [class.grid-cell-focused]="focusedCell === row._uuid + ':' + column.name" [attr.data-label]="column.label" [style]="cellStyle(column, row)" role="cell" (click)="selectCell(column, row)" (dblclick)="onDoubleClickCell(column, row)" (contextmenu)="openMenu($event, column, row)"><span [arcanaContent]="cellValue(column, row)" [arcanaContentHtml]="column.html === true"></span></div>
+                <div class="grid-cell {{ alignment(column) }} {{ pinColClass(column) }}" [class.grid-cell-focused]="focusedCell === row._uuid + ':' + column.name" [attr.data-label]="column.label" [style]="cellStyle(column, row)" role="cell" (click)="selectCell(column, row)" (dblclick)="onDoubleClickCell(column, row)" (contextmenu)="openMenu($event, column, row)">@if (isEditing(column, row) && column.editable !== false) {<input class="arcana-cell-editor" [value]="editDrafts[column.name]" (click)="$event.stopPropagation()" (input)="setDraft(column.name, $event)" (blur)="config.editMode !== 'row' && commitCell(column, row)" (keydown.enter)="config.editMode !== 'row' && commitCell(column, row)" (keydown.escape)="cancelEdit()" />} @else {<span [arcanaContent]="cellValue(column, row)" [arcanaContentHtml]="column.html === true"></span>}</div>
               }
               @if (config.actions) {
                 <div class="grid-cell {{ pinClsActions() }}" [attr.data-label]="msg.actions" [style]="actionsCellStyle()">
@@ -104,11 +112,14 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
                   }
                 </div>
               }
+              @if (editingRow === row._uuid) { <div class="arcana-row-edit-actions"><button type="button" (click)="$event.stopPropagation(); saveRow(row)">{{ msg.save }}</button><button type="button" (click)="$event.stopPropagation(); cancelEdit()">{{ msg.cancel }}</button></div> }
             </div>
             @if (expandable() && isExpanded(row)) {
               <div class="grid-detail-row" role="row"><div class="grid-detail-cell" role="cell" arcanaExpandedRow [row]="row" [grid]="grid"></div></div>
             }
+            }
           }
+          @if (virtualEnd() < snap.rows.length) { <div class="arcana-virtual-spacer" aria-hidden="true" [style.height.px]="(snap.rows.length - virtualEnd()) * virtualRowHeight()"></div> }
         </div>
         @if (config.footerSummarizerEnabled) {
           <div class="grid-summarizer" [class.grid-summarizer-sticky]="config.stickyHeaderEnabled">
@@ -162,6 +173,7 @@ import { ArcanaFilterFieldComponent } from "./filter-field.component";
               }
             </div>
           }
+          @if (config.columnVisibilityEnabled && columns.length > 1) { <button type="button" role="menuitem" class="arcana-hide-column" (click)="hideMenuColumn()">{{ msg.hideColumn }}</button> }
         </div>
       }
     </div>
@@ -175,6 +187,8 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   grid!: DataTableApi<DataTableRow>;
   snap!: DataTableSnapshot<DataTableRow>;
   columns: DataTableColumn<DataTableRow>[] = [];
+  allColumns: DataTableColumn<DataTableRow>[] = [];
+  displayColumns: DataTableColumn<DataTableRow>[] = [];
   /** Resolved built-in strings (config.messages > config.locale > global default). */
   msg: ArcanaMessages = resolveArcanaMessages();
   gridLocale: ArcanaLocale = resolveArcanaLocale();
@@ -184,13 +198,24 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   focusedCell: string | null = null;
   columnWidths: Record<string, number> = {};
   drag: string | null = null;
+  rowDrag: string | null = null;
+  columnChooserOpen = false;
+  scrollTop = 0;
+  scrollLeft = 0;
+  editingCell: string | null = null;
+  editingRow: string | null = null;
+  editDrafts: Record<string, string> = {};
   private didDrag = false;
   private pinPlan: PinPlan = { active: false, cellStyle: () => ({}), className: () => "" };
 
   readonly pageSizes = [10, 25, 50, 100, 250, 500];
   readonly expanderCellStyle = inlineStyle(expanderStyle);
   readonly selectionHeaderStyle = inlineStyle(selectionStyle);
-  rootStyle(): string { return inlineStyle(gridRootStyle(this.config)); }
+  rootStyle(): string {
+    const baseStyle = inlineStyle(gridRootStyle(this.config));
+    const virtualStyle = `--arcana-virtual-column-offset: ${this.virtualColumnStart() * this.virtualColumnWidth()}px; --arcana-virtual-column-total: ${this.displayColumns.length * this.virtualColumnWidth()}px`;
+    return baseStyle ? `${baseStyle}; ${virtualStyle}` : virtualStyle;
+  }
 
   private unsubscribe: (() => void) | null = null;
   private readonly cdr = inject(ChangeDetectorRef);
@@ -238,11 +263,15 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
     this.gridLocale = resolveArcanaLocale(config);
     this.grid = createDataTable(config);
     this.snap = this.grid.getSnapshot();
-    this.columns = this.grid.getColumns();
+    this.displayColumns = this.grid.getColumns();
+    this.refreshVirtualColumns();
+    this.allColumns = this.grid.getAllColumns();
     this.recomputePins();
     this.unsubscribe = this.grid.subscribe(() => {
       this.snap = this.grid.getSnapshot();
-      this.columns = this.grid.getColumns();
+      this.displayColumns = this.grid.getColumns();
+      this.refreshVirtualColumns();
+      this.allColumns = this.grid.getAllColumns();
       this.recomputePins();
       this.cdr.markForCheck();
     });
@@ -261,8 +290,27 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   bodyStyle(): string | null {
-    return this.config.overflowEnabled ? `max-height: ${this.config.height ?? 560}px; overflow: auto` : null;
+    return this.config.overflowEnabled || this.config.rowVirtualizationEnabled || this.columnVirtual() ? `max-height: ${this.config.height ?? 560}px; overflow: auto` : null;
   }
+
+  checked(event: Event): boolean { return (event.target as HTMLInputElement).checked; }
+  onScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (this.config.rowVirtualizationEnabled) this.scrollTop = target.scrollTop;
+    if (this.columnVirtual()) { this.scrollLeft = target.scrollLeft; this.refreshVirtualColumns(); }
+  }
+  columnVirtual(): boolean { return Boolean(this.config.columnVirtualizationEnabled && !this.displayColumns.some((column) => this.grid.getColumnPin(column.name))); }
+  virtualColumnWidth(): number { return Math.max(60, this.config.virtualColumnWidth ?? 160); }
+  virtualColumnStart(): number { return this.columnVirtual() ? Math.max(0, Math.floor(this.scrollLeft / this.virtualColumnWidth()) - (this.config.virtualOverscan ?? 2)) : 0; }
+  private refreshVirtualColumns(): void {
+    const start = this.virtualColumnStart();
+    const end = this.columnVirtual() ? Math.min(this.displayColumns.length, start + Math.ceil((this.config.virtualColumnViewportWidth ?? 800) / this.virtualColumnWidth()) + (this.config.virtualOverscan ?? 2) * 2) : this.displayColumns.length;
+    this.columns = this.displayColumns.slice(start, end);
+  }
+  virtualRowHeight(): number { return Math.max(24, this.config.virtualRowHeight ?? 42); }
+  virtualStart(): number { return this.config.rowVirtualizationEnabled ? Math.max(0, Math.floor(this.scrollTop / this.virtualRowHeight()) - (this.config.virtualOverscan ?? 5)) : 0; }
+  virtualEnd(): number { return this.config.rowVirtualizationEnabled ? Math.min(this.snap.rows.length, Math.ceil((this.scrollTop + (this.config.height ?? 400)) / this.virtualRowHeight()) + (this.config.virtualOverscan ?? 5)) : this.snap.rows.length; }
+  renderedRows(): DataTableRow[] { return this.snap.rows.slice(this.virtualStart(), this.virtualEnd()); }
 
   alignment(column: DataTableColumn<DataTableRow>): string {
     return alignmentClass(column, this.grid);
@@ -512,8 +560,42 @@ export class ArcanaDataTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onDoubleClickCell(column: DataTableColumn<DataTableRow>, row: DataTableRow): void {
+    this.beginEdit(column, row);
     this.config.onDoubleClickCell?.(this.grid.getCellValue(column, row), column, row, this.grid);
   }
+
+  beginEdit(column: DataTableColumn<DataTableRow>, row: DataTableRow): void {
+    if (!this.config.editingEnabled || column.editable === false || !row._uuid || row._arcanaGroup) return;
+    if (this.config.editMode === "row") {
+      this.editingRow = row._uuid;
+      this.editDrafts = Object.fromEntries(this.displayColumns.filter((item) => item.editable !== false).map((item) => [item.name, String(row[item.name] ?? "")]));
+    } else {
+      this.editingCell = `${row._uuid}:${column.name}`;
+      this.editDrafts = { [column.name]: String(row[column.name] ?? "") };
+    }
+  }
+  isEditing(column: DataTableColumn<DataTableRow>, row: DataTableRow): boolean { return this.editingRow === row._uuid || this.editingCell === `${row._uuid}:${column.name}`; }
+  setDraft(name: string, event: Event): void { this.editDrafts = { ...this.editDrafts, [name]: (event.target as HTMLInputElement).value }; }
+  parsedEdit(column: DataTableColumn<DataTableRow>, row: DataTableRow): unknown {
+    const raw = this.editDrafts[column.name] ?? "";
+    return column.editParser?.(raw, row, this.grid) ?? (["NUMBER", "CURRENCY", "PERCENTAGE"].includes(column.type ?? "") ? Number(raw) : raw);
+  }
+  async commitCell(column: DataTableColumn<DataTableRow>, row: DataTableRow): Promise<void> { if (row._uuid) await this.grid.updateCell(row._uuid, column.name, this.parsedEdit(column, row)); this.editingCell = null; }
+  async saveRow(row: DataTableRow): Promise<void> {
+    if (!row._uuid) return;
+    const previous = { ...row };
+    for (const column of this.displayColumns.filter((item) => item.editable !== false)) await this.grid.updateCell(row._uuid, column.name, this.parsedEdit(column, row));
+    const current = (this.grid.mode === "dataset" ? this.grid.getDataset() : this.grid.getRows()).find((item) => item._uuid === row._uuid);
+    if (current) await this.config.onRowEdit?.(current, previous, this.grid);
+    this.cancelEdit();
+  }
+  cancelEdit(): void { this.editingCell = null; this.editingRow = null; this.editDrafts = {}; }
+  allowRowDrop(event: DragEvent): void { if (this.config.rowReorderEnabled) event.preventDefault(); }
+  dropRow(event: DragEvent, row: DataTableRow): void { event.preventDefault(); if (this.rowDrag && row._uuid) this.grid.moveRow(this.rowDrag, row._uuid); this.rowDrag = null; }
+  groupCount(count: number): string { return formatMessage(this.msg.groupCount, { count }); }
+  aggregateEntries(value: Record<string, unknown>): [string, unknown][] { return Object.entries(value); }
+  aggregateLabel(name: string): string { return this.allColumns.find((column) => column.name === name)?.label ?? name; }
+  hideMenuColumn(): void { if (!this.sortMenu) return; this.grid.setColumnVisible(this.sortMenu.col, false); this.sortMenu = null; }
 
   pages(): number[] {
     return pagination(this.snap.currentPage, this.snap.totalRows, this.snap.rowsPerPage);

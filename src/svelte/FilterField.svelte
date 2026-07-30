@@ -6,7 +6,7 @@
    * commits on blur/Enter.
    */
   import { formatMessage, resolveArcanaMessages, type ArcanaLocale, type ArcanaMessages } from "../core/locale";
-  import type { DataTableColumn, DataTableRow, SearchOption } from "../core/types";
+  import type { DataTableColumn, DataTableRow, FilterOperator, SearchOption } from "../core/types";
   import { ArcanaInput as UiArcanaInput, ArcanaSelect, ArcanaDatePicker } from "@arcanalabs/ui-components/svelte";
   import type { Component, Snippet } from "svelte";
 
@@ -25,13 +25,15 @@
     onKeydown?: (event: KeyboardEvent) => void;
   }>;
 
-  let { column, value, disabled = false, messages, locale, onChange }: {
+  let { column, value, operator, disabled = false, messages, locale, onChange, onOperatorChange }: {
     column: DataTableColumn<DataTableRow>;
     value: unknown;
     disabled?: boolean;
     messages?: ArcanaMessages;
     locale?: ArcanaLocale;
+    operator: FilterOperator;
     onChange: (value: unknown) => void;
+    onOperatorChange: (value: FilterOperator) => void;
   } = $props();
 
   const msg = $derived(messages ?? resolveArcanaMessages());
@@ -60,8 +62,16 @@
   const listValue = $derived.by<string[]>(() => Array.isArray(draft)
     ? draft.map(String)
     : draft == null || draft === "" ? [] : [String(draft)]);
+  const operators = $derived<FilterOperator[]>(column.filterOperators ?? (["NUMBER", "CURRENCY", "PERCENTAGE"].includes(column.type ?? "")
+    ? ["equals", "notEquals", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual"]
+    : column.searchType == null ? ["contains", "startsWith", "endsWith", "equals", "notEquals"] : []));
+  const operatorLabels = $derived<Record<FilterOperator, string>>({ contains: msg.opContains, startsWith: msg.opStartsWith, endsWith: msg.opEndsWith, equals: msg.opEquals, notEquals: msg.opNotEquals, greaterThan: msg.opGreaterThan, greaterThanOrEqual: msg.opGreaterThanOrEqual, lessThan: msg.opLessThan, lessThanOrEqual: msg.opLessThanOrEqual, between: msg.opBetween });
 </script>
 
+<div class="arcana-filter-composer">
+{#if operators.length > 1}
+  <select class="arcana-filter-operator" aria-label={`${msg.filterOperator}: ${column.label}`} value={operator} onchange={(event) => onOperatorChange((event.currentTarget as HTMLSelectElement).value as FilterOperator)}>{#each operators as item (item)}<option value={item}>{operatorLabels[item]}</option>{/each}</select>
+{/if}
 {#if column.searchType === "DATE_RANGE"}
   <ArcanaDatePicker type="daterange" size="sm" value={rangeValue} {disabled} {locale} ariaLabel={filterLabel} onChange={commit} />
 {:else if column.searchType === "BOOLEAN"}
@@ -88,3 +98,4 @@
     />
   </label>
 {/if}
+</div>

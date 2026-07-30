@@ -20,6 +20,13 @@ const focusedRow = ref<string | null>(null);
 const focusedCell = ref<string | null>(null);
 const columnWidths = ref<Record<string, number>>({});
 const drag = ref<string | null>(null);
+const rowDrag = ref<string | null>(null);
+const columnChooserOpen = ref(false);
+const scrollTop = ref(0);
+const scrollLeft = ref(0);
+const editingCell = ref<string | null>(null);
+const editingRow = ref<string | null>(null);
+const editDrafts = ref<Record<string, string>>({});
 let didDrag = false;
 let unsubscribe = grid.value.subscribe(() => { revision.value += 1; });
 
@@ -55,6 +62,11 @@ defineExpose({
   upsert: (uuid: string, row: DataTableRow) => grid.value.upsert(uuid, row), getRows: () => grid.value.getRows(),
   getCheckedRows: () => grid.value.getCheckedRows(), clearCheckedRows: () => grid.value.clearCheckedRows(),
   setFilter: (name: string, value: unknown) => grid.value.setFilter(name, value), setFilters: (filters: Record<string, unknown>) => grid.value.setFilters(filters),
+  setFilterOperator: (name: string, operator: import("../core/types").FilterOperator) => grid.value.setFilterOperator(name, operator),
+  setColumnVisible: (name: string, visible: boolean) => grid.value.setColumnVisible(name, visible),
+  getColumnState: () => grid.value.getColumnState(), setColumnState: (state: import("../core/types").DataTableColumnState) => grid.value.setColumnState(state),
+  resetColumnState: () => grid.value.resetColumnState(), updateCell: (uuid: string, name: string, value: unknown) => grid.value.updateCell(uuid, name, value),
+  moveRow: (uuid: string, target: string, position?: "before" | "after") => grid.value.moveRow(uuid, target, position),
   expandRow: (uuid: string) => grid.value.expandRow(uuid), collapseRow: (uuid: string) => grid.value.collapseRow(uuid),
   getExpandedRows: () => grid.value.getExpandedRows()
 });
@@ -63,7 +75,18 @@ const themeClass = computed(() => arcanaThemeClass(props.config.theme));
 const msg = computed(() => resolveArcanaMessages(props.config));
 const gridLocale = computed(() => resolveArcanaLocale(props.config));
 const state = computed(() => { revision.value; return grid.value.getSnapshot(); });
-const columns = computed(() => { revision.value; return grid.value.getColumns(); });
+const displayColumns = computed(() => { revision.value; return grid.value.getColumns(); });
+const columnVirtual = computed(() => Boolean(props.config.columnVirtualizationEnabled && !displayColumns.value.some((column) => grid.value.getColumnPin(column.name))));
+const virtualColumnWidth = computed(() => Math.max(60, props.config.virtualColumnWidth ?? 160));
+const virtualColumnStart = computed(() => columnVirtual.value ? Math.max(0, Math.floor(scrollLeft.value / virtualColumnWidth.value) - (props.config.virtualOverscan ?? 2)) : 0);
+const virtualColumnEnd = computed(() => columnVirtual.value ? Math.min(displayColumns.value.length, virtualColumnStart.value + Math.ceil((props.config.virtualColumnViewportWidth ?? 800) / virtualColumnWidth.value) + (props.config.virtualOverscan ?? 2) * 2) : displayColumns.value.length);
+const columns = computed(() => displayColumns.value.slice(virtualColumnStart.value, virtualColumnEnd.value));
+const virtualColumnStyle = computed(() => ({ "--arcana-virtual-column-offset": `${virtualColumnStart.value * virtualColumnWidth.value}px`, "--arcana-virtual-column-total": `${displayColumns.value.length * virtualColumnWidth.value}px` }));
+const allColumns = computed(() => { revision.value; return grid.value.getAllColumns(); });
+const virtualRowHeight = computed(() => Math.max(24, props.config.virtualRowHeight ?? 42));
+const virtualStart = computed(() => props.config.rowVirtualizationEnabled ? Math.max(0, Math.floor(scrollTop.value / virtualRowHeight.value) - (props.config.virtualOverscan ?? 5)) : 0);
+const virtualEnd = computed(() => props.config.rowVirtualizationEnabled ? Math.min(state.value.rows.length, Math.ceil((scrollTop.value + (props.config.height ?? 400)) / virtualRowHeight.value) + (props.config.virtualOverscan ?? 5)) : state.value.rows.length);
+const renderedRows = computed(() => state.value.rows.slice(virtualStart.value, virtualEnd.value));
 const pages = computed(() => pagination(state.value.currentPage, state.value.totalRows, state.value.rowsPerPage));
 const lastPage = computed(() => Math.ceil(state.value.totalRows / state.value.rowsPerPage));
 const beginning = computed(() => state.value.totalRows ? ((state.value.currentPage - 1) * state.value.rowsPerPage) + 1 : 0);
@@ -163,6 +186,32 @@ const onCell = (column: DataTableColumn<DataTableRow>, row: DataTableRow) => {
   if (props.config.cellFocusEnabled ?? true) focusedCell.value = `${row._uuid}:${column.name}`;
   props.config.onClickCell?.(grid.value.getCellValue(column, row), column, row, grid.value);
 };
+const beginEdit = (column: DataTableColumn<DataTableRow>, row: DataTableRow) => {
+  if (!props.config.editingEnabled || column.editable === false || !row._uuid || row._arcanaGroup) return;
+  if (props.config.editMode === "row") {
+    editingRow.value = row._uuid;
+    editDrafts.value = Object.fromEntries(displayColumns.value.filter((item) => item.editable !== false).map((item) => [item.name, String(row[item.name] ?? "")]));
+  } else {
+    editingCell.value = `${row._uuid}:${column.name}`;
+    editDrafts.value = { [column.name]: String(row[column.name] ?? "") };
+  }
+};
+const parsedEdit = (column: DataTableColumn<DataTableRow>, row: DataTableRow) => {
+  const raw = editDrafts.value[column.name] ?? "";
+  return column.editParser?.(raw, row, grid.value) ?? (["NUMBER", "CURRENCY", "PERCENTAGE"].includes(column.type ?? "") ? Number(raw) : raw);
+};
+const commitCell = async (column: DataTableColumn<DataTableRow>, row: DataTableRow) => {
+  if (row._uuid) await grid.value.updateCell(row._uuid, column.name, parsedEdit(column, row));
+  editingCell.value = null;
+};
+const saveRow = async (row: DataTableRow) => {
+  if (!row._uuid) return;
+  const previous = { ...row };
+  for (const column of displayColumns.value.filter((item) => item.editable !== false)) await grid.value.updateCell(row._uuid, column.name, parsedEdit(column, row));
+  const current = (grid.value.mode === "dataset" ? grid.value.getDataset() : grid.value.getRows()).find((item) => item._uuid === row._uuid);
+  if (current) await props.config.onRowEdit?.(current, previous, grid.value);
+  editingRow.value = null; editDrafts.value = {};
+};
 const selectionCellStyle = (row: DataTableRow) => ({ ...selectionStyle, ...props.config.onBeforeCheckboxAndRadioButtonStyleMounted?.(row, grid.value) });
 const context = (event: MouseEvent, column: DataTableColumn<DataTableRow>, row: DataTableRow) => {
   const items = props.config.onContextMenu?.(grid.value.getCellValue(column, row), column, row, grid.value);
@@ -212,10 +261,17 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
 </script>
 
 <template>
-  <div class="arcana-grid grid-wrapper" :class="[themeClass, { 'arcana-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD' }]" :style="gridRootStyle(config)" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
+  <div class="arcana-grid grid-wrapper" :class="[themeClass, { 'arcana-grid-responsive-vertical': config.responsiveMode === 'VERTICAL_RECORD', 'arcana-column-virtualized': columnVirtual }]" :style="[gridRootStyle(config), virtualColumnStyle]" :aria-label="config.ariaLabel ?? msg.gridLabel" :aria-busy="state.loading">
     <div v-if="state.error" class="arcana-grid-error" role="alert">{{ msg.loadError }}</div>
     <ArcanaLoadingOverlay :visible="state.loading" :text="msg.loading" />
-    <div class="arcana-grid-body" :style="config.overflowEnabled ? { maxHeight: `${config.height ?? 560}px`, overflow: 'auto' } : undefined">
+    <div v-if="config.columnVisibilityEnabled" class="arcana-column-tools">
+      <button type="button" class="arcana-column-trigger" :aria-expanded="columnChooserOpen" @click="columnChooserOpen = !columnChooserOpen">{{ msg.columns }}</button>
+      <div v-if="columnChooserOpen" class="arcana-column-chooser">
+        <label v-for="column in allColumns" :key="column.name"><input type="checkbox" :checked="grid.isColumnVisible(column.name)" @change="grid.setColumnVisible(column.name, ($event.target as HTMLInputElement).checked)" />{{ column.label }}</label>
+        <button type="button" @click="grid.resetColumnState()">{{ msg.resetColumns }}</button>
+      </div>
+    </div>
+    <div class="arcana-grid-body" :style="config.overflowEnabled || config.rowVirtualizationEnabled || columnVirtual ? { maxHeight: `${config.height ?? 560}px`, overflow: 'auto' } : undefined" @scroll="config.rowVirtualizationEnabled && (scrollTop = ($event.target as HTMLElement).scrollTop); columnVirtual && (scrollLeft = ($event.target as HTMLElement).scrollLeft)">
       <div class="grid-header" :class="{ 'grid-header-sticky': config.stickyHeaderEnabled }" role="row">
         <div v-if="expandable" class="grid-header-cell grid-expand-cell" :class="pinClass(PIN_SLOT_EXPANDER)" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]" />
         <div v-if="config.checkboxEnabled" class="grid-header-cell" :class="pinClass(PIN_SLOT_CHECKBOX)" :style="[selectionStyle, pinStyle(PIN_SLOT_CHECKBOX)]"><input type="checkbox" :checked="state.rows.some(row => row._isChecked)" :disabled="config.isCheckboxHeaderDisabled?.(grid)" :aria-label="msg.selectAll" @change="grid.toggleAll(($event.target as HTMLInputElement).checked)" /></div>
@@ -231,22 +287,29 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
         <div v-if="config.checkboxEnabled" class="grid-search-row-cell" :class="pinClass(PIN_SLOT_CHECKBOX)" :style="[selectionStyle, pinStyle(PIN_SLOT_CHECKBOX)]" /><div v-if="config.radioButtonSelectionEnabled" class="grid-search-row-cell" :class="pinClass(PIN_SLOT_RADIO)" :style="[selectionStyle, pinStyle(PIN_SLOT_RADIO)]" />
         <div v-for="column in columns" :key="column.name" class="grid-search-row-cell" :class="pinClass(column.name)" :style="[colStyle(column), pinStyle(column.name)]">
           <RuntimeContent v-if="column.searchType === 'COMPONENT'" :value="column.searchTypeRenderer?.()" :html="true" />
-          <FilterField v-else-if="searchable(column)" :column="column" :model-value="state.filters[column.filterName ?? column.name] ?? config.initialFilters?.[column.filterName ?? column.name]" :disabled="disabledFilter(column)" :messages="msg" :locale="gridLocale" @change="grid.applyFilter(column, $event)" />
+          <FilterField v-else-if="searchable(column)" :column="column" :model-value="state.filters[column.filterName ?? column.name] ?? config.initialFilters?.[column.filterName ?? column.name]" :operator="grid.getFilterOperator(column.filterName ?? column.name)" :disabled="disabledFilter(column)" :messages="msg" :locale="gridLocale" @operator-change="grid.setFilterOperator(column.filterName ?? column.name, $event)" @change="grid.applyFilter(column, $event)" />
         </div>
         <div v-if="config.actions" class="grid-search-row-cell" :class="pinClass(PIN_SLOT_ACTIONS)" :style="[actionStyle(grid), pinStyle(PIN_SLOT_ACTIONS)]" />
       </div>
       <div class="grid-body" role="rowgroup">
         <div v-if="!state.loading && state.rows.length === 0" class="arcana-grid-status">{{ msg.empty }}</div>
-        <template v-for="row in state.rows" :key="row._uuid">
-          <div class="grid-row flex" :class="{ 'grid-row-focused': row._hasFocus || focusedRow === row._uuid, 'grid-row-checked': row._isChecked || row._isRadioChecked }" role="row" @click="onRow(row)" @dblclick="config.onDoubleClickRow?.(row, grid)">
+        <div v-if="virtualStart" class="arcana-virtual-spacer" aria-hidden="true" :style="{ height: `${virtualStart * virtualRowHeight}px` }" />
+        <template v-for="row in renderedRows" :key="row._uuid">
+          <div v-if="row._arcanaGroup" class="arcana-group-row" role="row" :style="{ paddingInlineStart: `${12 + row._arcanaGroup.level * 18}px` }"><strong>{{ row._arcanaGroup.label }}: {{ row._arcanaGroup.value }}</strong><span>{{ formatMessage(msg.groupCount, { count: row._arcanaGroup.count }) }}</span><span v-for="(value, name) in row._arcanaGroup.aggregates" :key="name" class="arcana-group-aggregate">{{ displayColumns.find(column => column.name === name)?.label ?? name }}: {{ value }}</span></div>
+          <div v-else class="grid-row flex" :draggable="Boolean(config.rowReorderEnabled)" :class="{ 'grid-row-focused': row._hasFocus || focusedRow === row._uuid, 'grid-row-checked': row._isChecked || row._isRadioChecked, 'arcana-row-dragging': rowDrag === row._uuid }" role="row" @dragstart="rowDrag = row._uuid ?? null" @dragover="config.rowReorderEnabled && $event.preventDefault()" @drop.prevent="rowDrag && row._uuid && grid.moveRow(rowDrag, row._uuid); rowDrag = null" @click="onRow(row)" @dblclick="config.onDoubleClickRow?.(row, grid)">
             <div v-if="expandable" class="grid-cell grid-expand-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_EXPANDER)" data-label="" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]"><button type="button" class="grid-expand-toggle" :class="{ 'is-open': isExpanded(row) }" :aria-expanded="isExpanded(row)" :aria-label="isExpanded(row) ? msg.collapseRow : msg.expandRow" @click="onExpandToggle($event, row)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></button></div>
             <div v-if="config.checkboxEnabled" class="grid-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_CHECKBOX)" :style="[selectionCellStyle(row), pinStyle(PIN_SLOT_CHECKBOX)]"><input type="checkbox" :checked="row._isChecked" :disabled="row._isCheckboxDisabled" :aria-label="msg.selectRow" @click.stop @change="grid.toggleRow(row, ($event.target as HTMLInputElement).checked)" /></div>
             <div v-if="config.radioButtonSelectionEnabled" class="grid-cell arcana-grid-selection-cell" :class="pinClass(PIN_SLOT_RADIO)" :style="[selectionCellStyle(row), pinStyle(PIN_SLOT_RADIO)]"><input type="radio" :name="state.uuid" :checked="row._isRadioChecked" :aria-label="msg.selectRow" @click.stop @change="selectRadio(row)" /></div>
-            <div v-for="column in columns" :key="column.name" class="grid-cell" :class="[alignmentClass(column, grid), { 'grid-cell-focused': focusedCell === `${row._uuid}:${column.name}` }, pinClass(column.name)]" :data-label="column.label" :style="[cellStyle(column, row), pinStyle(column.name)]" role="cell" @click="onCell(column, row)" @dblclick="config.onDoubleClickCell?.(grid.getCellValue(column, row), column, row, grid)" @contextmenu="context($event, column, row)"><RuntimeContent :value="grid.getCellValue(column, row)" :html="column.html === true" /></div>
+            <div v-for="column in columns" :key="column.name" class="grid-cell" :class="[alignmentClass(column, grid), { 'grid-cell-focused': focusedCell === `${row._uuid}:${column.name}` }, pinClass(column.name)]" :data-label="column.label" :style="[cellStyle(column, row), pinStyle(column.name)]" role="cell" @click="onCell(column, row)" @dblclick="beginEdit(column, row); config.onDoubleClickCell?.(grid.getCellValue(column, row), column, row, grid)" @contextmenu="context($event, column, row)">
+              <input v-if="(editingRow === row._uuid || editingCell === `${row._uuid}:${column.name}`) && column.editable !== false" class="arcana-cell-editor" :value="editDrafts[column.name] ?? ''" @click.stop @input="editDrafts = { ...editDrafts, [column.name]: ($event.target as HTMLInputElement).value }" @blur="config.editMode !== 'row' && commitCell(column, row)" @keydown.enter="config.editMode !== 'row' && commitCell(column, row)" @keydown.esc="editingCell = null; editingRow = null" />
+              <RuntimeContent v-else :value="grid.getCellValue(column, row)" :html="column.html === true" />
+            </div>
             <div v-if="config.actions" class="grid-cell" :class="pinClass(PIN_SLOT_ACTIONS)" :data-label="msg.actions" :style="[actionStyle(grid), pinStyle(PIN_SLOT_ACTIONS)]"><template v-for="(action, index) in config.actions" :key="index"><RuntimeContent v-if="action.isVisible?.(row) ?? true" :value="action.element(row)" :html="true" /></template></div>
+            <div v-if="editingRow === row._uuid" class="arcana-row-edit-actions"><button type="button" @click.stop="saveRow(row)">{{ msg.save }}</button><button type="button" @click.stop="editingRow = null; editDrafts = {}">{{ msg.cancel }}</button></div>
           </div>
           <div v-if="expandable && isExpanded(row)" class="grid-detail-row" role="row"><div class="grid-detail-cell" role="cell"><ExpandedRowContent :row="row" /></div></div>
         </template>
+        <div v-if="virtualEnd < state.rows.length" class="arcana-virtual-spacer" aria-hidden="true" :style="{ height: `${(state.rows.length - virtualEnd) * virtualRowHeight}px` }" />
       </div>
       <div v-if="config.footerSummarizerEnabled" class="grid-summarizer" :class="{ 'grid-summarizer-sticky': config.stickyHeaderEnabled }">
         <div v-if="expandable" class="grid-summarizer-cell grid-expand-cell" :class="pinClass(PIN_SLOT_EXPANDER)" :style="[expanderStyle, pinStyle(PIN_SLOT_EXPANDER)]" />
@@ -277,6 +340,7 @@ const ExpandedRowContent = defineComponent({ props: { row: null }, setup(detailP
         <button type="button" role="menuitem" :class="{ 'is-active': getColumnPin(sortMenu.col) === 'right' }" @click="applyPin('right')"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2h3v12h-3zM3 4h6v8H3z" /></svg>{{ msg.pinRight }}</button>
         <button v-if="getColumnPin(sortMenu.col)" type="button" role="menuitem" @click="applyPin(null)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>{{ msg.unpin }}</button>
       </div>
+      <button v-if="config.columnVisibilityEnabled && columns.length > 1" type="button" role="menuitem" class="arcana-hide-column" @click="grid.setColumnVisible(sortMenu.col, false); sortMenu = null">{{ msg.hideColumn }}</button>
     </div>
   </div>
 </template>

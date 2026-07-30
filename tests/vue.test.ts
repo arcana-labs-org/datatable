@@ -4,6 +4,22 @@ import type { DataTableApi } from "../src";
 import { ArcanaDataTable } from "../src/vue";
 
 describe("Vue adapter", () => {
+  it("renders grouping, editing, column chooser and a virtual row window", async () => {
+    const rows = Array.from({ length: 80 }, (_, index) => ({ id: index, name: `Person ${index}`, department: index % 2 ? "A" : "B", amount: index }));
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", dataset: rows, rowsPerPage: 100, height: 180, rowVirtualizationEnabled: true, columnVirtualizationEnabled: true, virtualColumnViewportWidth: 160, virtualOverscan: 0,
+      editingEnabled: true, rowReorderEnabled: true, columnVisibilityEnabled: true, groupBy: ["department"],
+      columns: [{ name: "name", label: "Name", editable: true }, { name: "department", label: "Department" }, { name: "amount", label: "Amount", aggregation: "sum" }]
+    } } });
+    expect(wrapper.findAll(".grid-body .grid-row").length).toBeLessThan(80);
+    expect(wrapper.findAll(".grid-header [data-col-name]").length).toBeLessThan(3);
+    expect(wrapper.find(".arcana-group-row").exists()).toBe(true);
+    await wrapper.find(".arcana-column-trigger").trigger("click");
+    expect(wrapper.find(".arcana-column-chooser").exists()).toBe(true);
+    await wrapper.find(".grid-body .grid-row .grid-cell").trigger("dblclick");
+    expect(wrapper.find(".arcana-cell-editor").exists()).toBe(true);
+  });
+
   it("applies a CSS-length native borderRadius to the grid root", () => {
     const wrapper = mount(ArcanaDataTable, { props: { config: {
       mode: "dataset", dataset: [], columns: [], borderRadius: "0.75rem"

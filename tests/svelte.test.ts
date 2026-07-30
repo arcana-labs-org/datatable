@@ -25,6 +25,23 @@ afterEach(() => {
 });
 
 describe("Svelte adapter", () => {
+  it("renders grouping, editing, column chooser and a virtual row window", () => {
+    const rows = Array.from({ length: 80 }, (_, index) => ({ id: index, name: `Person ${index}`, department: index % 2 ? "A" : "B", amount: index }));
+    const { target } = renderTable({
+      mode: "dataset", dataset: rows, rowsPerPage: 100, height: 180, rowVirtualizationEnabled: true, columnVirtualizationEnabled: true, virtualColumnViewportWidth: 160, virtualOverscan: 0,
+      editingEnabled: true, rowReorderEnabled: true, columnVisibilityEnabled: true, groupBy: ["department"],
+      columns: [{ name: "name", label: "Name", editable: true }, { name: "department", label: "Department" }, { name: "amount", label: "Amount", aggregation: "sum" }]
+    });
+    expect(target.querySelectorAll(".grid-body .grid-row").length).toBeLessThan(80);
+    expect(target.querySelectorAll(".grid-header [data-col-name]").length).toBeLessThan(3);
+    expect(target.querySelector(".arcana-group-row")).toBeTruthy();
+    click(target.querySelector(".arcana-column-trigger"));
+    expect(target.querySelector(".arcana-column-chooser")).toBeTruthy();
+    target.querySelector(".grid-body .grid-row .grid-cell")?.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+    flushSync();
+    expect(target.querySelector(".arcana-cell-editor")).toBeTruthy();
+  });
+
   it("applies a numeric native borderRadius to the grid root in pixels", () => {
     const { target } = renderTable({
       mode: "dataset", dataset: [], columns: [], borderRadius: 10

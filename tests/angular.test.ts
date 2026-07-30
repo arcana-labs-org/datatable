@@ -35,6 +35,24 @@ const click = (element: Element | null) => {
 };
 
 describe("Angular adapter", () => {
+  it("renders grouping, editing, column chooser and a virtual row window", async () => {
+    const rows = Array.from({ length: 80 }, (_, index) => ({ id: index, name: `Person ${index}`, department: index % 2 ? "A" : "B", amount: index }));
+    const { fixture, element } = await renderTable({
+      mode: "dataset", dataset: rows, rowsPerPage: 100, height: 180, rowVirtualizationEnabled: true, columnVirtualizationEnabled: true, virtualColumnViewportWidth: 160, virtualOverscan: 0,
+      editingEnabled: true, rowReorderEnabled: true, columnVisibilityEnabled: true, groupBy: ["department"],
+      columns: [{ name: "name", label: "Name", editable: true }, { name: "department", label: "Department" }, { name: "amount", label: "Amount", aggregation: "sum" }]
+    });
+    expect(element.querySelectorAll(".grid-body .grid-row").length).toBeLessThan(80);
+    expect(element.querySelectorAll(".grid-header [data-col-name]").length).toBeLessThan(3);
+    expect(element.querySelector(".arcana-group-row")).toBeTruthy();
+    click(element.querySelector(".arcana-column-trigger"));
+    fixture.detectChanges();
+    expect(element.querySelector(".arcana-column-chooser")).toBeTruthy();
+    element.querySelector(".grid-body .grid-row .grid-cell")?.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+    fixture.detectChanges();
+    expect(element.querySelector(".arcana-cell-editor")).toBeTruthy();
+  });
+
   it("applies a CSS-length native borderRadius to the grid root", async () => {
     const { element } = await renderTable({
       mode: "dataset", dataset: [], columns: [], borderRadius: "1rem"

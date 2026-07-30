@@ -1,5 +1,5 @@
 import type { Component } from "svelte";
-import type { DataTableApi, DataTableConfig, DataTableRow } from "./core/types";
+import type { DataTableApi, DataTableColumnState, DataTableConfig, DataTableRow, FilterOperator } from "./core/types";
 import ArcanaDataTableComponent from "./svelte/ArcanaDataTable.svelte";
 
 export * from "./index";
@@ -28,6 +28,13 @@ export interface ArcanaDataTableExports {
   clearCheckedRows(): void;
   setFilter(name: string, value: unknown): Promise<void>;
   setFilters(filters: Record<string, unknown>): Promise<void>;
+  setFilterOperator(name: string, operator: FilterOperator): Promise<void>;
+  setColumnVisible(name: string, visible: boolean): void;
+  getColumnState(): DataTableColumnState;
+  setColumnState(state: DataTableColumnState): void;
+  resetColumnState(): void;
+  updateCell(uuid: string, name: string, value: unknown): Promise<void>;
+  moveRow(uuid: string, target: string, position?: "before" | "after"): void;
   expandRow(uuid: string): void;
   collapseRow(uuid: string): void;
   getExpandedRows(): DataTableRow[];

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { ArcanaLocale, ArcanaTheme, DataResponse, DataTableConfig, DataTableRow } from "../../../src";
+import type { ArcanaLocale, ArcanaTheme, DataResponse, DataTableColumn, DataTableConfig, DataTableRow } from "../../../src";
 import { ARCANA_LOCALES } from "../../../src";
 import { ArcanaDataTable } from "../../../src/react";
 import { fmt, useLang, type Messages } from "../i18n";
@@ -120,6 +120,32 @@ export function ThemePreview() {
     </div>
     <ArcanaDataTable key={locale} config={config} />
   </>;
+}
+
+export function AdvancedFeaturesPreview() {
+  const { msg, rows, gridLocale } = useDemo();
+  const columns = useMemo<DataTableColumn<DemoRow>[]>(() => [
+    { name: "name", label: msg.demos.cols.name, editable: true, filterOperators: ["contains", "startsWith", "equals"] },
+    { name: "department", label: msg.demos.cols.area, editable: true },
+    { name: "amount", label: msg.demos.cols.amount, type: "CURRENCY", editable: true, aggregation: "sum", filterOperators: ["equals", "greaterThan", "lessThan"] },
+    { name: "score", label: msg.demos.cols.score, type: "NUMBER", editable: true, aggregation: "average", filterOperators: ["equals", "greaterThan", "lessThan"] }
+  ], [msg]);
+  const config = useMemo<DataTableConfig<DemoRow>>(() => ({
+    mode: "dataset",
+    dataset: rows,
+    rowsPerPage: 100,
+    height: 330,
+    rowVirtualizationEnabled: true,
+    columnVirtualizationEnabled: true,
+    editingEnabled: true,
+    editMode: "cell",
+    rowReorderEnabled: true,
+    columnVisibilityEnabled: true,
+    groupBy: ["department"],
+    locale: gridLocale,
+    columns
+  }), [rows, columns, gridLocale]);
+  return <ArcanaDataTable config={config} />;
 }
 
 export function LocalizationPreview() {

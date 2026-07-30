@@ -5,6 +5,22 @@ import type { DataTableApi } from "../src";
 import { ArcanaDataTable } from "../src/react";
 
 describe("React adapter", () => {
+  it("renders the advanced workflow controls and virtual row window", () => {
+    const rows = Array.from({ length: 80 }, (_, index) => ({ id: index, name: `Person ${index}`, department: index % 2 ? "A" : "B", amount: index }));
+    const { container } = render(<ArcanaDataTable config={{
+      mode: "dataset", dataset: rows, rowsPerPage: 100, height: 180, rowVirtualizationEnabled: true, columnVirtualizationEnabled: true, virtualColumnViewportWidth: 160, virtualOverscan: 0,
+      editingEnabled: true, rowReorderEnabled: true, columnVisibilityEnabled: true, groupBy: ["department"],
+      columns: [{ name: "name", label: "Name", editable: true }, { name: "department", label: "Department" }, { name: "amount", label: "Amount", aggregation: "sum" }]
+    }} />);
+    expect(container.querySelectorAll(".grid-body .grid-row").length).toBeLessThan(80);
+    expect(container.querySelectorAll(".grid-header [data-col-name]").length).toBeLessThan(3);
+    expect(container.querySelector(".arcana-group-row")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Colunas" }));
+    expect(screen.getByText("Restaurar colunas")).toBeTruthy();
+    fireEvent.doubleClick(screen.getByText("Person 0"));
+    expect(container.querySelector(".arcana-cell-editor")).toBeTruthy();
+  });
+
   it("applies a numeric native borderRadius to the grid root in pixels", () => {
     const { container } = render(<ArcanaDataTable config={{
       mode: "dataset", dataset: [], columns: [], borderRadius: 12

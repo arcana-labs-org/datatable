@@ -13,6 +13,14 @@ export interface Pagination {
 }
 
 export type SearchType = "DATE" | "DATE_MONTH" | "REMOTE" | "LIST" | "DATE_RANGE" | "BOOLEAN" | "COMPONENT";
+export type FilterOperator =
+  | "contains" | "startsWith" | "endsWith"
+  | "equals" | "notEquals"
+  | "greaterThan" | "greaterThanOrEqual"
+  | "lessThan" | "lessThanOrEqual"
+  | "between";
+export type DataTableEditMode = "cell" | "row";
+export type DataTableAggregation = "sum" | "average" | "count" | "min" | "max";
 export type ArcanaThemePreset = "zinc" | "ocean" | "forest" | "midnight";
 /**
  * Theme name applied as the `arcana-theme-{name}` CSS class.
@@ -43,6 +51,8 @@ export interface DataTableRow {
   _isChecked?: boolean;
   _isCheckboxDisabled?: boolean;
   _isRadioChecked?: boolean;
+  /** Internal group header emitted when `groupBy` is configured. */
+  _arcanaGroup?: DataTableGroup;
   [key: string]: unknown;
 }
 
@@ -86,6 +96,10 @@ export interface DataTableColumn<Row extends DataTableRow = DataTableRow> {
   textAlignment?: "center" | "left" | "right";
   filterName?: string;
   searchType?: SearchType;
+  /** Default comparison used by dataset filters. */
+  filterOperator?: FilterOperator;
+  /** Operators exposed to the user for this column. */
+  filterOperators?: FilterOperator[];
   searchConfig?: () => SearchOption[] | Promise<SearchOption[]>;
   searchTypeRenderer?: () => Renderable;
   headerContentGetter?: (value: unknown, grid: DataTableApi<Row>) => Renderable;
@@ -93,6 +107,12 @@ export interface DataTableColumn<Row extends DataTableRow = DataTableRow> {
   onBeforeColumnStyleMounted?: (value: Renderable, row: Row, grid: DataTableApi<Row>) => StyleMap;
   orderByEnabled?: boolean;
   searchEnabled?: boolean;
+  /** Enables the built-in editor for this column when table editing is active. */
+  editable?: boolean;
+  /** Converts the native editor value before it is committed to the row. */
+  editParser?: (value: string, row: Row, grid: DataTableApi<Row>) => unknown;
+  /** Aggregation displayed on group headers. */
+  aggregation?: DataTableAggregation | ((rows: Row[], column: DataTableColumn<Row>) => unknown);
   isCreatedDynamically?: boolean;
   isVisible?: () => boolean;
   summarizerValueGetter?: (value: unknown, row: Row) => number;
@@ -113,6 +133,21 @@ export interface DataResponse<Row extends DataTableRow = DataTableRow> {
 
 export interface StyleMap {
   [property: string]: string | number | undefined;
+}
+
+export interface DataTableGroup {
+  key: string;
+  value: unknown;
+  label: string;
+  level: number;
+  count: number;
+  aggregates: Record<string, unknown>;
+}
+
+export interface DataTableColumnState {
+  order: string[];
+  pins: Record<string, "left" | "right" | null>;
+  hidden: string[];
 }
 
 export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
@@ -177,6 +212,30 @@ export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
    * `true`.
    */
   columnPinEnabled?: boolean;
+  /** Adds a built-in column chooser and runtime show/hide API. */
+  columnVisibilityEnabled?: boolean;
+  /** Saves order, pin and visibility in localStorage under this key. */
+  columnStateStorageKey?: string;
+  /** Renders only the visible row window. Requires a scrollable `height`. */
+  rowVirtualizationEnabled?: boolean;
+  /** Estimated virtual row height in pixels. Defaults to 42. */
+  virtualRowHeight?: number;
+  /** Extra rows rendered above and below the viewport. Defaults to 5. */
+  virtualOverscan?: number;
+  /** Renders only the horizontally visible data-column window. */
+  columnVirtualizationEnabled?: boolean;
+  /** Estimated virtual column width in pixels. Defaults to 160. */
+  virtualColumnWidth?: number;
+  /** Estimated horizontal viewport width in pixels. Defaults to 800. */
+  virtualColumnViewportWidth?: number;
+  /** Enables native cell or row editing. */
+  editingEnabled?: boolean;
+  /** Editing interaction. Defaults to `cell`. */
+  editMode?: DataTableEditMode;
+  /** Enables drag-and-drop row ordering. */
+  rowReorderEnabled?: boolean;
+  /** Groups dataset rows by these column names. */
+  groupBy?: string[];
   textAlignment?: "center" | "left" | "right";
   columns: DataTableColumn<Row>[] | (() => DataTableColumn<Row>[]);
   actions?: DataTableAction<Row>[];
@@ -233,6 +292,9 @@ export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
   onRadioStateChanged?: (row: Row, grid: DataTableApi<Row>) => void;
   onClickCell?: (value: unknown, column: DataTableColumn<Row>, row: Row, grid: DataTableApi<Row>) => unknown;
   onDoubleClickCell?: (value: unknown, column: DataTableColumn<Row>, row: Row, grid: DataTableApi<Row>) => unknown;
+  onCellEdit?: (value: unknown, column: DataTableColumn<Row>, row: Row, grid: DataTableApi<Row>) => void | Promise<void>;
+  onRowEdit?: (row: Row, previous: Row, grid: DataTableApi<Row>) => void | Promise<void>;
+  onRowReorder?: (rows: Row[], moved: Row, grid: DataTableApi<Row>) => void;
   onContextMenu?: (value: unknown, column: DataTableColumn<Row>, row: Row, grid: DataTableApi<Row>) => ContextMenuItem[];
   uniqueKeyIdentifier?: string | ((row: Row) => string);
 }
@@ -264,6 +326,8 @@ export interface DataTableSnapshot<Row extends DataTableRow = DataTableRow> {
    * unpin). A column absent here falls back to its `column.pinned`.
    */
   columnPins: Record<string, "left" | "right" | null>;
+  hiddenColumns: string[];
+  filterOperators: Record<string, FilterOperator>;
   loading: boolean;
   error: unknown;
   currentPage: number;
@@ -300,6 +364,8 @@ export interface DataTableApi<Row extends DataTableRow = DataTableRow> extends D
   isEmpty(): boolean;
   isNotEmpty(): boolean;
   getColumns(): DataTableColumn<Row>[];
+  /** All declared columns, including columns currently hidden at runtime. */
+  getAllColumns(): DataTableColumn<Row>[];
   /** Replaces the whole effective column order (a list of column `name`s). */
   setColumnOrder(order: string[]): void;
   /**
@@ -311,6 +377,11 @@ export interface DataTableApi<Row extends DataTableRow = DataTableRow> extends D
   getColumnPin(name: string): "left" | "right" | null;
   /** Pins a column to an edge, or unpins it with `null`. */
   setColumnPinned(name: string, pinned: "left" | "right" | null): void;
+  setColumnVisible(name: string, visible: boolean): void;
+  isColumnVisible(name: string): boolean;
+  getColumnState(): DataTableColumnState;
+  setColumnState(state: Partial<DataTableColumnState>): void;
+  resetColumnState(): void;
   getFilters(): Record<string, unknown>;
   applyFilter(column: DataTableColumn<Row>, value: unknown): Promise<void>;
   /**
@@ -327,6 +398,8 @@ export interface DataTableApi<Row extends DataTableRow = DataTableRow> extends D
   toggleOrderBy(name: string, options?: { additive?: boolean }): Promise<void>;
   setFilter(name: string, value: unknown): Promise<void>;
   setFilters(filters: Record<string, unknown>): Promise<void>;
+  setFilterOperator(name: string, operator: FilterOperator): Promise<void>;
+  getFilterOperator(name: string): FilterOperator;
   paginate(page: number, rowsPerPage: number): Promise<void>;
   getSummarizedValue(column: DataTableColumn<Row>, onlyIsChecked?: boolean): SummarizedValue | null;
   getSelectedRadioRow(): Row | null;
@@ -338,6 +411,8 @@ export interface DataTableApi<Row extends DataTableRow = DataTableRow> extends D
   collapseRow(uuid: string): void;
   getExpandedRows(): Row[];
   getCellValue(column: DataTableColumn<Row>, row: Row): Renderable;
+  updateCell(rowUuid: string, columnName: string, value: unknown): Promise<void>;
+  moveRow(rowUuid: string, targetUuid: string, position?: "before" | "after"): void;
 }
 
 export interface ArcanaDataTableOptions {
@@ -391,8 +466,8 @@ export type OnVisibleActionCheck = (row: Row) => boolean;
 export type State = DataTableSnapshot;
 export type Methods = Pick<DataTableApi,
   "refresh" | "fetch" | "setRows" | "setDataset" | "getDataset" | "clearRows" | "removeRow" | "addRow" | "upsert" | "updateRow" |
-  "getRows" | "getCheckedRows" | "isEmpty" | "isNotEmpty" | "getColumns" | "setColumnOrder" | "moveColumn" | "getColumnPin" | "setColumnPinned" | "applyFilter" | "applyOrderBy" | "toggleOrderBy" |
-  "setFilter" | "setFilters" | "paginate" | "getSummarizedValue" | "getSelectedRadioRow" |
+  "getRows" | "getCheckedRows" | "isEmpty" | "isNotEmpty" | "getColumns" | "getAllColumns" | "setColumnOrder" | "moveColumn" | "getColumnPin" | "setColumnPinned" | "setColumnVisible" | "isColumnVisible" | "getColumnState" | "setColumnState" | "resetColumnState" | "applyFilter" | "applyOrderBy" | "toggleOrderBy" |
+  "setFilter" | "setFilters" | "setFilterOperator" | "getFilterOperator" | "paginate" | "getSummarizedValue" | "getSelectedRadioRow" | "updateCell" | "moveRow" |
   "clearRadioRowSelection" | "clearCheckedRows" | "setSelectedRadioRow" |
   "expandRow" | "collapseRow" | "getExpandedRows">;
 export type Props = { config: SparkGridConfig };

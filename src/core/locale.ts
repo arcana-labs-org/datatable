@@ -101,9 +101,44 @@ export interface ArcanaMessages {
   nextMonth: string;
   /** Calendar: next year (») aria-label. */
   nextYear: string;
+  columns: string;
+  columnChooser: string;
+  resetColumns: string;
+  hideColumn: string;
+  edit: string;
+  save: string;
+  cancel: string;
+  dragRow: string;
+  groupCount: string;
+  filterOperator: string;
+  opContains: string;
+  opStartsWith: string;
+  opEndsWith: string;
+  opEquals: string;
+  opNotEquals: string;
+  opGreaterThan: string;
+  opGreaterThanOrEqual: string;
+  opLessThan: string;
+  opLessThanOrEqual: string;
+  opBetween: string;
 }
 
+const advancedMessages: Record<ArcanaLocale, Pick<ArcanaMessages,
+  "columns" | "columnChooser" | "resetColumns" | "hideColumn" | "edit" | "save" | "cancel" | "dragRow" | "groupCount" |
+  "filterOperator" | "opContains" | "opStartsWith" | "opEndsWith" | "opEquals" | "opNotEquals" | "opGreaterThan" |
+  "opGreaterThanOrEqual" | "opLessThan" | "opLessThanOrEqual" | "opBetween">> = {
+  "pt-BR": { columns: "Colunas", columnChooser: "Escolher colunas", resetColumns: "Restaurar colunas", hideColumn: "Ocultar coluna", edit: "Editar", save: "Salvar", cancel: "Cancelar", dragRow: "Arrastar para reordenar", groupCount: "{count} registro(s)", filterOperator: "Operador do filtro", opContains: "Contém", opStartsWith: "Começa com", opEndsWith: "Termina com", opEquals: "Igual a", opNotEquals: "Diferente de", opGreaterThan: "Maior que", opGreaterThanOrEqual: "Maior ou igual", opLessThan: "Menor que", opLessThanOrEqual: "Menor ou igual", opBetween: "Entre" },
+  en: { columns: "Columns", columnChooser: "Choose columns", resetColumns: "Reset columns", hideColumn: "Hide column", edit: "Edit", save: "Save", cancel: "Cancel", dragRow: "Drag to reorder", groupCount: "{count} record(s)", filterOperator: "Filter operator", opContains: "Contains", opStartsWith: "Starts with", opEndsWith: "Ends with", opEquals: "Equals", opNotEquals: "Does not equal", opGreaterThan: "Greater than", opGreaterThanOrEqual: "Greater than or equal", opLessThan: "Less than", opLessThanOrEqual: "Less than or equal", opBetween: "Between" },
+  es: { columns: "Columnas", columnChooser: "Elegir columnas", resetColumns: "Restablecer columnas", hideColumn: "Ocultar columna", edit: "Editar", save: "Guardar", cancel: "Cancelar", dragRow: "Arrastrar para reordenar", groupCount: "{count} registro(s)", filterOperator: "Operador de filtro", opContains: "Contiene", opStartsWith: "Empieza por", opEndsWith: "Termina en", opEquals: "Igual a", opNotEquals: "Distinto de", opGreaterThan: "Mayor que", opGreaterThanOrEqual: "Mayor o igual", opLessThan: "Menor que", opLessThanOrEqual: "Menor o igual", opBetween: "Entre" },
+  it: { columns: "Colonne", columnChooser: "Scegli colonne", resetColumns: "Ripristina colonne", hideColumn: "Nascondi colonna", edit: "Modifica", save: "Salva", cancel: "Annulla", dragRow: "Trascina per riordinare", groupCount: "{count} record", filterOperator: "Operatore filtro", opContains: "Contiene", opStartsWith: "Inizia con", opEndsWith: "Finisce con", opEquals: "Uguale a", opNotEquals: "Diverso da", opGreaterThan: "Maggiore di", opGreaterThanOrEqual: "Maggiore o uguale", opLessThan: "Minore di", opLessThanOrEqual: "Minore o uguale", opBetween: "Tra" },
+  zh: { columns: "列", columnChooser: "选择列", resetColumns: "重置列", hideColumn: "隐藏列", edit: "编辑", save: "保存", cancel: "取消", dragRow: "拖动以重新排序", groupCount: "{count} 条记录", filterOperator: "筛选运算符", opContains: "包含", opStartsWith: "开头是", opEndsWith: "结尾是", opEquals: "等于", opNotEquals: "不等于", opGreaterThan: "大于", opGreaterThanOrEqual: "大于或等于", opLessThan: "小于", opLessThanOrEqual: "小于或等于", opBetween: "介于" },
+  ja: { columns: "列", columnChooser: "列を選択", resetColumns: "列をリセット", hideColumn: "列を非表示", edit: "編集", save: "保存", cancel: "キャンセル", dragRow: "ドラッグして並べ替え", groupCount: "{count} 件", filterOperator: "フィルター演算子", opContains: "含む", opStartsWith: "で始まる", opEndsWith: "で終わる", opEquals: "等しい", opNotEquals: "等しくない", opGreaterThan: "より大きい", opGreaterThanOrEqual: "以上", opLessThan: "より小さい", opLessThanOrEqual: "以下", opBetween: "範囲内" },
+  de: { columns: "Spalten", columnChooser: "Spalten auswählen", resetColumns: "Spalten zurücksetzen", hideColumn: "Spalte ausblenden", edit: "Bearbeiten", save: "Speichern", cancel: "Abbrechen", dragRow: "Zum Sortieren ziehen", groupCount: "{count} Einträge", filterOperator: "Filteroperator", opContains: "Enthält", opStartsWith: "Beginnt mit", opEndsWith: "Endet mit", opEquals: "Ist gleich", opNotEquals: "Ist ungleich", opGreaterThan: "Größer als", opGreaterThanOrEqual: "Größer oder gleich", opLessThan: "Kleiner als", opLessThanOrEqual: "Kleiner oder gleich", opBetween: "Zwischen" },
+  ru: { columns: "Столбцы", columnChooser: "Выбрать столбцы", resetColumns: "Сбросить столбцы", hideColumn: "Скрыть столбец", edit: "Изменить", save: "Сохранить", cancel: "Отмена", dragRow: "Перетащить для сортировки", groupCount: "{count} записей", filterOperator: "Оператор фильтра", opContains: "Содержит", opStartsWith: "Начинается с", opEndsWith: "Заканчивается на", opEquals: "Равно", opNotEquals: "Не равно", opGreaterThan: "Больше", opGreaterThanOrEqual: "Больше или равно", opLessThan: "Меньше", opLessThanOrEqual: "Меньше или равно", opBetween: "Между" }
+};
+
 const ptBR: ArcanaMessages = {
+  ...advancedMessages["pt-BR"],
   loadError: "Não foi possível carregar os dados.",
   loading: "Carregando…",
   empty: "Nenhum registro encontrado.",
@@ -149,6 +184,7 @@ const ptBR: ArcanaMessages = {
 };
 
 const en: ArcanaMessages = {
+  ...advancedMessages.en,
   loadError: "Could not load the data.",
   loading: "Loading…",
   empty: "No records found.",
@@ -194,6 +230,7 @@ const en: ArcanaMessages = {
 };
 
 const es: ArcanaMessages = {
+  ...advancedMessages.es,
   loadError: "No fue posible cargar los datos.",
   loading: "Cargando…",
   empty: "No se encontraron registros.",
@@ -239,6 +276,7 @@ const es: ArcanaMessages = {
 };
 
 const it: ArcanaMessages = {
+  ...advancedMessages.it,
   loadError: "Impossibile caricare i dati.",
   loading: "Caricamento…",
   empty: "Nessun record trovato.",
@@ -284,6 +322,7 @@ const it: ArcanaMessages = {
 };
 
 const zh: ArcanaMessages = {
+  ...advancedMessages.zh,
   loadError: "无法加载数据。",
   loading: "加载中…",
   empty: "未找到记录。",
@@ -329,6 +368,7 @@ const zh: ArcanaMessages = {
 };
 
 const ja: ArcanaMessages = {
+  ...advancedMessages.ja,
   loadError: "データを読み込めませんでした。",
   loading: "読み込み中…",
   empty: "レコードが見つかりません。",
@@ -374,6 +414,7 @@ const ja: ArcanaMessages = {
 };
 
 const de: ArcanaMessages = {
+  ...advancedMessages.de,
   loadError: "Die Daten konnten nicht geladen werden.",
   loading: "Wird geladen…",
   empty: "Keine Einträge gefunden.",
@@ -419,6 +460,7 @@ const de: ArcanaMessages = {
 };
 
 const ru: ArcanaMessages = {
+  ...advancedMessages.ru,
   loadError: "Не удалось загрузить данные.",
   loading: "Загрузка…",
   empty: "Записи не найдены.",

@@ -2,12 +2,12 @@ import { useMemo, type ReactNode } from "react";
 import { DocsShell, type DocsGroup } from "./components/DocsShell";
 import { CodeBlock } from "./components/CodeBlock";
 import {
-  ActionsPreview, CheckboxPreview, ColumnManagementPreview, ColumnResizePreview, ColumnsPreview, DataModesPreview,
+  ActionsPreview, AdvancedFeaturesPreview, CheckboxPreview, ColumnManagementPreview, ColumnResizePreview, ColumnsPreview, DataModesPreview,
   ExpandablePreview, FiltersPreview, FirstUsePreview, HooksPreview, LayoutPreview, LocalizationPreview,
   MultiSortPreview, PaginationPreview, RadioPreview, SearchTypesPreview, SortingPreview, SummaryPreview, ThemePreview
 } from "./components/demos";
 import {
-  actionsCode, checkboxCode, columnManagementCode, columnResizeCode, columnsCode, controllerCode, expandableCode,
+  actionsCode, advancedCode, checkboxCode, columnManagementCode, columnResizeCode, columnsCode, controllerCode, expandableCode,
   filtersCode, firstUseCode, fullConfigCode, hooksCode, installCode, layoutCode, localizationCode, modeCode,
   multiSortCode, paginationCode, radioCode, searchTypesCode, sortingCode, stylesCode, summaryCode, themeCode,
   type SnippetPair
@@ -15,7 +15,7 @@ import {
 import { rich, useLang, type Messages } from "./i18n";
 import { ARCANA_MESSAGES } from "../../src";
 import type { ArcanaLocale, ArcanaMessages } from "../../src";
-import type { MethodKey, PropertyKey, SearchTypeKey } from "./i18n/types";
+import type { Lang, MethodKey, PropertyKey, SearchTypeKey } from "./i18n/types";
 
 function P({ children }: { children: string }) {
   return <p>{rich(children)}</p>;
@@ -173,8 +173,20 @@ const SEARCH_TYPE_ORDER: SearchTypeKey[] = ["DATE", "DATE_MONTH", "DATE_RANGE", 
 
 const MESSAGE_KEYS = Object.keys(ARCANA_MESSAGES.en) as Array<keyof ArcanaMessages>;
 
-function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
+const ADVANCED_DOCS: Record<Lang, { title: string; p1: string; p2: string; preview: string }> = {
+  en: { title: "Advanced data workflows", p1: "Use row and column virtualization for large grids, native <c>cell</c>/<c>row</c> editing, row drag-and-drop and runtime column visibility with optional localStorage persistence.", p2: "Dataset mode also supports <c>groupBy</c>, column aggregations and selectable filter operators. Double-click an editable cell, drag a row, open Columns and change a filter operator in the live example.", preview: "real component · all advanced workflows" },
+  "pt-BR": { title: "Fluxos avançados de dados", p1: "Use virtualização de linhas e colunas em grids grandes, edição nativa por <c>cell</c>/<c>row</c>, drag-and-drop de linhas e visibilidade de colunas em runtime com persistência opcional no localStorage.", p2: "O modo dataset também suporta <c>groupBy</c>, agregações por coluna e operadores selecionáveis de filtro. Dê duplo clique em uma célula, arraste uma linha, abra Colunas e troque um operador no exemplo.", preview: "componente real · todos os fluxos avançados" },
+  es: { title: "Flujos avanzados de datos", p1: "Use virtualización de filas y columnas, edición por celda o fila, arrastre de filas y visibilidad de columnas con persistencia opcional.", p2: "El modo dataset también admite <c>groupBy</c>, agregaciones y operadores de filtro seleccionables. Pruebe todas las acciones en el ejemplo.", preview: "componente real · flujos avanzados" },
+  it: { title: "Flussi dati avanzati", p1: "Usa la virtualizzazione di righe e colonne, la modifica per cella o riga, il trascinamento delle righe e la visibilità delle colonne con persistenza opzionale.", p2: "La modalità dataset supporta anche <c>groupBy</c>, aggregazioni e operatori filtro selezionabili. Prova tutte le azioni nell'esempio.", preview: "componente reale · flussi avanzati" },
+  zh: { title: "高级数据工作流", p1: "使用行列虚拟化、单元格/行编辑、行拖放和可持久化的列可见性。", p2: "dataset 模式还支持 <c>groupBy</c>、列聚合和可选筛选运算符。可在示例中直接体验。", preview: "真实组件 · 高级工作流" },
+  ja: { title: "高度なデータワークフロー", p1: "行と列の仮想化、セル/行編集、行のドラッグ、永続化可能な列表示を利用できます。", p2: "dataset モードは <c>groupBy</c>、列集計、選択式フィルター演算子にも対応します。例で操作できます。", preview: "実コンポーネント · 高度なワークフロー" },
+  de: { title: "Erweiterte Datenabläufe", p1: "Nutzen Sie Zeilen- und Spaltenvirtualisierung, Zell-/Zeilenbearbeitung, Zeilen-Drag-and-drop und persistierbare Spaltensichtbarkeit.", p2: "Der Dataset-Modus unterstützt außerdem <c>groupBy</c>, Spaltenaggregate und wählbare Filteroperatoren. Testen Sie alles im Beispiel.", preview: "echte Komponente · erweiterte Abläufe" },
+  ru: { title: "Расширенные сценарии данных", p1: "Используйте виртуализацию строк и столбцов, редактирование ячеек/строк, перетаскивание строк и сохраняемую видимость столбцов.", p2: "Режим dataset также поддерживает <c>groupBy</c>, агрегаты и выбираемые операторы фильтра. Все доступно в примере.", preview: "реальный компонент · расширенные сценарии" }
+};
+
+function buildGroups(msg: Messages, gridLocale: ArcanaLocale, lang: Lang): DocsGroup[] {
   const s = msg.sections;
+  const advanced = ADVANCED_DOCS[lang];
   const chips = (keys: string[]): ReactNode => <KeyChips keys={keys} ariaLabel={msg.shell.keyChipsAria} />;
 
   return [
@@ -318,6 +330,18 @@ function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
     {
       label: msg.groups.features,
       sections: [
+        {
+          id: "fluxos-avancados",
+          title: advanced.title,
+          code: pairToCode(advancedCode, "AdvancedTable.tsx", "AdvancedTable.vue", "advanced-table.component.ts", "AdvancedTable.svelte"),
+          preview: <AdvancedFeaturesPreview />,
+          previewLabel: advanced.preview,
+          body: <>
+            <P>{advanced.p1}</P>
+            <P>{advanced.p2}</P>
+            {chips(["rowVirtualizationEnabled", "virtualRowHeight", "columnVirtualizationEnabled", "virtualColumnWidth", "editingEnabled", "editMode", "rowReorderEnabled", "columnVisibilityEnabled", "columnStateStorageKey", "groupBy", "aggregation", "filterOperators"])}
+          </>
+        },
         {
           id: "filtros",
           title: s.filters.title,
@@ -535,6 +559,6 @@ function buildGroups(msg: Messages, gridLocale: ArcanaLocale): DocsGroup[] {
 
 export function App() {
   const { lang, msg } = useLang();
-  const groups = useMemo(() => buildGroups(msg, lang as ArcanaLocale), [msg, lang]);
+  const groups = useMemo(() => buildGroups(msg, lang as ArcanaLocale, lang), [msg, lang]);
   return <DocsShell groups={groups} />;
 }

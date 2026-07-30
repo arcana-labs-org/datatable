@@ -32,8 +32,10 @@ Import both stylesheets once at the application entrypoint. Input, Select and
 DatePicker use the official `@arcanalabs/ui-components` stylesheet and their
 native `sm` variant; the DataTable CSS only adds grid layout and theme tokens.
 
-Everything else — remote/dataset modes, filters, sorting, selection, expandable rows,
-themes, localization (8 languages) and the full API reference — lives in the
+Everything else — remote/dataset modes, virtual rows and columns, cell/row editing, advanced
+filter operators, grouping and aggregations, row/column drag-and-drop, persistent
+column visibility, selection, expandable rows, themes, localization (8 languages)
+and the full API reference — lives in the
 **[documentation](https://arcana-labs-org.github.io/datatable/)**, with live demos for
 all four frameworks.
 

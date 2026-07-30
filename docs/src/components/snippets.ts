@@ -302,6 +302,31 @@ export const localizationCode: SnippetPair = {
 };
 
 export const columnsCode = codePair(["mode: 'dataset',", "dataset: rows,", "calculateCellWidth: true,", "cellMinWidth: 130,", "textAlignment: 'left',", "columns: () => [", "  { name: 'id', label: 'ID', width: 90, textAlignment: 'center' },", "  // string returns are safe text by default; opt in with html: true to render markup", "  { name: 'name', label: 'Name', html: true, valueGetter: value => `<strong>${value}</strong>` },", "  { name: 'score', label: 'Score', isVisible: () => canSeeScore },", "]", "// useFlexbox is deprecated; the layout is always flex"]);
+
+export const advancedCode = codePair([
+  "mode: 'dataset',",
+  "dataset: rows,",
+  "rowsPerPage: 100,",
+  "height: 360,",
+  "rowVirtualizationEnabled: true,",
+  "columnVirtualizationEnabled: true,",
+  "virtualColumnWidth: 160,",
+  "editingEnabled: true,",
+  "editMode: 'cell', // or 'row'",
+  "rowReorderEnabled: true,",
+  "columnVisibilityEnabled: true,",
+  "columnStateStorageKey: 'people-table-layout',",
+  "groupBy: ['department'],",
+  "columns: [",
+  "  { name: 'name', label: 'Name', editable: true,",
+  "    filterOperators: ['contains', 'startsWith', 'equals'] },",
+  "  { name: 'department', label: 'Department', editable: true },",
+  "  { name: 'amount', label: 'Amount', type: 'CURRENCY', editable: true,",
+  "    aggregation: 'sum', filterOperators: ['equals', 'greaterThan', 'lessThan'] },",
+  "],",
+  "onCellEdit: (value, column, row) => api.people.update(row.id, { [column.name]: value }),",
+  "onRowReorder: rows => api.people.saveOrder(rows)"
+]);
 export const paginationCode = codePair(["mode: 'dataset',", "dataset: rows,", "columns,", "rowsPerPage: 25,", "footerVisible: true,", "isRowsPerPageVisible: true,", "messages: { empty: 'No records found.' }"]);
 export const filtersCode = codePair(["mode: 'dataset',", "dataset: rows,", "searchEnabled: true,", "initialFilters: { department: 'Engineering' },", "disableFilterWhenPresentOnInitialFilters: true,", "columns: [", "  { name: 'name', label: 'Name', filterName: 'name' },", "  { name: 'department', label: 'Area', searchType: 'LIST', searchConfig: loadAreas },", "  { name: 'score', label: 'Score', searchEnabled: false },", "]"]);
 export const searchTypesCode = codePair(["mode: 'dataset',", "dataset: rows,", "columns: [", "  { name: 'date', label: 'Date', searchType: 'DATE' },", "  { name: 'month', label: 'Month', searchType: 'DATE_MONTH' },", "  { name: 'period', label: 'Period', searchType: 'DATE_RANGE' },", "  { name: 'active', label: 'Active', searchType: 'BOOLEAN' },", "  { name: 'area', label: 'List', searchType: 'LIST', searchConfig: loadAreas },", "  { name: 'remote', label: 'Remote', searchType: 'REMOTE', searchConfig: fetchAreas },", "  { name: 'custom', label: 'Custom', searchType: 'COMPONENT', searchTypeRenderer: CustomFilter },", "]"]);

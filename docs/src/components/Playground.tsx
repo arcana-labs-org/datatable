@@ -98,6 +98,15 @@ interface KnobState {
   rowFocusEnabled: boolean;
   cellFocusEnabled: boolean;
   actionsEnabled: boolean;
+  rowVirtualizationEnabled: boolean;
+  columnVirtualizationEnabled: boolean;
+  editingEnabled: boolean;
+  editMode: "cell" | "row";
+  rowReorderEnabled: boolean;
+  columnVisibilityEnabled: boolean;
+  persistColumnState: boolean;
+  groupByDepartment: boolean;
+  filterOperatorsEnabled: boolean;
   expandableRowsEnabled: boolean;
   expandRowOnClick: boolean;
   expandMode: "sync" | "async";
@@ -155,6 +164,15 @@ const DEFAULT_STATE: KnobState = {
   rowFocusEnabled: false,
   cellFocusEnabled: true,
   actionsEnabled: false,
+  rowVirtualizationEnabled: false,
+  columnVirtualizationEnabled: false,
+  editingEnabled: false,
+  editMode: "cell",
+  rowReorderEnabled: false,
+  columnVisibilityEnabled: false,
+  persistColumnState: false,
+  groupByDepartment: false,
+  filterOperatorsEnabled: false,
   expandableRowsEnabled: false,
   expandRowOnClick: false,
   expandMode: "sync",
@@ -188,9 +206,10 @@ function loadState(): KnobState {
         (merged as unknown as Record<string, unknown>)[key] = value;
       }
     });
-    if (![3, 5, 10, 25].includes(merged.rowsPerPage)) merged.rowsPerPage = DEFAULT_STATE.rowsPerPage;
+    if (![3, 5, 10, 25, 100, 250].includes(merged.rowsPerPage)) merged.rowsPerPage = DEFAULT_STATE.rowsPerPage;
     if (!["off", "240", "320", "480"].includes(merged.height)) merged.height = "off";
     if (!["sync", "async"].includes(merged.expandMode)) merged.expandMode = "sync";
+    if (!["cell", "row"].includes(merged.editMode)) merged.editMode = "cell";
     if (!["HORIZONTAL_OVERFLOW", "VERTICAL_RECORD"].includes(merged.responsiveMode)) merged.responsiveMode = "HORIZONTAL_OVERFLOW";
     if (!THEMES.includes(merged.theme as (typeof THEMES)[number])) merged.theme = "zinc";
     if (merged.locale !== "auto" && !ARCANA_LOCALES.includes(merged.locale as ArcanaLocale)) merged.locale = "auto";
@@ -212,7 +231,7 @@ function loadState(): KnobState {
   }
 }
 
-function makeColumns(msg: Messages): DataTableColumn<DemoRow>[] {
+function makeColumns(msg: Messages, advanced?: { editing: boolean; filterOperators: boolean }): DataTableColumn<DemoRow>[] {
   const locale = msg.meta.locale;
   const areas = [
     msg.demos.departments.engineering,
@@ -222,13 +241,13 @@ function makeColumns(msg: Messages): DataTableColumn<DemoRow>[] {
     msg.demos.departments.infrastructure
   ];
   return [
-    { name: "name", label: msg.demos.cols.name },
+    { name: "name", label: msg.demos.cols.name, editable: advanced?.editing, filterOperators: advanced?.filterOperators ? ["contains", "startsWith", "endsWith", "equals", "notEquals"] : undefined },
     { name: "email", label: msg.demos.cols.email, searchEnabled: false, width: 200 },
-    { name: "department", label: msg.demos.cols.area, searchType: "LIST", searchConfig: () => areas.map((value) => ({ value, label: value })) },
+    { name: "department", label: msg.demos.cols.area, editable: advanced?.editing, searchType: "LIST", searchConfig: () => areas.map((value) => ({ value, label: value })) },
     { name: "status", label: msg.demos.cols.status },
     { name: "joinedAt", label: msg.demos.cols.joinedAt, searchType: "DATE", valueGetter: (value) => new Date(`${value}T12:00:00`).toLocaleDateString(locale) },
-    { name: "amount", label: msg.demos.cols.amount, type: "CURRENCY", textAlignment: "right", searchEnabled: false, valueGetter: (value) => currency(value, locale) },
-    { name: "score", label: msg.demos.cols.score, type: "NUMBER", textAlignment: "right", searchEnabled: false }
+    { name: "amount", label: msg.demos.cols.amount, type: "CURRENCY", editable: advanced?.editing, aggregation: "sum", textAlignment: "right", searchEnabled: advanced?.filterOperators, filterOperators: advanced?.filterOperators ? ["equals", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual"] : undefined, valueGetter: (value) => currency(value, locale) },
+    { name: "score", label: msg.demos.cols.score, type: "NUMBER", editable: advanced?.editing, aggregation: "average", textAlignment: "right", searchEnabled: advanced?.filterOperators, filterOperators: advanced?.filterOperators ? ["equals", "greaterThan", "lessThan"] : undefined }
   ];
 }
 
@@ -302,6 +321,24 @@ function configLines(state: KnobState, variant: SnippetVariant, effectiveLocale:
     else if (variant === "vue") lines.push("actions: [{ element: row => h('button', { onClick: () => open(row) }, 'Open') }],");
     else lines.push("actions: [{ element: row => '<button>Open</button>' }],");
   }
+  if (state.rowVirtualizationEnabled) {
+    lines.push("rowVirtualizationEnabled: true,");
+    lines.push("height: 320, // fixed viewport for the virtualizer");
+  }
+  if (state.columnVirtualizationEnabled) {
+    lines.push("columnVirtualizationEnabled: true,");
+    lines.push("virtualColumnWidth: 160,");
+  }
+  if (state.editingEnabled) {
+    lines.push("editingEnabled: true,");
+    if (state.editMode === "row") lines.push("editMode: 'row',");
+    lines.push("onCellEdit: (value, column, row) => api.people.update(row.id, { [column.name]: value }),");
+  }
+  if (state.rowReorderEnabled) lines.push("rowReorderEnabled: true,");
+  if (state.columnVisibilityEnabled) lines.push("columnVisibilityEnabled: true,");
+  if (state.persistColumnState) lines.push("columnStateStorageKey: 'people-grid-layout',");
+  if (state.groupByDepartment) lines.push("groupBy: ['department'], // columns may declare aggregation: 'sum' | 'average' | …");
+  if (state.filterOperatorsEnabled) lines.push("// columns may declare filterOperators: ['contains', 'equals', 'greaterThan', …]");
   if (state.expandableRowsEnabled) {
     lines.push("expandableRowsEnabled: true,");
     if (state.expandRowOnClick) lines.push("expandRowOnClick: true,");
@@ -366,6 +403,17 @@ function Section({ title }: { title: string }) {
   return <h3 className="pg-sec">{title}</h3>;
 }
 
+const ADVANCED_PLAYGROUND: Record<string, { group: string; virtual: string; colVirtual: string; editing: string; editMode: string; rowReorder: string; visibility: string; persist: string; grouping: string; operators: string }> = {
+  en: { group: "Advanced", virtual: "Render only the visible row window for large pages.", colVirtual: "Render only the horizontally visible column window.", editing: "Edit cells or full rows by double-clicking.", editMode: "Choose cell or row editing.", rowReorder: "Drag rows to change their dataset order.", visibility: "Show the built-in column chooser.", persist: "Persist column order, pinning and visibility.", grouping: "Group by department and show amount/score aggregates.", operators: "Expose contains, equality and numeric comparison operators." },
+  "pt-BR": { group: "Avançado", virtual: "Renderiza apenas a janela de linhas visível em páginas grandes.", colVirtual: "Renderiza apenas a janela horizontal de colunas visível.", editing: "Edita células ou linhas completas com duplo clique.", editMode: "Escolhe edição por célula ou linha.", rowReorder: "Arraste linhas para mudar a ordem do dataset.", visibility: "Exibe o seletor nativo de colunas.", persist: "Persiste ordem, fixação e visibilidade das colunas.", grouping: "Agrupa por área e mostra agregados de valor/pontuação.", operators: "Expõe contém, igualdade e comparações numéricas." },
+  es: { group: "Avanzado", virtual: "Renderiza solo la ventana de filas visible.", colVirtual: "Renderiza solo la ventana horizontal de columnas.", editing: "Edita celdas o filas completas con doble clic.", editMode: "Elige edición por celda o fila.", rowReorder: "Arrastra filas para cambiar el orden.", visibility: "Muestra el selector de columnas.", persist: "Guarda orden, fijación y visibilidad.", grouping: "Agrupa por área y muestra agregados.", operators: "Expone operadores de texto y numéricos." },
+  it: { group: "Avanzato", virtual: "Renderizza solo la finestra di righe visibile.", colVirtual: "Renderizza solo la finestra orizzontale di colonne.", editing: "Modifica celle o righe con doppio clic.", editMode: "Scegli modifica per cella o riga.", rowReorder: "Trascina le righe per riordinarle.", visibility: "Mostra il selettore di colonne.", persist: "Salva ordine, blocco e visibilità.", grouping: "Raggruppa per area e mostra aggregati.", operators: "Espone operatori testuali e numerici." },
+  zh: { group: "高级", virtual: "大型页面仅渲染可见行窗口。", colVirtual: "仅渲染水平可见的列窗口。", editing: "双击编辑单元格或整行。", editMode: "选择单元格或行编辑。", rowReorder: "拖动行以更改顺序。", visibility: "显示内置列选择器。", persist: "保存列顺序、固定和可见性。", grouping: "按部门分组并显示聚合值。", operators: "提供文本和数字筛选运算符。" },
+  ja: { group: "高度な機能", virtual: "大きなページでは表示中の行だけを描画します。", colVirtual: "横方向に表示中の列だけを描画します。", editing: "ダブルクリックでセルまたは行を編集します。", editMode: "セル編集か行編集を選択します。", rowReorder: "行をドラッグして並べ替えます。", visibility: "列セレクターを表示します。", persist: "列順・固定・表示状態を保存します。", grouping: "部門でグループ化し集計を表示します。", operators: "文字列・数値フィルター演算子を公開します。" },
+  de: { group: "Erweitert", virtual: "Rendert bei großen Seiten nur sichtbare Zeilen.", colVirtual: "Rendert nur das horizontal sichtbare Spaltenfenster.", editing: "Zellen oder ganze Zeilen per Doppelklick bearbeiten.", editMode: "Zell- oder Zeilenbearbeitung wählen.", rowReorder: "Zeilen per Drag-and-drop sortieren.", visibility: "Integrierte Spaltenauswahl anzeigen.", persist: "Reihenfolge, Fixierung und Sichtbarkeit speichern.", grouping: "Nach Bereich gruppieren und Aggregate zeigen.", operators: "Text- und Zahlenoperatoren anbieten." },
+  ru: { group: "Расширенные", virtual: "Отрисовывает только видимое окно строк.", colVirtual: "Отрисовывает только видимое окно столбцов.", editing: "Редактирует ячейки или строки двойным щелчком.", editMode: "Выбор режима ячейки или строки.", rowReorder: "Перетаскивание строк для изменения порядка.", visibility: "Показывает выбор столбцов.", persist: "Сохраняет порядок, закрепление и видимость.", grouping: "Группирует по отделу и показывает агрегаты.", operators: "Добавляет текстовые и числовые операторы." }
+};
+
 export function Playground({ framework, panelOpen }: { framework: Framework; panelOpen: boolean }) {
   const { lang, msg } = useLang();
   const [state, setState] = useState<KnobState>(loadState);
@@ -398,7 +446,7 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
   };
 
   const rows = useMemo(() => makeRows(msg), [msg]);
-  const playgroundColumns = useMemo(() => makeColumns(msg), [msg]);
+  const playgroundColumns = useMemo(() => makeColumns(msg, { editing: state.editingEnabled, filterOperators: state.filterOperatorsEnabled }), [msg, state.editingEnabled, state.filterOperatorsEnabled]);
   // "auto" follows the docs language (which maps 1:1 onto the library locales).
   const effectiveLocale: ArcanaLocale = state.locale === "auto" ? (lang as ArcanaLocale) : (state.locale as ArcanaLocale);
 
@@ -429,6 +477,15 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
       stickyHeaderEnabled: state.stickyHeaderEnabled,
       columnResizeEnabled: state.columnResizeEnabled,
       columnReorderEnabled: state.columnReorderEnabled,
+      rowVirtualizationEnabled: state.rowVirtualizationEnabled,
+      columnVirtualizationEnabled: state.columnVirtualizationEnabled,
+      virtualRowHeight: 42,
+      editingEnabled: state.editingEnabled,
+      editMode: state.editMode,
+      rowReorderEnabled: state.rowReorderEnabled,
+      columnVisibilityEnabled: state.columnVisibilityEnabled,
+      columnStateStorageKey: state.persistColumnState ? "arcana-playground-columns" : undefined,
+      groupBy: state.groupByDepartment ? ["department"] : undefined,
       overflowEnabled: state.overflowEnabled,
       responsiveMode: state.responsiveMode,
       footerVisible: state.footerVisible,
@@ -444,6 +501,7 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
     }
     if (state.radioButtonSelectionEnabled) cfg.uniqueKeyIdentifier = "id";
     if (state.height !== "off") cfg.height = Number(state.height);
+    else if (state.rowVirtualizationEnabled) cfg.height = 320;
     if (state.actionsEnabled) {
       cfg.actionsWidth = 90;
       cfg.actions = [{
@@ -481,6 +539,7 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
     return { ...prev, messagesOverrides: next };
   });
   const hints = msg.playground.hints;
+  const advanced = ADVANCED_PLAYGROUND[lang] ?? ADVANCED_PLAYGROUND.en;
   const infoAria = msg.playground.infoAria;
 
   return <div className="playground">
@@ -494,7 +553,7 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
         <Section title={msg.playground.groupData} />
         <Row k="rowsPerPage" label="rowsPerPage" desc={hints.rowsPerPage} modified={changed("rowsPerPage")} infoAria={infoAria}>
           <select className="pg-select" aria-label="rowsPerPage" value={state.rowsPerPage} onChange={(event) => update({ rowsPerPage: Number(event.target.value) })}>
-            {[3, 5, 10, 25].map((size) => <option key={size} value={size}>{size}</option>)}
+            {[3, 5, 10, 25, 100, 250].map((size) => <option key={size} value={size}>{size}</option>)}
           </select>
         </Row>
         <Row k="emptyDataset" label={msg.playground.emptyDataset} desc={msg.playground.emptyDatasetHint} modified={changed("emptyDataset")} infoAria={infoAria}>
@@ -528,6 +587,35 @@ export function Playground({ framework, panelOpen }: { framework: Framework; pan
         </Row>
         <Row k="actions" label="actions" desc={msg.playground.actionsHint} modified={changed("actionsEnabled")} infoAria={infoAria}>
           <MiniSwitch label="actions" checked={state.actionsEnabled} onChange={(value) => update({ actionsEnabled: value })} />
+        </Row>
+
+        <Section title={advanced.group} />
+        <Row k="rowVirtualizationEnabled" label="rowVirtualizationEnabled" desc={advanced.virtual} modified={changed("rowVirtualizationEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="rowVirtualizationEnabled" checked={state.rowVirtualizationEnabled} onChange={(value) => update({ rowVirtualizationEnabled: value, rowsPerPage: value ? 100 : state.rowsPerPage })} />
+        </Row>
+        <Row k="columnVirtualizationEnabled" label="columnVirtualizationEnabled" desc={advanced.colVirtual} modified={changed("columnVirtualizationEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="columnVirtualizationEnabled" checked={state.columnVirtualizationEnabled} onChange={(value) => update({ columnVirtualizationEnabled: value })} />
+        </Row>
+        <Row k="editingEnabled" label="editingEnabled" desc={advanced.editing} modified={changed("editingEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="editingEnabled" checked={state.editingEnabled} onChange={(value) => update({ editingEnabled: value })} />
+        </Row>
+        <Row k="editMode" label="editMode" desc={advanced.editMode} modified={changed("editMode")} disabled={!state.editingEnabled} infoAria={infoAria}>
+          <select className="pg-select" aria-label="editMode" disabled={!state.editingEnabled} value={state.editMode} onChange={(event) => update({ editMode: event.target.value as KnobState["editMode"] })}><option value="cell">cell</option><option value="row">row</option></select>
+        </Row>
+        <Row k="rowReorderEnabled" label="rowReorderEnabled" desc={advanced.rowReorder} modified={changed("rowReorderEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="rowReorderEnabled" checked={state.rowReorderEnabled} onChange={(value) => update({ rowReorderEnabled: value })} />
+        </Row>
+        <Row k="columnVisibilityEnabled" label="columnVisibilityEnabled" desc={advanced.visibility} modified={changed("columnVisibilityEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="columnVisibilityEnabled" checked={state.columnVisibilityEnabled} onChange={(value) => update({ columnVisibilityEnabled: value })} />
+        </Row>
+        <Row k="persistColumnState" label="columnStateStorageKey" desc={advanced.persist} modified={changed("persistColumnState")} disabled={!state.columnVisibilityEnabled} infoAria={infoAria}>
+          <MiniSwitch label="columnStateStorageKey" disabled={!state.columnVisibilityEnabled} checked={state.persistColumnState} onChange={(value) => update({ persistColumnState: value })} />
+        </Row>
+        <Row k="groupByDepartment" label="groupBy" desc={advanced.grouping} modified={changed("groupByDepartment")} infoAria={infoAria}>
+          <MiniSwitch label="groupBy" checked={state.groupByDepartment} onChange={(value) => update({ groupByDepartment: value })} />
+        </Row>
+        <Row k="filterOperatorsEnabled" label="filterOperators" desc={advanced.operators} modified={changed("filterOperatorsEnabled")} infoAria={infoAria}>
+          <MiniSwitch label="filterOperators" checked={state.filterOperatorsEnabled} onChange={(value) => update({ filterOperatorsEnabled: value })} />
         </Row>
 
         <Section title={msg.playground.groupExpandable} />

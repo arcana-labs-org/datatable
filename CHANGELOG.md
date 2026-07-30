@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.0 — 2026-07-30
+
+### Novos recursos
+- Virtualização real de linhas e colunas com viewport, tamanho estimado e overscan configuráveis.
+- Edição nativa por célula ou linha, com parsing por coluna e callbacks de persistência.
+- Reordenação de linhas por drag-and-drop.
+- Agrupamento em modo dataset com `sum`, `average`, `count`, `min`, `max` ou agregador customizado.
+- Seletor de colunas, APIs de visibilidade e persistência de ordem/fixação/visibilidade em `localStorage`.
+- Operadores de filtro selecionáveis para texto e números, também serializados nas requisições remotas.
+- Paridade dos recursos nos adapters React, Vue 3, Angular e Svelte.
+- Novas mensagens traduzidas em `pt-BR`, `en`, `es`, `it`, `zh`, `ja`, `de` e `ru`.
+- Documentação e playground interativos atualizados com exemplos para os quatro frameworks.
+
 ## 1.5.0 — 2026-07-26
 
 ### Alterações

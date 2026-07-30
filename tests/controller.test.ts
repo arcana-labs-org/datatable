@@ -367,4 +367,58 @@ describe("DataTableController", () => {
     grid.setDataset([{ id: 9, name: "Nova", amount: 90 }]);
     expect(grid.getSnapshot().expandedRowUuids).toEqual([]);
   });
+
+  it("supports runtime column visibility and serializable column state", () => {
+    const grid = createDataTable({ mode: "dataset", dataset: [{ id: 1, a: "A", b: "B" }], columns: [{ name: "a", label: "A" }, { name: "b", label: "B" }] });
+    grid.setColumnVisible("b", false);
+    grid.setColumnPinned("a", "left");
+    expect(grid.getColumns().map((column) => column.name)).toEqual(["a"]);
+    expect(grid.getAllColumns()).toHaveLength(2);
+    expect(grid.getColumnState()).toEqual({ order: [], pins: { a: "left" }, hidden: ["b"] });
+    grid.resetColumnState();
+    expect(grid.getColumns()).toHaveLength(2);
+  });
+
+  it("edits cells and reorders rows in dataset mode", async () => {
+    const edited = vi.fn();
+    const reordered = vi.fn();
+    const grid = createDataTable<Person>({
+      mode: "dataset", dataset: [{ id: 1, name: "Ada", amount: 10 }, { id: 2, name: "Grace", amount: 20 }],
+      rowsPerPage: 10, columns: [{ name: "name", label: "Name", editable: true }], onCellEdit: edited, onRowReorder: reordered
+    });
+    const [first, second] = grid.getRows();
+    await grid.updateCell(first._uuid!, "name", "Ada Lovelace");
+    expect(grid.getDataset()[0].name).toBe("Ada Lovelace");
+    grid.moveRow(second._uuid!, first._uuid!);
+    expect(grid.getDataset().map((row) => row.id)).toEqual([2, 1]);
+    expect(edited).toHaveBeenCalledOnce();
+    expect(reordered).toHaveBeenCalledOnce();
+  });
+
+  it("applies selectable text and numeric filter operators", async () => {
+    const grid = createDataTable<Person>({
+      mode: "dataset", dataset: [{ id: 1, name: "Ada", amount: 10 }, { id: 2, name: "Grace", amount: 20 }, { id: 3, name: "Alan", amount: 30 }],
+      rowsPerPage: 10, columns: [{ name: "name", label: "Name" }, { name: "amount", label: "Amount", type: "NUMBER" }]
+    });
+    await grid.setFilterOperator("name", "startsWith");
+    await grid.setFilter("name", "A");
+    expect(grid.getRows().map((row) => row.name)).toEqual(["Ada", "Alan"]);
+    await grid.setFilter("name", "");
+    await grid.setFilterOperator("amount", "greaterThan");
+    await grid.setFilter("amount", 10);
+    expect(grid.getRows().map((row) => row.amount)).toEqual([20, 30]);
+  });
+
+  it("creates group rows with configured aggregates", () => {
+    const grid = createDataTable<Person & { department: string }>({
+      mode: "dataset",
+      dataset: [{ id: 1, name: "Ada", amount: 10, department: "Eng" }, { id: 2, name: "Grace", amount: 20, department: "Eng" }, { id: 3, name: "Alan", amount: 5, department: "Research" }],
+      rowsPerPage: 10,
+      groupBy: ["department"],
+      columns: [{ name: "department", label: "Department" }, { name: "amount", label: "Amount", aggregation: "sum" }]
+    });
+    const groups = grid.getRows().filter((row) => "_arcanaGroup" in row) as Array<Person & { department: string; _arcanaGroup?: { value: unknown; count: number; aggregates: Record<string, unknown> } }>;
+    expect(groups).toHaveLength(2);
+    expect(groups[0]._arcanaGroup).toMatchObject({ value: "Eng", count: 2, aggregates: { amount: 30 } });
+  });
 });

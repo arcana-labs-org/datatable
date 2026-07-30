@@ -666,6 +666,124 @@
     min-height: 180px;
 }
 
+/* Advanced data-workbench controls: virtualization, editing, grouping and
+   column state. Kept deliberately compact so they work in dense ERP screens. */
+.arcana-column-tools {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 34px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--arcana-border);
+  background: var(--arcana-surface-muted);
+  z-index: 22;
+}
+.arcana-column-trigger,
+.arcana-column-chooser button,
+.arcana-row-edit-actions button {
+  border: 1px solid var(--arcana-border);
+  border-radius: 6px;
+  background: var(--arcana-surface);
+  color: var(--arcana-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.arcana-column-trigger { padding: 4px 10px; }
+.arcana-column-chooser {
+  position: absolute;
+  inset-block-start: calc(100% - 3px);
+  inset-inline-end: 8px;
+  display: grid;
+  min-width: 210px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 8px;
+  gap: 3px;
+  border: 1px solid var(--arcana-border);
+  border-radius: 8px;
+  background: var(--arcana-surface);
+  box-shadow: 0 14px 35px rgb(0 0 0 / 18%);
+  z-index: 60;
+}
+.arcana-column-chooser label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.arcana-column-chooser label:hover { background: var(--arcana-row-hover); }
+.arcana-column-chooser button { margin-top: 5px; padding: 6px 8px; }
+.arcana-filter-composer { display: grid; gap: 3px; width: 100%; min-width: 0; }
+.arcana-filter-operator {
+  width: 100%;
+  height: 22px;
+  border: 0;
+  border-bottom: 1px dashed var(--arcana-border);
+  background: transparent;
+  color: var(--arcana-text-muted);
+  font: inherit;
+  font-size: 10px;
+}
+.arcana-cell-editor {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  padding: 3px 7px;
+  border: 1px solid var(--arcana-focus-ring);
+  border-radius: 5px;
+  outline: 2px solid color-mix(in srgb, var(--arcana-focus-ring) 18%, transparent);
+  background: var(--arcana-surface);
+  color: var(--arcana-text);
+  font: inherit;
+}
+.arcana-row-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 7px;
+  background: var(--arcana-surface);
+}
+.arcana-row-edit-actions button { padding: 4px 7px; }
+.arcana-row-dragging { opacity: .48; }
+.grid-row[draggable="true"] { cursor: grab; }
+.grid-row[draggable="true"]:active { cursor: grabbing; }
+.arcana-group-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  box-sizing: border-box;
+  min-height: 38px;
+  padding-block: 7px;
+  padding-inline-end: 12px;
+  border-bottom: 1px solid var(--arcana-border);
+  background: color-mix(in srgb, var(--arcana-surface-muted) 84%, var(--arcana-focus-ring) 16%);
+  color: var(--arcana-text);
+  font-size: 12px;
+}
+.arcana-group-row > span { color: var(--arcana-text-muted); }
+.arcana-group-aggregate {
+  padding: 2px 6px;
+  border: 1px solid var(--arcana-border);
+  border-radius: 999px;
+  background: var(--arcana-surface);
+}
+.arcana-virtual-spacer { flex: 0 0 auto; width: 100%; pointer-events: none; }
+.arcana-column-virtualized .grid-header,
+.arcana-column-virtualized .grid-search-row,
+.arcana-column-virtualized .grid-row,
+.arcana-column-virtualized .grid-summarizer {
+  box-sizing: border-box;
+  min-width: var(--arcana-virtual-column-total);
+  padding-inline-start: var(--arcana-virtual-column-offset);
+}
+.arcana-hide-column { border-top: 1px solid var(--arcana-border) !important; }
+
 .arcana-grid .arcana-grid-body,
 .arcana-grid .grid-body {
     z-index: 0;

@@ -3,10 +3,12 @@ import type {
   DataResponse,
   DataTableApi,
   DataTableColumn,
+  DataTableColumnState,
   DataTableConfig,
   DataTableMode,
   DataTableRow,
   DataTableSnapshot,
+  FilterOperator,
   OrderBy,
   Renderable,
   SearchType,
@@ -33,6 +35,8 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   orderByList: OrderBy[] = [];
   columnOrder: string[] = [];
   columnPins: Record<string, "left" | "right" | null> = {};
+  hiddenColumns: string[] = [];
+  filterOperators: Record<string, FilterOperator> = {};
   loading = false;
   error: unknown = null;
   currentPage = 1;
@@ -58,7 +62,9 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
     // Seed the runtime pin state from each column's declared `pinned`.
     this.baseColumns().forEach((column) => {
       if (column.pinned) this.columnPins[column.name] = column.pinned;
+      if (column.filterOperator) this.filterOperators[column.filterName ?? column.name] = column.filterOperator;
     });
+    this.restoreColumnState();
     this.updateSnapshot();
 
     if (this.mode === "dataset") {
@@ -86,6 +92,8 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
       orderByList: this.orderByList,
       columnOrder: [...this.columnOrder],
       columnPins: { ...this.columnPins },
+      hiddenColumns: [...this.hiddenColumns],
+      filterOperators: { ...this.filterOperators },
       loading: this.loading,
       error: this.error,
       currentPage: this.currentPage,
@@ -168,7 +176,9 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
     const params: Record<string, unknown> = {};
     Object.entries(source).forEach(([key, value]) => {
       const parts = key.split(".");
-      params[parts[parts.length - 1] ?? key] = value;
+      const param = parts[parts.length - 1] ?? key;
+      params[param] = value;
+      params[`${param}[operator]`] = this.getFilterOperator(key);
     });
     params.page = this.currentPage;
     params.limit = this.rowsPerPage;
@@ -259,10 +269,15 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   isEmpty(): boolean { return this.rows.length === 0; }
   isNotEmpty(): boolean { return this.rows.length > 0; }
 
-  /** Visible columns in natural (config) order, before reorder/pin grouping. */
-  private baseColumns(): DataTableColumn<Row>[] {
+  /** Declared columns in natural config order, before runtime visibility. */
+  getAllColumns(): DataTableColumn<Row>[] {
     const columns = typeof this.config.columns === "function" ? this.config.columns() : this.config.columns;
     return columns.filter((column) => column.isVisible?.() ?? true);
+  }
+
+  /** Visible columns in natural (config) order, before reorder/pin grouping. */
+  private baseColumns(): DataTableColumn<Row>[] {
+    return this.getAllColumns().filter((column) => !this.hiddenColumns.includes(column.name));
   }
 
   getColumns(): DataTableColumn<Row>[] {
@@ -290,6 +305,7 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
 
   setColumnOrder(order: string[]): void {
     this.columnOrder = [...order];
+    this.persistColumnState();
     this.notify();
   }
 
@@ -309,6 +325,7 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
       }
     }
     this.columnOrder = current;
+    this.persistColumnState();
     this.notify();
   }
 
@@ -319,7 +336,67 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
 
   setColumnPinned(name: string, pinned: "left" | "right" | null): void {
     this.columnPins = { ...this.columnPins, [name]: pinned };
+    this.persistColumnState();
     this.notify();
+  }
+
+  setColumnVisible(name: string, visible: boolean): void {
+    if (!this.getAllColumns().some((column) => column.name === name)) return;
+    const next = new Set(this.hiddenColumns);
+    visible ? next.delete(name) : next.add(name);
+    // Never allow the chooser to hide the final data column.
+    if (next.size >= this.getAllColumns().length) return;
+    this.hiddenColumns = [...next];
+    this.persistColumnState();
+    this.notify();
+  }
+
+  isColumnVisible(name: string): boolean {
+    return !this.hiddenColumns.includes(name);
+  }
+
+  getColumnState(): DataTableColumnState {
+    return { order: [...this.columnOrder], pins: { ...this.columnPins }, hidden: [...this.hiddenColumns] };
+  }
+
+  setColumnState(state: Partial<DataTableColumnState>): void {
+    const names = new Set(this.getAllColumns().map((column) => column.name));
+    if (state.order) this.columnOrder = state.order.filter((name) => names.has(name));
+    if (state.pins) this.columnPins = Object.fromEntries(Object.entries(state.pins).filter(([name]) => names.has(name)));
+    if (state.hidden) this.hiddenColumns = state.hidden.filter((name) => names.has(name)).slice(0, Math.max(0, names.size - 1));
+    this.persistColumnState();
+    this.notify();
+  }
+
+  resetColumnState(): void {
+    this.columnOrder = [];
+    this.columnPins = {};
+    this.hiddenColumns = [];
+    this.getAllColumns().forEach((column) => { if (column.pinned) this.columnPins[column.name] = column.pinned; });
+    const key = this.config.columnStateStorageKey;
+    if (key && typeof localStorage !== "undefined") localStorage.removeItem(key);
+    this.notify();
+  }
+
+  private restoreColumnState(): void {
+    const key = this.config.columnStateStorageKey;
+    if (!key || typeof localStorage === "undefined") return;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) ?? "null") as Partial<DataTableColumnState> | null;
+      if (!saved) return;
+      const names = new Set(this.getAllColumns().map((column) => column.name));
+      this.columnOrder = saved.order?.filter((name) => names.has(name)) ?? [];
+      this.columnPins = { ...this.columnPins, ...Object.fromEntries(Object.entries(saved.pins ?? {}).filter(([name]) => names.has(name))) };
+      this.hiddenColumns = saved.hidden?.filter((name) => names.has(name)).slice(0, Math.max(0, names.size - 1)) ?? [];
+    } catch {
+      // Ignore corrupt or unavailable storage.
+    }
+  }
+
+  private persistColumnState(): void {
+    const key = this.config.columnStateStorageKey;
+    if (!key || typeof localStorage === "undefined") return;
+    try { localStorage.setItem(key, JSON.stringify(this.getColumnState())); } catch { /* private mode/quota */ }
   }
 
   async setFilter(name: string, value: unknown): Promise<void> {
@@ -350,6 +427,21 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   }
 
   getFilters(): Record<string, unknown> { return { ...this.filters }; }
+
+  async setFilterOperator(name: string, operator: FilterOperator): Promise<void> {
+    this.filterOperators = { ...this.filterOperators, [name]: operator };
+    this.currentPage = 1;
+    if (this.mode === "dataset") this.recomputeDataset();
+    else {
+      this.notify();
+      await this.fetch();
+    }
+  }
+
+  getFilterOperator(name: string): FilterOperator {
+    const column = this.getAllColumns().find((item) => (item.filterName ?? item.name) === name || item.name === name);
+    return this.filterOperators[name] ?? column?.filterOperator ?? defaultFilterOperator(column?.searchType);
+  }
 
   async applyFilter(column: DataTableColumn<Row>, value: unknown): Promise<void> {
     await this.setFilter(column.filterName ?? column.name, value);
@@ -474,6 +566,43 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
     return value ?? "";
   }
 
+  async updateCell(rowUuid: string, columnName: string, value: unknown): Promise<void> {
+    const column = this.getAllColumns().find((item) => item.name === columnName);
+    const collection = this.mode === "dataset" ? this.dataset : this.rows;
+    const previous = collection.find((row) => row._uuid === rowUuid);
+    if (!column || !previous || previous._arcanaGroup) return;
+    const next = { ...previous } as Row;
+    setValue(next, columnName, value);
+    if (this.mode === "dataset") {
+      this.dataset = this.dataset.map((row) => row._uuid === rowUuid ? next : row);
+      this.recomputeDataset();
+    } else {
+      this.rows = this.rows.map((row) => row._uuid === rowUuid ? next : row);
+      this.notify();
+    }
+    await this.config.onCellEdit?.(value, column, next, this);
+  }
+
+  moveRow(rowUuid: string, targetUuid: string, position: "before" | "after" = "before"): void {
+    if (rowUuid === targetUuid) return;
+    const collection = this.mode === "dataset" ? [...this.dataset] : [...this.rows];
+    const from = collection.findIndex((row) => row._uuid === rowUuid);
+    if (from === -1) return;
+    const [moved] = collection.splice(from, 1);
+    let target = collection.findIndex((row) => row._uuid === targetUuid);
+    if (target === -1) return;
+    if (position === "after") target += 1;
+    collection.splice(target, 0, moved);
+    if (this.mode === "dataset") {
+      this.dataset = collection;
+      this.recomputeDataset();
+    } else {
+      this.rows = collection;
+      this.notify();
+    }
+    this.config.onRowReorder?.([...collection], moved, this);
+  }
+
   getSummarizedValue(column: DataTableColumn<Row>, onlyIsChecked = true): SummarizedValue | null {
     const aggregate = column.type === "CURRENCY" || column.type === "NUMBER" || column.summarizerValueGetter ||
       (column.isCreatedDynamically && column.metadata?.value_formatter === "currency");
@@ -505,7 +634,8 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
     const lastPage = Math.max(1, Math.ceil(this.totalRows / this.rowsPerPage));
     this.currentPage = Math.min(Math.max(1, this.currentPage), lastPage);
     const start = (this.currentPage - 1) * this.rowsPerPage;
-    this.rows = sorted.slice(start, start + this.rowsPerPage);
+    const pageRows = sorted.slice(start, start + this.rowsPerPage);
+    this.rows = this.config.groupBy?.length ? this.groupRows(pageRows) : pageRows;
     this.loading = false;
     this.error = null;
     this.notify();
@@ -517,8 +647,47 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
       if (empty(filter)) return true;
       const column = this.getColumns().find((item) => (item.filterName ?? item.name) === name || item.name === name);
       const value = getValue(row, column?.name ?? name);
-      return matchesFilter(value, filter, column?.searchType);
+      return matchesFilter(value, filter, column?.searchType, this.getFilterOperator(name));
     }));
+  }
+
+  private groupRows(rows: Row[]): Row[] {
+    const names = this.config.groupBy ?? [];
+    if (!names.length) return rows;
+    const columns = this.getAllColumns();
+    const flatten = (items: Row[], level: number, prefix: string): Row[] => {
+      const name = names[level];
+      if (!name) return items;
+      const groups = new Map<string, { value: unknown; rows: Row[] }>();
+      items.forEach((row) => {
+        const value = getValue(row, name);
+        const key = String(value ?? "");
+        const current = groups.get(key) ?? { value, rows: [] };
+        current.rows.push(row);
+        groups.set(key, current);
+      });
+      return [...groups.entries()].flatMap(([key, group]) => {
+        const path = `${prefix}${name}:${key}`;
+        const aggregates: Record<string, unknown> = {};
+        columns.forEach((column) => {
+          if (!column.aggregation) return;
+          aggregates[column.name] = aggregateRows(group.rows, column);
+        });
+        const header = {
+          _uuid: `arcana-group-${path}`,
+          _arcanaGroup: {
+            key: path,
+            value: group.value,
+            label: columns.find((column) => column.name === name)?.label ?? name,
+            level,
+            count: group.rows.length,
+            aggregates
+          }
+        } as Row;
+        return [header, ...flatten(group.rows, level + 1, `${path}/`)];
+      });
+    };
+    return flatten(rows, 0, "");
   }
 
   private applyLocalSort(rows: Row[]): Row[] {
@@ -549,7 +718,7 @@ export class DataTableController<Row extends DataTableRow = DataTableRow> implem
   }
 }
 
-function matchesFilter(value: unknown, filter: unknown, type?: SearchType): boolean {
+export function matchesFilter(value: unknown, filter: unknown, type?: SearchType, operator: FilterOperator = defaultFilterOperator(type)): boolean {
   if (type === "DATE_RANGE" && Array.isArray(filter)) {
     const comparable = toComparable(value);
     const start = empty(filter[0]) ? null : toComparable(filter[0]);
@@ -569,12 +738,35 @@ function matchesFilter(value: unknown, filter: unknown, type?: SearchType): bool
     return normalizeBoolean(value) === normalizeBoolean(filter);
   }
 
+  if (operator === "between" && Array.isArray(filter)) {
+    const comparable = toComparable(value);
+    const start = empty(filter[0]) ? null : toComparable(filter[0]);
+    const end = empty(filter[1]) ? null : toComparable(filter[1]);
+    return (start == null || comparable >= start) && (end == null || comparable <= end);
+  }
+
   if (Array.isArray(filter)) {
     const rowValues = Array.isArray(value) ? value : [value];
     return filter.some((expected) => rowValues.some((current) => String(current) === String(expected)));
   }
 
-  return String(value ?? "").toLocaleLowerCase("pt-BR").includes(String(filter).toLocaleLowerCase("pt-BR"));
+  const left = String(value ?? "");
+  const right = String(filter ?? "");
+  const normalizedLeft = left.toLocaleLowerCase("pt-BR");
+  const normalizedRight = right.toLocaleLowerCase("pt-BR");
+  if (operator === "startsWith") return normalizedLeft.startsWith(normalizedRight);
+  if (operator === "endsWith") return normalizedLeft.endsWith(normalizedRight);
+  if (operator === "equals") return normalizedLeft === normalizedRight;
+  if (operator === "notEquals") return normalizedLeft !== normalizedRight;
+  if (operator === "greaterThan") return toComparable(value) > toComparable(filter);
+  if (operator === "greaterThanOrEqual") return toComparable(value) >= toComparable(filter);
+  if (operator === "lessThan") return toComparable(value) < toComparable(filter);
+  if (operator === "lessThanOrEqual") return toComparable(value) <= toComparable(filter);
+  return normalizedLeft.includes(normalizedRight);
+}
+
+function defaultFilterOperator(type?: SearchType): FilterOperator {
+  return type === "DATE_RANGE" ? "between" : type === "DATE" || type === "DATE_MONTH" || type === "BOOLEAN" || type === "LIST" || type === "REMOTE" ? "equals" : "contains";
 }
 
 function normalizeBoolean(value: unknown): boolean {
@@ -583,6 +775,8 @@ function normalizeBoolean(value: unknown): boolean {
 
 function toComparable(value: unknown): number {
   if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) return Number(value);
   const date = Date.parse(String(value));
   return Number.isNaN(date) ? Number(value) : date;
 }
@@ -594,6 +788,28 @@ function compareValues(left: unknown, right: unknown): number {
   if (left instanceof Date || right instanceof Date) return toComparable(left) - toComparable(right);
   if (typeof left === "number" && typeof right === "number") return left - right;
   return collator.compare(String(left), String(right));
+}
+
+function setValue(target: Record<string, unknown>, path: string, value: unknown): void {
+  const parts = path.split(".");
+  let current = target;
+  parts.slice(0, -1).forEach((part) => {
+    const child = current[part];
+    if (!child || typeof child !== "object" || Array.isArray(child)) current[part] = {};
+    current = current[part] as Record<string, unknown>;
+  });
+  current[parts[parts.length - 1]] = value;
+}
+
+function aggregateRows<Row extends DataTableRow>(rows: Row[], column: DataTableColumn<Row>): unknown {
+  if (typeof column.aggregation === "function") return column.aggregation(rows, column);
+  const values = rows.map((row) => Number(getValue(row, column.name))).filter(Number.isFinite);
+  if (column.aggregation === "count") return rows.length;
+  if (!values.length) return 0;
+  if (column.aggregation === "average") return values.reduce((sum, value) => sum + value, 0) / values.length;
+  if (column.aggregation === "min") return Math.min(...values);
+  if (column.aggregation === "max") return Math.max(...values);
+  return values.reduce((sum, value) => sum + value, 0);
 }
 
 function isDataResponse<Row extends DataTableRow>(value: unknown): value is DataResponse<Row> {
