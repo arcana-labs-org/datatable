@@ -78,6 +78,26 @@ export function pinnedColumnWidth<Row extends DataTableRow>(column: DataTableCol
   return 140;
 }
 
+/** Default actions-column width (px), scaling with the number of actions. Shared
+ * by `actionsColumnWidth` and `actionStyle` so the pin math and the rendered cell
+ * can never drift apart. */
+function defaultActionsWidth<Row extends DataTableRow>(grid: DataTableApi<Row>): number {
+  return ((grid.config.actions?.length ?? 0) * 50) + 50;
+}
+
+/**
+ * Coerces a width value into a browser-honored CSS length. A bare number or an
+ * unitless numeric string (e.g. `actionsWidth: "120"`) becomes `px`; anything that
+ * already carries a unit or percentage passes through untouched. Without this the
+ * flex actions cell would get an ignored `width: 120`, collapse to its content and
+ * render the header (label) wider than the body (buttons). Mirrors `columnStyle`.
+ */
+export function cssWidth(value: number | string): string {
+  if (typeof value === "number") return `${value}px`;
+  const trimmed = value.trim();
+  return /^-?\d*\.?\d+$/.test(trimmed) ? `${trimmed}px` : trimmed;
+}
+
 /** Numeric width (px) of the actions column, mirroring `actionStyle`. */
 export function actionsColumnWidth<Row extends DataTableRow>(grid: DataTableApi<Row>): number {
   const width = grid.config.actionsWidth;
@@ -86,7 +106,7 @@ export function actionsColumnWidth<Row extends DataTableRow>(grid: DataTableApi<
     const parsed = Number.parseFloat(width);
     if (Number.isFinite(parsed)) return parsed;
   }
-  return ((grid.config.actions?.length ?? 0) * 50) + 50;
+  return defaultActionsWidth(grid);
 }
 
 /** Fixed keys of the built-in system slots, used by the pin layout. */
@@ -240,7 +260,7 @@ export function expandedRowLoadingContent(messages: ArcanaMessages): string {
 }
 
 export function actionStyle<Row extends DataTableRow>(grid: DataTableApi<Row>): StyleMap {
-  const width = grid.config.actionsWidth ?? `${((grid.config.actions?.length ?? 0) * 50) + 50}px`;
+  const width = cssWidth(grid.config.actionsWidth ?? defaultActionsWidth(grid));
   return { width, minWidth: width, maxWidth: width, flexBasis: width, justifyContent: "center", padding: "10px", textAlign: "center" };
 }
 
