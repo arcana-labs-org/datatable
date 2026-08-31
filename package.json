@@ -1,6 +1,6 @@
 {
   "name": "@arcanalabs/datatable",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "A framework-native, typed and accessible data table for Vue 3, React, Angular and Svelte.",
   "keywords": [
     "datatable",
