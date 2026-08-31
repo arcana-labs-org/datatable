@@ -28,6 +28,9 @@ import "@arcanalabs/datatable/styles.css";
 <ArcanaDataTable config={{ columns, datasource: (params) => api.orders.list(params) }} />
 ```
 
+To keep only horizontal row separators, add `columnBordersEnabled: false` to
+the table config. The outer grid border remains unchanged.
+
 Import both stylesheets once at the application entrypoint. Input, Select and
 DatePicker use the official `@arcanalabs/ui-components` stylesheet and their
 native `sm` variant; the DataTable CSS only adds grid layout and theme tokens.

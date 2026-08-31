@@ -171,6 +171,12 @@ export interface DataTableConfig<Row extends DataTableRow = DataTableRow> {
    */
   borderRadius?: number | string;
   /**
+   * Shows the vertical dividers between columns. Set to `false` to keep only
+   * the horizontal row separators. The grid's outer border is not affected.
+   * Defaults to `true`.
+   */
+  columnBordersEnabled?: boolean;
+  /**
    * Locale of the grid's built-in strings (pagination, filters, sort menu,
    * calendar, …). Falls back to the global default set via
    * `setDefaultArcanaLocale` (initially `pt-BR`).

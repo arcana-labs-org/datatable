@@ -110,7 +110,7 @@
 .arcana-grid .arcana-grid-datatable-cell {
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-collapse: collapse;
     position: relative;
     display: flex;
@@ -137,7 +137,7 @@
 }
 
 .arcana-grid .arcana-grid-datatable-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .arcana-grid-datatable-cell .cell-has-comment {
@@ -223,7 +223,7 @@
     background: var(--arcana-surface);
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-collapse: collapse;
     padding: 10px;
 }
@@ -238,7 +238,7 @@
 }
 
 .arcana-grid .arcana-grid-datatable-search-row .arcana-grid-datatable-search-row-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .arcana-grid-datatable-search-row .has-feedback.has-feedback-left select,
@@ -316,7 +316,7 @@
 
 .arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell {
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-right: 1px solid transparent;
     border-collapse: collapse;
     position: relative;
@@ -362,12 +362,12 @@
 }
 
 .arcana-grid .arcana-grid-datatable-header .arcana-grid-datatable-header-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .arcana-grid-datatable-summarizer-cell {
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-collapse: collapse;
     display: flex;
     align-items: center;
@@ -393,7 +393,7 @@
 }
 
 .arcana-grid .arcana-grid-datatable-summarizer-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .arcana-grid-datatable-header-sticky {
@@ -817,7 +817,7 @@
 .arcana-grid .grid-cell {
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-collapse: collapse;
     position: relative;
     display: flex;
@@ -847,7 +847,7 @@
 }
 
 .arcana-grid .grid-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .grid-cell .cell-has-comment {
@@ -934,7 +934,7 @@
     background: var(--arcana-surface);
     border: 1px solid transparent;
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-collapse: collapse;
     padding: 10px;
 }
@@ -953,7 +953,7 @@
 
 .arcana-grid .grid-search-row .grid-search-row-cell:last-child,
 .arcana-grid .grid-search-row .arcana-grid-datatable-header-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .grid-search-row .has-feedback.has-feedback-left select,
@@ -968,7 +968,7 @@
 
 .arcana-grid .grid-header .grid-header-cell {
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-right: 1px solid transparent;
     border-collapse: collapse;
     position: relative;
@@ -1043,7 +1043,7 @@
 }
 
 .arcana-grid .grid-header .grid-header-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .grid-summarizer {
@@ -1052,7 +1052,7 @@
 
 .arcana-grid .grid-summarizer-cell {
     border-top: 1px solid var(--arcana-border);
-    border-left: 1px solid var(--arcana-border);
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-border));
     border-collapse: collapse;
     display: flex;
     align-items: center;
@@ -1082,7 +1082,7 @@
 }
 
 .arcana-grid .grid-summarizer-cell:last-child {
-    border-right: 1px solid var(--arcana-border);
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-border));
 }
 
 .arcana-grid .grid-header-sticky {
@@ -1528,12 +1528,12 @@
 /* Subtle divider/shadow separating the frozen region from the scrollable one. */
 .arcana-grid .arcana-pin-left-edge {
     box-shadow: 6px 0 8px -6px var(--arcana-pin-shadow);
-    border-right: 1px solid var(--arcana-pin-border) !important;
+    border-right: 1px solid var(--arcana-column-border, var(--arcana-pin-border)) !important;
 }
 
 .arcana-grid .arcana-pin-right-edge {
     box-shadow: -6px 0 8px -6px var(--arcana-pin-shadow);
-    border-left: 1px solid var(--arcana-pin-border) !important;
+    border-left: 1px solid var(--arcana-column-border, var(--arcana-pin-border)) !important;
 }
 
 .arcana-grid .arcana-search-input {

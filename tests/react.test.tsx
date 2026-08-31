@@ -28,6 +28,13 @@ describe("React adapter", () => {
     expect(container.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("12px");
   });
 
+  it("disables only column divider borders through the shared CSS token", () => {
+    const { container } = render(<ArcanaDataTable config={{
+      mode: "dataset", dataset: [], columns: [], columnBordersEnabled: false
+    }} />);
+    expect(container.querySelector<HTMLElement>(".arcana-grid")?.style.getPropertyValue("--arcana-column-border")).toBe("transparent");
+  });
+
   it("hides sort icons when ordering is disabled globally or per column", () => {
     const { container, rerender } = render(<ArcanaDataTable config={{
       mode: "dataset", dataset: [], orderByEnabled: false,

@@ -210,6 +210,7 @@ export const de: Messages = {
         mode: "Bestimmt, wo Filter, Sortierung und Paginierung ausgeführt werden.",
         theme: "Visuelles Theme des Grids und der Steuerelemente, die seine Tokens erben — Preset oder eigene arcana-theme-{name}-Klasse; der globale Standard ändert sich mit setDefaultArcanaTheme.",
         borderRadius: "Rundet die äußeren Ecken des Grids ab. Zahlen sind Pixel; Strings akzeptieren jedes CSS-Längenmaß. Überschreibt das Theme-Token --arcana-border-radius.",
+        columnBordersEnabled: "Zeigt vertikale Trennlinien zwischen Spalten. Mit false bleiben nur horizontale Zeilentrenner sichtbar; der äußere Rahmen bleibt erhalten.",
         locale: "Locale der eingebauten Texte des Grids (8 mitgelieferte Pakete); der globale Standard ändert sich mit setDefaultArcanaLocale.",
         messages: "Punktuelle Überschreibungen der eingebauten Texte, angewendet über dem aufgelösten Locale-Paket.",
         dataset: "Vollständige Sammlung für lokale Operationen; impliziert den dataset-Modus.",

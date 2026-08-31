@@ -3,10 +3,15 @@ import type { DataTableApi, DataTableColumn, DataTableConfig, DataTableRow, Orde
 
 /**
  * Inline style for the grid root. Leaving `borderRadius` undefined lets the
- * active theme's `--arcana-border-radius` token control the corners.
+ * active theme's `--arcana-border-radius` token control the corners. Column
+ * dividers use a transparent color when explicitly disabled so cell sizing
+ * stays identical to the default layout.
  */
 export function gridRootStyle<Row extends DataTableRow>(config: DataTableConfig<Row>): StyleMap {
-  return config.borderRadius === undefined ? {} : { borderRadius: config.borderRadius };
+  const style: StyleMap = {};
+  if (config.borderRadius !== undefined) style.borderRadius = config.borderRadius;
+  if (config.columnBordersEnabled === false) style["--arcana-column-border"] = "transparent";
+  return style;
 }
 
 /**
