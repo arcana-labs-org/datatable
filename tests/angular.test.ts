@@ -60,6 +60,13 @@ describe("Angular adapter", () => {
     expect(element.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("1rem");
   });
 
+  it("disables only column divider borders through the shared CSS token", async () => {
+    const { element } = await renderTable({
+      mode: "dataset", dataset: [], columns: [], columnBordersEnabled: false
+    });
+    expect(element.querySelector<HTMLElement>(".arcana-grid")?.style.getPropertyValue("--arcana-column-border")).toBe("transparent");
+  });
+
   it("hides sort icons when ordering is disabled globally or per column", async () => {
     const global = await renderTable({
       mode: "dataset", dataset: [], orderByEnabled: false,

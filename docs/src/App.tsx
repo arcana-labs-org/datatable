@@ -58,6 +58,7 @@ const PROPERTY_META: Array<{ key: PropertyKey; name: string; type: string; def: 
   { key: "mode", name: "mode", type: "remote | dataset", def: null },
   { key: "theme", name: "theme", type: "zinc | ocean | forest | midnight | string", def: "zinc" },
   { key: "borderRadius", name: "borderRadius", type: "number | string", def: "0" },
+  { key: "columnBordersEnabled", name: "columnBordersEnabled", type: "boolean", def: "true" },
   { key: "locale", name: "locale", type: "pt-BR | en | es | it | zh | ja | de | ru", def: "pt-BR" },
   { key: "messages", name: "messages", type: "Partial<ArcanaMessages>", def: undefined },
   { key: "dataset", name: "dataset", type: "DataTableRow[]", def: undefined },

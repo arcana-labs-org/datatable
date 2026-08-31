@@ -1,5 +1,10 @@
 # Changelog
 
+## Não publicado
+
+### Novos recursos
+- Nova opção `columnBordersEnabled: false` para ocultar os divisores verticais entre colunas, preservando as linhas horizontais e a borda externa do grid em todos os adapters.
+
 ## 1.7.0 — 2026-07-30
 
 ### Novos recursos

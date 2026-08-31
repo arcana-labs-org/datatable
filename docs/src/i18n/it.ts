@@ -210,6 +210,7 @@ export const it: Messages = {
         mode: "Definisce dove vengono eseguiti filtri, ordinamento e paginazione.",
         theme: "Tema visivo della griglia e dei controlli che ne ereditano i token — un preset o una classe arcana-theme-{name}; il default globale cambia con setDefaultArcanaTheme.",
         borderRadius: "Arrotonda gli angoli esterni della griglia. I numeri sono pixel; le stringhe accettano qualsiasi misura CSS. Sovrascrive il token --arcana-border-radius del tema.",
+        columnBordersEnabled: "Mostra i divisori verticali tra le colonne. Imposta false per mantenere solo le linee orizzontali tra le righe; il bordo esterno resta visibile.",
         locale: "Locale delle stringhe interne della griglia (8 pack inclusi); il default globale cambia con setDefaultArcanaLocale.",
         messages: "Sostituzioni puntuali delle stringhe interne, applicate sopra il pack del locale risolto.",
         dataset: "Collezione completa per le operazioni locali; inferisce la modalità dataset.",

@@ -16,6 +16,7 @@ export type PropertyKey =
   | "mode"
   | "theme"
   | "borderRadius"
+  | "columnBordersEnabled"
   | "locale"
   | "messages"
   | "dataset"

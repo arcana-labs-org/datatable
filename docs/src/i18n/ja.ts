@@ -210,6 +210,7 @@ export const ja: Messages = {
         mode: "フィルター、ソート、ページネーションをどこで実行するかを定義します。",
         theme: "グリッドとトークンを継承するコントロールのビジュアルテーマです。プリセット、または独自の arcana-theme-{name} クラスを指定します。グローバルなデフォルトは setDefaultArcanaTheme で変更します。",
         borderRadius: "グリッド外側の角を丸めます。数値はピクセル、文字列は任意の CSS 長さを指定できます。テーマの --arcana-border-radius トークンを上書きします。",
+        columnBordersEnabled: "列間の縦罫線を表示します。false にすると行間の横罫線だけを残し、グリッドの外枠は維持されます。",
         locale: "グリッド内蔵文言のロケール（8 パック同梱）。グローバルデフォルトは setDefaultArcanaLocale で変更します。",
         messages: "内蔵文言のキー単位の上書きです。解決されたロケールパックの上に適用されます。",
         dataset: "ローカル操作用の全コレクションです。dataset モードが推論されます。",

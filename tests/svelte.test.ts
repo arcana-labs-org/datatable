@@ -49,6 +49,13 @@ describe("Svelte adapter", () => {
     expect(target.querySelector<HTMLElement>(".arcana-grid")?.style.borderRadius).toBe("10px");
   });
 
+  it("disables only column divider borders through the shared CSS token", () => {
+    const { target } = renderTable({
+      mode: "dataset", dataset: [], columns: [], columnBordersEnabled: false
+    });
+    expect(target.querySelector<HTMLElement>(".arcana-grid")?.style.getPropertyValue("--arcana-column-border")).toBe("transparent");
+  });
+
   it("overlays a loading spinner over existing rows during a remote refetch", async () => {
     let resolveRefetch!: (value: unknown) => void;
     const datasource = vi.fn()

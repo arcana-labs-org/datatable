@@ -33,4 +33,13 @@ describe("ArcanaGrid styles", () => {
       /\.arcana-grid-responsive-vertical > \.grid-footer,[^{]*\{[^}]*border-bottom:\s*1px solid var\(--arcana-border\);/s
     );
   });
+
+  it("uses an overridable color only for vertical column dividers", () => {
+    const columnBorder = "var(--arcana-column-border, var(--arcana-border))";
+    expect(styles).toContain(`border-left: 1px solid ${columnBorder};`);
+    expect(styles).toContain(`border-right: 1px solid ${columnBorder};`);
+    expect(styles).toContain("var(--arcana-column-border, var(--arcana-pin-border))");
+    expect(styles).toContain("border-top: 1px solid var(--arcana-border);");
+    expect(styles).toContain("border-bottom: 1px solid var(--arcana-border);");
+  });
 });

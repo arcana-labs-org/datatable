@@ -27,6 +27,13 @@ describe("Vue adapter", () => {
     expect((wrapper.find(".arcana-grid").element as HTMLElement).style.borderRadius).toBe("0.75rem");
   });
 
+  it("disables only column divider borders through the shared CSS token", () => {
+    const wrapper = mount(ArcanaDataTable, { props: { config: {
+      mode: "dataset", dataset: [], columns: [], columnBordersEnabled: false
+    } } });
+    expect((wrapper.find(".arcana-grid").element as HTMLElement).style.getPropertyValue("--arcana-column-border")).toBe("transparent");
+  });
+
   it("hides sort icons when ordering is disabled globally or per column", async () => {
     const wrapper = mount(ArcanaDataTable, { props: { config: {
       mode: "dataset", dataset: [], orderByEnabled: false,

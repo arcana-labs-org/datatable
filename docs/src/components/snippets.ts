@@ -451,7 +451,7 @@ export const fullConfigCode: SnippetPair = (() => {
     "const config = {", "  mode: 'remote',", "  columns,", "  datasource,", "  rowsPerPage: 10,",
     "  searchEnabled: true,", "  orderByEnabled: true,", "  checkboxEnabled: false,",
     "  radioButtonSelectionEnabled: false,", "  footerSummarizerEnabled: false,",
-    "  responsiveMode: 'HORIZONTAL_OVERFLOW',", "  stickyHeaderEnabled: false,",
+    "  responsiveMode: 'HORIZONTAL_OVERFLOW',", "  stickyHeaderEnabled: false,", "  columnBordersEnabled: true,",
     "  sendRequestOnMounted: true,", "  initialFilters: {},",
     "  onRequestError: (error) => reportError(error)", "}"
   ].join("\n");

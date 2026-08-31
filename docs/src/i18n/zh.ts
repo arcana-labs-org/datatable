@@ -210,6 +210,7 @@ export const zh: Messages = {
         mode: "定义筛选、排序和分页在何处执行。",
         theme: "表格及继承其令牌的控件视觉主题——预设或自定义 arcana-theme-{name} class；全局默认值通过 setDefaultArcanaTheme 修改。",
         borderRadius: "设置表格外角的圆角。数字按像素处理；字符串可使用任意 CSS 长度。它会覆盖主题的 --arcana-border-radius 令牌。",
+        columnBordersEnabled: "显示列之间的垂直分隔线。设为 false 时仅保留行之间的水平分隔线，表格外边框仍然可见。",
         locale: "表格内置文案的语言（内置 8 个语言包）；全局默认值通过 setDefaultArcanaLocale 修改。",
         messages: "对内置文案的逐条覆盖，叠加在解析出的语言包之上。",
         dataset: "供本地操作使用的完整集合；会自动推断为 dataset 模式。",

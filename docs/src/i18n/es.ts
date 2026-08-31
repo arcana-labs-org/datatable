@@ -210,6 +210,7 @@ export const es: Messages = {
         mode: "Define dónde se ejecutan los filtros, la ordenación y la paginación.",
         theme: "Tema visual del grid y de los controles que heredan sus tokens — un preset o una clase arcana-theme-{name} propia; el valor global cambia con setDefaultArcanaTheme.",
         borderRadius: "Redondea las esquinas exteriores del grid. Los números son píxeles; las cadenas aceptan cualquier medida CSS. Sobrescribe el token --arcana-border-radius del tema.",
+        columnBordersEnabled: "Muestra los divisores verticales entre columnas. Usa false para conservar solo las líneas horizontales entre filas; el borde exterior permanece visible.",
         locale: "Locale de las cadenas internas del grid (8 packs incluidos); el valor global cambia con setDefaultArcanaLocale.",
         messages: "Reemplazos puntuales de las cadenas internas, aplicados sobre el pack del locale resuelto.",
         dataset: "Colección completa para operaciones locales; infiere el modo dataset.",
